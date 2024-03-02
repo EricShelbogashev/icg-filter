@@ -1,6 +1,6 @@
 package model;
 
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,12 +16,12 @@ public class ImageProcessor {
     public BufferedImage apply(ICGFilter filter) {
         BufferedImage resultImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
         MatrixViewFactory factory = new MatrixViewFactory(image, filter.getPattern());
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor(); // Java 19 and later
-
-        factory.rows().forEach(row ->
-                executor.submit(() -> job(resultImage, filter, row))
-        );
-        executor.shutdown();
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            factory.rows().forEach(row ->
+                    executor.submit(() -> job(resultImage, filter, row))
+            );
+            executor.shutdown();
+        }
 
         return resultImage;
     }
@@ -31,8 +31,6 @@ public class ImageProcessor {
     }
 
     private void applyFilter(BufferedImage resultImage, int color, Point pivot) {
-        synchronized (resultImage) {
-            resultImage.setRGB(pivot.x, pivot.y, color);
-        }
+        resultImage.setRGB(pivot.x, pivot.y, color);
     }
 }

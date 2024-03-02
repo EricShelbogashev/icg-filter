@@ -71,8 +71,8 @@ public class TestApp extends JFrame {
                 public int apply(MatrixView matrixView) {
                     int res = (
                         matrixView.get(-1, 0) +
-                        matrixView.get(1, 0) +
-                        matrixView.get(0, -1) +
+                        matrixView.get(1, 0) -
+                        matrixView.get(0, -1) -
                         matrixView.get(0, 1)
                     ) / 4 / 25;
                     return res * 10;

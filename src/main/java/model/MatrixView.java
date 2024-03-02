@@ -88,15 +88,15 @@ public class MatrixView {
     }
 
     private boolean isWithinBounds(int x, int y) {
-        return x >= pattern.getStart().x && x <= pattern.getEnd().x && y >= pattern.getStart().y && y <= pattern.getEnd().y;
+        return x >= pattern.start().x && x <= pattern.end().x && y >= pattern.start().y && y <= pattern.end().y;
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(pivot).append("\n");
-        for (int y = pattern.getStart().y; y <= pattern.getEnd().y; y++) {
-            for (int x = pattern.getStart().x; x <= pattern.getEnd().x; x++) {
+        for (int y = pattern.start().y; y <= pattern.end().y; y++) {
+            for (int x = pattern.start().x; x <= pattern.end().x; x++) {
                 int rgb = orElseDefault(x, y, 0);
                 builder.append(String.format("%08X ", rgb));
             }
