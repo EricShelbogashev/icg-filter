@@ -3,16 +3,17 @@ import model.ImageProcessor;
 import model.MatrixView;
 import model.Pattern;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Point;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class TestApp extends JFrame {
     private JLabel imageLabel;
@@ -65,19 +66,30 @@ public class TestApp extends JFrame {
 
     private void applyFilter() {
         if (originalImage != null) {
-            ImageProcessor processor = new ImageProcessor(originalImage);
-            BufferedImage image = processor.apply(new ICGFilter(new Pattern(new Point(-1, -1), new Point(1, 1))) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-1, -1), new Point(1, 1))) {
                 @Override
                 public int apply(MatrixView matrixView) {
-                    int res = (
-                        matrixView.get(-1, 0) +
-                        matrixView.get(1, 0) -
-                        matrixView.get(0, -1) -
-                        matrixView.get(0, 1)
-                    ) / 4 / 25;
-                    return res * 10;
+                    Optional<Color> optional = Stream.of(
+                                    matrixView.get(-1, -1),
+                                    matrixView.get(-1, 0),
+                                    matrixView.get(-1, 1),
+                                    matrixView.get(0, -1),
+                                    matrixView.get(0, 1),
+                                    matrixView.get(1, -1),
+                                    matrixView.get(1, 0),
+                                    matrixView.get(1, 1)
+                            ).map(Color::new)
+                            .map(color -> List.of(color.getRed(), color.getGreen(), color.getBlue()))
+                            .reduce((a, b) -> List.of(a.getFirst() + b.getFirst(), a.get(1) + b.get(1), a.getLast() + b.getLast()))
+                            .map(list -> new Color(list.getFirst() / 8, list.get(1) / 8, list.getLast() / 8));
+                    return optional.orElse(Color.BLACK).getRGB();
                 }
-            });
+            };
+            BufferedImage image = originalImage;
+            for (int i = 0; i < 25; i++) {
+                ImageProcessor processor = new ImageProcessor(image);
+                image = processor.apply(filter);
+            }
             originalImage = image;
             imageLabel.setIcon(new ImageIcon(image));
             this.pack();
