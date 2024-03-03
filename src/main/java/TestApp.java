@@ -86,10 +86,8 @@ public class TestApp extends JFrame {
                 }
             };
             BufferedImage image = originalImage;
-            for (int i = 0; i < 25; i++) {
-                ImageProcessor processor = new ImageProcessor(image);
-                image = processor.apply(filter);
-            }
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, System.out::println);
             originalImage = image;
             imageLabel.setIcon(new ImageIcon(image));
             this.pack();
