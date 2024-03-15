@@ -1,7 +1,4 @@
-import model.ICGFilter;
-import model.ImageProcessor;
-import model.MatrixView;
-import model.Pattern;
+import model.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,6 +15,8 @@ import java.util.stream.Stream;
 public class TestApp extends JFrame {
     private JLabel imageLabel;
     private BufferedImage originalImage;
+    private int w = 5;
+    private int[] kv = {8, 8, 8};
 
     public TestApp() {
         super("Image Filter Application");
@@ -32,7 +31,10 @@ public class TestApp extends JFrame {
 
         // Button for applying filter
         JButton filterButton = new JButton("Apply Filter");
-        filterButton.addActionListener((ActionEvent e) -> applyFilter());
+        filterButton.addActionListener((ActionEvent e) -> SmoothingFilter());
+
+        JButton chooseSizeButton = new JButton("Choose size");
+        chooseSizeButton.addActionListener((ActionEvent e) -> chooseSize());
 
         // Label for displaying the image
         imageLabel = new JLabel();
@@ -42,6 +44,7 @@ public class TestApp extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(chooseButton);
         buttonPanel.add(filterButton);
+        buttonPanel.add(chooseSizeButton);
 
         // Adding components to frame
         add(buttonPanel, BorderLayout.SOUTH);
@@ -62,6 +65,11 @@ public class TestApp extends JFrame {
                 JOptionPane.showMessageDialog(this, "Error loading the image: " + ex.getMessage());
             }
         }
+    }
+    private void chooseSize(){
+        ChooseWindowSize chooser = new ChooseWindowSize(this, w);
+        if (chooser.is_new)
+            w = Integer.parseInt(chooser.selectedSize());
     }
 
     private void applyFilter() {
@@ -92,6 +100,173 @@ public class TestApp extends JFrame {
             imageLabel.setIcon(new ImageIcon(image));
             this.pack();
         } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void BlackWhiteFilter() {
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-1, -1), new Point(1, 1))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    int pixel = matrixView.get(0, 0);
+                    float R = (float)((pixel & 0x00FF0000) >> 16);
+                    float G = (float)((pixel & 0x0000FF00) >> 8);
+                    float B = (float)(pixel & 0x000000FF);
+                    R = G = B = (R + G + B) / 3.0f;
+                    int newPixel = 0xFF000000 | ((int)R << 16) | ((int)G << 8) | ((int)B);
+                    return newPixel;
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, System.out::println);
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void SmoothingFilter() {
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-1 * w, -1 * w), new Point(w, w))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    float res_r = 0;
+                    float res_g = 0;
+                    float res_b = 0;
+                    float sigma = w / 2.1f;
+                    for (int x = -1 * w; x <= w; x++)
+                        for (int y = -1 * w; y <= w; y++){
+                            float k = (float) (1.0f / (2.0f * Math.PI * sigma * sigma) * Math.pow(2.7f,  -1.0f * (x * x + y * y) / (2.0f * sigma * sigma)));
+                            res_r += ((matrixView.get(x, y) >> 16) & 0xFF) * k;
+                            res_g += ((matrixView.get(x, y) >> 8) & 0xFF) * k;
+                            res_b += ((matrixView.get(x, y)) & 0xFF) * k;
+                        }
+                    if (Math.round(res_r) > 255 || Math.round(res_r) < 0)
+                        res_r = 255;
+                    if (Math.round(res_b) > 255 || Math.round(res_b) < 0)
+                        res_b = 255;
+                    if (Math.round(res_g) > 255 || Math.round(res_g) < 0)
+                        res_g = 255;
+                    return new Color((int)Math.round(res_r), (int)Math.round(res_g), (int)Math.round(res_b)).getRGB();
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, v->this.repaint());
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+    private int find_closest_palette_color(int red, int green, int blue, int alpha){
+        int []result = {red, green, blue};
+        for (int i = 0; i < 3; i++) {
+            if (result[i] < 0)
+                result[i] = 0;
+            if (result[i] > 255)
+                result[i] = 255;
+            float del = (float)(kv[i] - 1);
+            result[i] = (int)((float)((int)((float)result[i] / 255 * del)) / del * 255);
+        }
+        return ((alpha & 0xFF) << 24) |
+                ((result[0] & 0xFF) << 16) |
+                ((result[1] & 0xFF) << 8) |
+                ((result[2] & 0xFF));
+    }
+
+    private void WaterShedFilter(){
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-1, -1), new Point(1, 1))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    int oldpix = matrixView.get(0, 0);
+                    int old_red = (oldpix >> 16) & 0xFF;
+                    int old_green = (oldpix >> 8) & 0xFF;
+                    int old_blue = (oldpix) & 0xFF;
+                    int alpha = (oldpix >> 24) & 0xFF;
+                    float err_red = 0;
+                    float err_blue = 0;
+                    float err_green = 0;
+                    int[] values = {matrixView.get(-1, -1), matrixView.get(-1, 0), matrixView.get(-1, 1), matrixView.get(1, -1), matrixView.get(1, 0), matrixView.get(1, 1)};
+                    float[] koef = {-1.0f / 9, -2.0f / 9, -1.0f / 9, 1.0f / 9, 2.0f / 9, 1.0f / 9};
+                    for (int i = 0; i < 4; i++){
+                        err_red += (((values[i] >> 16) & 0xFF)) * koef[i];
+                        err_green += (((values[i] >> 8) & 0xFF)) * koef[i];
+                        err_blue += (((values[i]) & 0xFF)) * koef[i];
+                    }
+                    int r = find_closest_palette_color(old_red + (int)err_red, old_green + (int)err_green, old_blue + (int)err_blue, alpha);
+                    return r;
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, v->this.repaint());
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+            ColorStretchFunc();
+            FillColor();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+    private void ColorStretchFunc(){
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(0, 0), new Point(0, 0))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    int oldpix = matrixView.get(0, 0);
+                    int alpha = (oldpix >> 24) & 0xFF;
+                    float err_red = 0;
+                    float err_blue = 0;
+                    float err_green = 0;
+                    float koef = 1.0f / 25;
+                    for (int i = -2; i < 2; i++)
+                        for (int j = -2; j < 2; j++) {
+                            err_red += (((matrixView.get(i, j) >> 16) & 0xFF)) * koef;
+                            err_green += (((matrixView.get(i, j) >> 8) & 0xFF)) * koef;
+                            err_blue += (((matrixView.get(i, j)) & 0xFF)) * koef;
+                        }
+                    int r = find_closest_palette_color((int)err_red, (int)err_green, (int)err_blue, alpha);
+                    return r;
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, v->this.repaint());
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+    private void FillColor(){
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(0, 0), new Point(0, 0))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    int alpha = (matrixView.get(0, 0) >> 24) & 0xFF;
+                    int r = ((alpha & 0xFF) << 24) |
+                            (((((matrixView.get(0, 0) & 0xFF) / 2) * 30 + 40) & 0xFF) << 16) |
+                            (((((matrixView.get(0, 0) & 0xFF) / 2) * 10 + 40) & 0xFF) << 8) |
+                            (((((matrixView.get(0, 0) & 0xFF) / 2) * 20 + 40) & 0xFF));
+                    return r;
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, v->this.repaint());
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        }else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
