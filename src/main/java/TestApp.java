@@ -137,6 +137,7 @@ public class TestApp extends JFrame {
                     float res_r = 0;
                     float res_g = 0;
                     float res_b = 0;
+                    int alpha = (matrixView.get(0, 0) >> 24) & 0xFF;
                     float sigma = w / 2.1f;
                     for (int x = -1 * w; x <= w; x++)
                         for (int y = -1 * w; y <= w; y++){
@@ -151,7 +152,10 @@ public class TestApp extends JFrame {
                         res_b = 255;
                     if (Math.round(res_g) > 255 || Math.round(res_g) < 0)
                         res_g = 255;
-                    return new Color((int)Math.round(res_r), (int)Math.round(res_g), (int)Math.round(res_b)).getRGB();
+                    return ((alpha & 0xFF) << 24) |
+                            ((Math.round(res_r) & 0xFF) << 16) |
+                            ((Math.round(res_g) & 0xFF) << 8) |
+                            ((Math.round(res_b) & 0xFF));
                 }
             };
             BufferedImage image = originalImage;
