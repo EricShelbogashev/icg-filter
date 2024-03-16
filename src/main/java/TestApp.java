@@ -31,7 +31,7 @@ public class TestApp extends JFrame {
 
         // Button for applying filter
         JButton filterButton = new JButton("Apply Filter");
-        filterButton.addActionListener((ActionEvent e) -> SmoothingFilter());
+        filterButton.addActionListener((ActionEvent e) -> WaterShedFilter());
 
         JButton chooseSizeButton = new JButton("Choose size");
         chooseSizeButton.addActionListener((ActionEvent e) -> chooseSize());
@@ -218,7 +218,7 @@ public class TestApp extends JFrame {
     }
     private void ColorStretchFunc(){
         if (originalImage != null) {
-            ICGFilter filter = new ICGFilter(new Pattern(new Point(0, 0), new Point(0, 0))) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-2, -2), new Point(2, 2))) {
                 @Override
                 public int apply(MatrixView matrixView) {
                     int oldpix = matrixView.get(0, 0);
