@@ -32,7 +32,7 @@ public class TestApp extends JFrame {
         filter2Button.addActionListener(e -> applyEmbossingFilter());
 
         JButton ditheringFilterButton = new JButton("Apply dithering");
-        ditheringFilterButton.addActionListener(e -> applyDithering());
+        /*ditheringFilterButton.addActionListener(e -> applyDithering());*/
 
         JButton bloomButton = new JButton("Apply bloom");
         bloomButton.addActionListener(e -> {
@@ -82,7 +82,7 @@ public class TestApp extends JFrame {
 
     private void applyEmbossingFilter() {
         if (originalImage != null) {
-            EmbossingFilter filter1 = new EmbossingFilter();
+            EmbossingFilter filter1 = new EmbossingFilter(EmbossingFilter.Light.RIGHT_TOP);
             BufferedImage image = originalImage;
             ImageProcessor processor = new ImageProcessor(image);
             image = processor.apply(filter1, v -> this.repaint());
@@ -109,15 +109,15 @@ public class TestApp extends JFrame {
         }
     }
 
-    private void applyDithering() {
+    /*private void applyDithering() {
         if (originalImage != null) {
             BufferedImage image = originalImage;
-            imageLabel.setIcon(new ImageIcon(Dithering.applyDithering(image)));
+            imageLabel.setIcon(new ImageIcon(Dithering.applyDithering(image, 4, 4 , 4)));
             this.pack();
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
-    }
+    }*/
 
     private void applyBloom() throws InterruptedException {
         if (originalImage != null) {
