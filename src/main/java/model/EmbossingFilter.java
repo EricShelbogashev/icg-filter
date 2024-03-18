@@ -3,23 +3,54 @@ package model;
 import java.awt.*;
 
 public class EmbossingFilter extends ICGFilter {
-    // Matrix 4x4
 
-    static int[][] embossingMatrix1 = {
-            { -2, -1, 0},
+    public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP}
+    static int[][] rightTopLight = {
+            {0, 1, 2},
+            {-1, 1, 1},
+            {-2, -1, 0}
+    };
+
+    static int[][] leftTopLight = {
+            {2, 1, 0},
+            {1, 1, -1},
+            {0, -1, -2}
+    };
+
+    static int[][] leftBottomLight = {
+            {0, -1, -2},
+            {1, 1, -1},
+            {2, 1, 0}
+    };
+
+    static int[][] rightBottomLight = {
+            {-2, -1, 0},
             {-1, 1, 1},
             {0, 1, 2}
     };
 
-    /*static int[][] embossingMatrix2 = {
-            {2, 1, 0},
-            {1, 1, -1},
-            {0, -1, -2}
-    };*/
+    Light lightPosition;
+
+    private int getKoef(int x, int y) {
+        if (lightPosition == Light.LEFT_TOP) {
+            return leftTopLight[x][y];
+        }
+        else if (lightPosition == Light.RIGHT_BOTTOM) {
+            return rightBottomLight[x][y];
+        }
+        else if(lightPosition == Light.RIGHT_TOP) {
+            return rightTopLight[x][y];
+        }
+        else {
+            return leftBottomLight[x][y];
+        }
+    }
+
 
     static Pattern pattern  = new Pattern(new Point(-1, -1), new Point(new Point(1, 1)));
-    public EmbossingFilter() {
+    public EmbossingFilter(Light lightPosition) {
         super(pattern);
+        this.lightPosition = lightPosition;
     }
 
     @Override
@@ -30,7 +61,7 @@ public class EmbossingFilter extends ICGFilter {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 curColor = (matrixView.get(i, j) >> 16) & 0xFF;
-                int koef = embossingMatrix1[i+1][j+1];
+                int koef = getKoef(i+1, j+1);
                 curColor *= koef;
                 resultColor += curColor;
             }
