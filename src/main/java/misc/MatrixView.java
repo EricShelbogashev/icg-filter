@@ -1,4 +1,4 @@
-package model;
+package misc;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,7 +19,7 @@ public class MatrixView {
      * Constructor for MatrixView.
      *
      * @param image   The source image to access.
-     * @param pattern The filter matrix pattern.
+     * @param pattern The model.filter matrix pattern.
      * @param pivot   The pivot point of the view. Must be a valid point in the image.
      */
     public MatrixView(BufferedImage image, Pattern pattern, Point pivot) {

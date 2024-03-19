@@ -1,4 +1,4 @@
-package model;
+package misc;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
