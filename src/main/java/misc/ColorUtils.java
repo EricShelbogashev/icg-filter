@@ -41,4 +41,12 @@ public class ColorUtils {
 
         return rgb((int) (0.299 * red(rgb)), (int) (0.587 * green(rgb)), (int) (0.114 * blue(rgb)), alpha(rgb));
     }
+
+    public static int sum(int rgb1, int rgb2) {
+        int red = Math.min(ColorUtils.red(rgb2) + ColorUtils.red(rgb1), 255);
+        int green = Math.min(ColorUtils.green(rgb2) + ColorUtils.green(rgb1), 255);
+        int blue = Math.min(ColorUtils.blue(rgb2) + ColorUtils.blue(rgb1), 255);
+
+        return ColorUtils.rgb(red, green, blue);
+    }
 }

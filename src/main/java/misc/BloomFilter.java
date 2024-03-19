@@ -14,6 +14,11 @@ public class BloomFilter extends MatrixFilter {
         this.threshold = threshold;
     }
 
+    public BloomFilter() {
+        this.glowFactor = 0.3;
+        this.threshold = 0.7;
+    }
+
 
     @Override
     public int apply(Image image, int x, int y) {

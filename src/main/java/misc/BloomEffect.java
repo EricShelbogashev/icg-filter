@@ -8,6 +8,7 @@ package misc;
 import core.filter.FilterExecutor;
 import model.filter.leonid.GaussianBlurFilter;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import static java.lang.Thread.sleep;
@@ -28,21 +29,7 @@ public class BloomEffect {
         this.radius = radius;
     }
 
-    private static int getResultRGB(int rgb1, int rgb2) {
-        int red1 = ColorUtils.red(rgb1);
-        int green1 = ColorUtils.green(rgb1);
-        int blue1 = ColorUtils.blue(rgb1);
 
-        int red2 = ColorUtils.red(rgb2);
-        int green2 = ColorUtils.green(rgb2);
-        int blue2 = ColorUtils.blue(rgb2);
-
-        int red = Math.min(red1 + red2, 255);
-        int green = Math.min(green1 + green2, 255);
-        int blue = Math.min(blue1 + blue2, 255);
-
-        return ColorUtils.rgb(red, green, blue);
-    }
 
     private void mixImages(BufferedImage image1, BufferedImage image2) {
         for (int y = 0; y < image1.getHeight(); y++) {
@@ -50,9 +37,7 @@ public class BloomEffect {
                 int rgb1 = image1.getRGB(x, y);
                 int rgb2 = image2.getRGB(x,y);
 
-                int resultRGB = getResultRGB(rgb1, rgb2);
-
-
+                int resultRGB = ColorUtils.sum(rgb1, rgb2);
                 image1.setRGB(x, y, resultRGB);
             }
         }
