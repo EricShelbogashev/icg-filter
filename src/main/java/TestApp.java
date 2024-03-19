@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 public class TestApp extends JFrame {
     private final JLabel imageLabel;
@@ -163,6 +162,13 @@ public class TestApp extends JFrame {
         this.buttons.forEach(JButton::disable);
         this.setCursor(Cursor.WAIT_CURSOR);
         FilterExecutor.of(originalImage)
+                .with(filter)
+                .with(filter)
+                .with(filter)
+                .with(filter)
+                .with(filter)
+                .with(filter)
+                .with(filter)
                 .with(filter)
                 .progress(this::updateLoader)
                 .process()
