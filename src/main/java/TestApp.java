@@ -16,7 +16,12 @@ public class TestApp extends JFrame {
     private JLabel imageLabel;
     private BufferedImage originalImage;
     private int w = 5;
-    private int[] kv = {8, 8, 8};
+    private int[] kv = {16, 16, 16};
+    private int[][] M1 = {{0, 2}, {3, 1}};
+    private int[][] M2 = {{0, 8, 2, 10}, {12, 4, 14, 6}, {3, 11, 1, 9}, {15, 7, 13, 5}};
+    private int[][] M3 = {{0, 32, 8, 40, 2, 34, 10, 42}, {48, 16, 56, 24, 50, 18, 58, 26}, {12, 44, 4, 36, 14, 46, 6, 38},
+            {60, 28, 52, 20, 62, 30, 54, 22}, {3, 35, 11, 43, 1, 33, 9, 41}, {51, 19, 59, 27, 49, 17, 57, 25},
+            {15, 47, 7, 39, 13, 45, 5, 37}, {63, 31, 55, 23, 61, 29, 53, 21}};
 
     public TestApp() {
         super("Image Filter Application");
@@ -30,11 +35,14 @@ public class TestApp extends JFrame {
         chooseButton.addActionListener((ActionEvent e) -> chooseImage());
 
         // Button for applying filter
-        JButton filterButton = new JButton("Apply Filter");
-        filterButton.addActionListener((ActionEvent e) -> WaterShedFilter());
+        //JButton filterButton = new JButton("Apply Filter");
+        //filterButton.addActionListener((ActionEvent e) -> OrderedDithering());
 
-        JButton chooseSizeButton = new JButton("Choose size");
-        chooseSizeButton.addActionListener((ActionEvent e) -> chooseSize());
+        //JButton chooseSizeButton = new JButton("Choose size");
+        //chooseSizeButton.addActionListener((ActionEvent e) -> chooseSize());
+
+        //JButton chooseLevelButton = new JButton("Choose level");
+        //chooseLevelButton.addActionListener((ActionEvent e) -> chooseLevel());
 
         // Label for displaying the image
         imageLabel = new JLabel();
@@ -43,8 +51,9 @@ public class TestApp extends JFrame {
         // Panel for buttons
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(chooseButton);
-        buttonPanel.add(filterButton);
-        buttonPanel.add(chooseSizeButton);
+        //buttonPanel.add(filterButton);
+        //buttonPanel.add(chooseSizeButton);
+        //buttonPanel.add(chooseLevelButton);
 
         // Adding components to frame
         add(buttonPanel, BorderLayout.SOUTH);
@@ -66,10 +75,16 @@ public class TestApp extends JFrame {
             }
         }
     }
-    private void chooseSize(){
+    private void mychooseSize(){
         ChooseWindowSize chooser = new ChooseWindowSize(this, w);
         if (chooser.is_new)
             w = Integer.parseInt(chooser.selectedSize());
+    }
+
+    private void mychooseLevel(){
+        ChooseKvantLevel chooser = new ChooseKvantLevel(this);
+        if (chooser.is_new)
+            kv = chooser.selectedValues();
     }
 
     private void applyFilter() {
@@ -137,6 +152,7 @@ public class TestApp extends JFrame {
                     float res_r = 0;
                     float res_g = 0;
                     float res_b = 0;
+                    int alpha = (matrixView.get(0, 0) >> 24) & 0xFF;
                     float sigma = w / 2.1f;
                     for (int x = -1 * w; x <= w; x++)
                         for (int y = -1 * w; y <= w; y++){
@@ -151,7 +167,10 @@ public class TestApp extends JFrame {
                         res_b = 255;
                     if (Math.round(res_g) > 255 || Math.round(res_g) < 0)
                         res_g = 255;
-                    return new Color((int)Math.round(res_r), (int)Math.round(res_g), (int)Math.round(res_b)).getRGB();
+                    return ((alpha & 0xFF) << 24) |
+                            ((Math.round(res_r) & 0xFF) << 16) |
+                            ((Math.round(res_g) & 0xFF) << 8) |
+                            ((Math.round(res_b) & 0xFF));
                 }
             };
             BufferedImage image = originalImage;
@@ -267,6 +286,80 @@ public class TestApp extends JFrame {
             imageLabel.setIcon(new ImageIcon(image));
             this.pack();
         }else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void MyFloydDithering(){
+        if (originalImage != null) {
+            ICGFilter filter = new ICGFilter(new Pattern(new Point(-1 * w, -1 * w), new Point(w, w))) {
+                @Override
+                public int apply(MatrixView matrixView) {
+                    int oldpix = matrixView.get(0, 0);
+                    int old_red = (oldpix >> 16) & 0xFF;
+                    int old_green = (oldpix >> 8) & 0xFF;
+                    int old_blue = (oldpix) & 0xFF;
+                    int alpha = (oldpix >> 24) & 0xFF;
+                    float err_red = 0;
+                    float err_blue = 0;
+                    float err_green = 0;
+                    int[] values = {matrixView.get(-1, 0), matrixView.get(1, -1), matrixView.get(0, -1), matrixView.get(-1, -1)};
+                    float[] koef = {7.0f / 16, 3.0f / 16, 5.0f / 16, 1 / 16.0f};
+                    for (int i = 0; i < 4; i++){
+                        err_red += (old_red - ((values[i] >> 16) & 0xFF)) * koef[i];
+                        err_green += (old_green - ((values[i] >> 8) & 0xFF)) * koef[i];
+                        err_blue += (old_blue - ((values[i]) & 0xFF)) * koef[i];
+                    }
+                    int r = find_closest_palette_color(old_red + (int)err_red, old_green + (int)err_green, old_blue + (int)err_blue, alpha);
+                    return r;
+                }
+            };
+            BufferedImage image = originalImage;
+            ImageProcessor processor = new ImageProcessor(image);
+            image = processor.apply(filter, v->this.repaint());
+            originalImage = image;
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void MyOrderedDithering(){
+        if (originalImage != null) {
+            BufferedImage image = originalImage;
+            int red = -1000, green = -1000, blue = -1000;
+            for (int i = 0; i < image.getWidth(); i++)
+                for (int j = 0; j < image.getHeight(); j++) {
+                    int oldpix = image.getRGB(i, j);
+                    if (kv[0] == 4)
+                        red = ((oldpix >> 16) & 0xFF) + 32 - M3[j % 8][i % 8];
+                    if (kv[1] == 4)
+                        green = ((oldpix >> 8) & 0xFF) + 32 - M3[j % 8][i % 8];
+                    if (kv[2] == 4)
+                        blue = ((oldpix) & 0xFF) + 32 - M3[j % 8][i % 8];
+                    if (kv[0] == 16)
+                        red = ((oldpix >> 16) & 0xFF) + 8 - M2[j % 4][i % 4];
+                    if (kv[1] == 16)
+                        green = ((oldpix >> 8) & 0xFF) + 8 - M2[j % 4][i % 4];
+                    if (kv[2] == 16)
+                        blue = ((oldpix) & 0xFF) + 8 - M2[j % 4][i % 4];
+                    if (kv[0] == 64)
+                        red = ((oldpix >> 16) & 0xFF) + 2 - M1[j % 2][i % 2];
+                    if (kv[1] == 64)
+                        green = ((oldpix >> 8) & 0xFF) + 2 - M1[j % 2][i % 2];
+                    if (kv[2] == 64)
+                        blue = ((oldpix) & 0xFF) + 2 - M1[j % 2][i % 2];
+                    int alpha = (oldpix >> 24) & 0xFF;
+                    if (red == -1000 || green == -1000 || blue == -1000)
+                        return;
+                    image.setRGB(i, j, find_closest_palette_color(red, green, blue, alpha));
+                }
+            originalImage = image;
+            this.repaint();
+            imageLabel.setIcon(new ImageIcon(image));
+            this.pack();
+        } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
