@@ -1,6 +1,7 @@
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import misc.BloomFilter;
+import model.filter.eric.LanczosResampling;
 import model.filter.leonid.GaussianBlurFilter;
 import model.filter.leonid.MonochromeFilter;
 
@@ -33,7 +34,6 @@ public class ImageFilterApp extends JFrame {
     private void initializeUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setSize(600, 800);
         imageLabel = new JLabel("", SwingConstants.CENTER);
         progressBar = new JProgressBar();
 
@@ -43,6 +43,8 @@ public class ImageFilterApp extends JFrame {
 
         add(buttonPanel, BorderLayout.SOUTH);
         add(jScrollPane, BorderLayout.CENTER);
+        setMinimumSize(new Dimension(400, 300));
+        pack();
     }
 
     private JPanel createButtonPanel() {
@@ -50,10 +52,34 @@ public class ImageFilterApp extends JFrame {
 
         addFilterButton(buttonPanel, "Choose Image", e -> chooseImage());
         filters.forEach((label, action) -> addFilterButton(buttonPanel, label, e -> action.accept(originalImage)));
+        createFitToScreenButton(buttonPanel);
 
         progressBar.setStringPainted(true);
         buttonPanel.add(progressBar);
         return buttonPanel;
+    }
+
+    private void createFitToScreenButton(JPanel panel) {
+        JButton fitToScreenButton = new JButton("Fit to Screen");
+        fitToScreenButton.addActionListener(e -> fitImageToScreen());
+        panel.add(fitToScreenButton);
+    }
+
+    private void fitImageToScreen() {
+        if (originalImage != null) {
+            Dimension screenSize = this.getSize();
+            double widthRatio = screenSize.getWidth() / originalImage.getWidth();
+            double heightRatio = screenSize.getHeight() / originalImage.getHeight();
+            double ratio = Math.min(widthRatio, heightRatio); // Scale down a bit to ensure it fits on screen
+
+            int newWidth = (int) (originalImage.getWidth() * ratio);
+            int newHeight = (int) (originalImage.getHeight() * ratio);
+
+            final var filter = new LanczosResampling(newWidth, newHeight);
+            applyFilter(filter);
+        } else {
+            JOptionPane.showMessageDialog(this, "No image loaded to fit to screen.");
+        }
     }
 
     private void addFilterButton(JPanel panel, String label, ActionListener action) {
@@ -142,7 +168,6 @@ public class ImageFilterApp extends JFrame {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
         }
     }
-
 
     private void addMouseDragFeature(JScrollPane pane) {
         MouseAdapter ma = new MouseAdapter() {

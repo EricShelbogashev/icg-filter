@@ -1,20 +1,13 @@
 package core.filter;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Image {
     private final BufferedImage image;
-    private int defaultColor;
     public static final int DEFAULT_ALPHA = 0xFF;
 
-    public Image(BufferedImage image, int defaultColor) {
-        this.image = image;
-        this.defaultColor = defaultColor;
-    }
-
     public Image(BufferedImage image) {
-        this(image, Color.BLACK.getRGB());
+        this.image = image;
     }
 
     public static int buildColor(int red, int green, int blue) {
@@ -29,16 +22,8 @@ public class Image {
         return image.getHeight();
     }
 
-    public int defaultColor() {
-        return defaultColor;
-    }
-
     public int type() {
         return image.getType();
-    }
-
-    public void defaultColor(int defaultColor) {
-        this.defaultColor = defaultColor;
     }
 
     public BufferedImage bufferedImage() {
@@ -46,7 +31,9 @@ public class Image {
     }
 
     public int color(int x, int y) {
-        return orElseDefaultColor(x, y, defaultColor);
+        int clampedX = Math.max(0, Math.min(x, image.getWidth() - 1));
+        int clampedY = Math.max(0, Math.min(y, image.getHeight() - 1));
+        return image.getRGB(clampedX, clampedY);
     }
 
     public int red(int x, int y) {
@@ -59,19 +46,5 @@ public class Image {
 
     public int blue(int x, int y) {
         return color(x, y) & 0xFF;
-    }
-
-    private int orElseDefaultColor(int x, int y, int defaultVal) {
-        Integer result = safeAccess(x, y);
-        return result != null ? result : defaultVal;
-    }
-
-    private Integer safeAccess(int x, int y) {
-        if (!isWithinBounds(x, y)) return null;
-        return image.getRGB(x, y);
-    }
-
-    private boolean isWithinBounds(int x, int y) {
-        return x >= 0 && x < image.getWidth() && y >= 0 && y < image.getHeight();
     }
 }
