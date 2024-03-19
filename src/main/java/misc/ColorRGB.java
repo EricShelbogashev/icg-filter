@@ -1,4 +1,4 @@
-package model;
+package misc;
 
 public class ColorRGB {
     static int getRed(int rgb) {
