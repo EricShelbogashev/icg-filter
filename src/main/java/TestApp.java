@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +86,49 @@ public class TestApp extends JFrame {
 
         // Adding components to frame
         add(buttonPanel, BorderLayout.SOUTH);
-        add(new JScrollPane(imageLabel), BorderLayout.CENTER);
+        final var pane = new JScrollPane(imageLabel);
+        add(pane, BorderLayout.CENTER);
+
+        MouseAdapter ma = new MouseAdapter() {
+            private Point origin;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                // Only consider middle mouse button (button 2)
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    origin = new Point(e.getPoint());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                origin = null; // Reset origin on release
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (origin != null && SwingUtilities.isLeftMouseButton(e)) {
+                    JViewport viewport = pane.getViewport();
+                    if (viewport != null) {
+                        int deltaX = origin.x - e.getX();
+                        int deltaY = origin.y - e.getY();
+
+                        Rectangle view = viewport.getViewRect();
+                        view.x += deltaX;
+                        view.y += deltaY;
+
+                        imageLabel.scrollRectToVisible(view);
+                        // Update the origin to the current point.
+                        origin.setLocation(e.getX(), e.getY());
+                    }
+                }
+            }
+        };
+
+        // Add listeners to the scrollPane's viewport
+        JViewport viewport = pane.getViewport();
+        viewport.addMouseListener(ma);
+        viewport.addMouseMotionListener(ma);
     }
 
     private void chooseImage() {
@@ -182,7 +226,6 @@ public class TestApp extends JFrame {
         imageLabel.setIcon(new ImageIcon(image));
         this.setCursor(Cursor.DEFAULT_CURSOR);
         this.revalidate();
-        this.pack();
         progressBar.setValue(100);
         this.buttons.forEach(JButton::enable);
     }
