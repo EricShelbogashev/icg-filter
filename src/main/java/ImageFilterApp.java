@@ -1,7 +1,10 @@
 import core.filter.Filter;
 import core.filter.FilterExecutor;
+import core.filter.Image;
+import misc.BloomFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.GaussianBlurFilter;
+import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
 
 import javax.imageio.ImageIO;
@@ -13,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ImageFilterApp extends JFrame {
     private JLabel imageLabel;
@@ -84,6 +88,19 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void applyBloomEffect() {
+        if (originalImage != null) {
+            BufferedImage bloomMask = originalImage;
+            BloomFilter bloomFilter = new BloomFilter(0.3, 0.7);
+            GaussianBlurFilter blurFilter = new GaussianBlurFilter(5);
+            MixFilter mixFilter = new MixFilter(new Image(originalImage));
+            applyFilter(bloomFilter, blurFilter, mixFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
@@ -104,11 +121,15 @@ public class ImageFilterApp extends JFrame {
         applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(5)));
         toolBar.add(applyGaussianBlur);
 
+        JButton applyBloom = new JButton("Apply Gaussian bloom");
+        applyBloom.addActionListener(e -> applyBloomEffect());
+        toolBar.add(applyBloom);
+
         add(toolBar, BorderLayout.NORTH);
     }
 
 
-    private void applyFilter(Filter filter) {
+    private void applyFilter(Filter... filters) {
         if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
@@ -116,8 +137,13 @@ public class ImageFilterApp extends JFrame {
 
         overlayPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
-        FilterExecutor.of(originalImage)
-                .with(filter)
+
+        FilterExecutor.Builder builder = FilterExecutor.of(originalImage);
+        for (Filter filter : filters) {
+            builder = builder.with(filter);
+        }
+
+        builder
                 .progress(this::updateLoader)
                 .process()
                 .thenAccept(image -> {
