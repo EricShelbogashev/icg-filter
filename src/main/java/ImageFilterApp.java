@@ -31,14 +31,10 @@ public class ImageFilterApp extends JFrame {
         };
         overlayPanel.setOpaque(false);
         overlayPanel.setVisible(false);
-
         overlayPanel.setSize(this.getSize());
         overlayPanel.setPreferredSize(this.getSize());
-        MouseAdapter mouseAdapter = new MouseAdapter() {
-        };
-        overlayPanel.addMouseListener(mouseAdapter);
-        overlayPanel.addMouseMotionListener(mouseAdapter);
-        overlayPanel.addMouseWheelListener(mouseAdapter);
+
+        progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setString("Processing...");
 
@@ -48,9 +44,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void showOverlay(boolean show) {
-        SwingUtilities.invokeLater(() -> {
-            overlayPanel.setVisible(show);
-        });
+        SwingUtilities.invokeLater(() -> overlayPanel.setVisible(show));
     }
 
     public ImageFilterApp() {

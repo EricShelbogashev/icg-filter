@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class FilterExecutor {
     static class Progress {
         private final float cap;
@@ -60,15 +60,11 @@ public final class FilterExecutor {
         }
     }
 
-    public static BufferedImage run(BufferedImage image, Filter filter) throws ExecutionException, InterruptedException {
-        final var future = of(image).with(filter).process();
-        return future.get();
-    }
-
     public static Builder of(BufferedImage image) {
         return new Builder(image);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     static public class Builder {
         private final BufferedImage image;
         private final Collection<Filter> filters;
@@ -153,10 +149,12 @@ public final class FilterExecutor {
                 CompletableFuture<Void> future = CompletableFuture.supplyAsync(job, executorService);
                 futures.add(future);
             }
-            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> {
-                futures.forEach(CompletableFuture::join);
-                return result;
-            });
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenRun(() -> futures.forEach(CompletableFuture::join))
+                    .thenApply(v -> {
+                        executorService.shutdown();
+                        return result;
+                    });
         }
 
         private static List<Supplier<Void>> buildMatrixFilterJobs(Image origin, BufferedImage result, MatrixFilter filter, int maxNumberOfThreads, @Nullable Progress progress) {
