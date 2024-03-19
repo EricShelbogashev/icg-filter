@@ -183,6 +183,7 @@ public class TestApp extends JFrame {
         this.setCursor(Cursor.DEFAULT_CURSOR);
         this.revalidate();
         this.pack();
+        progressBar.setValue(100);
         this.buttons.forEach(JButton::enable);
     }
 

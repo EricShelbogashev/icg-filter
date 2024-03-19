@@ -1,18 +1,13 @@
 package model.filter.eric;
 
-import core.filter.CustomFilter;
 import core.filter.Image;
 
 import java.awt.image.BufferedImage;
 
-public class BilinearInterpolation extends CustomFilter {
-
-    private final int targetWidth;
-    private final int targetHeight;
+public class BilinearInterpolation extends ResamplingFilter {
 
     public BilinearInterpolation(int targetWidth, int targetHeight) {
-        this.targetWidth = targetWidth;
-        this.targetHeight = targetHeight;
+        super(targetWidth, targetHeight);
     }
 
     public static BufferedImage resizeImage(Image originalImage, int targetWidth, int targetHeight) {
