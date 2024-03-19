@@ -163,13 +163,6 @@ public class TestApp extends JFrame {
         this.setCursor(Cursor.WAIT_CURSOR);
         FilterExecutor.of(originalImage)
                 .with(filter)
-                .with(filter)
-                .with(filter)
-                .with(filter)
-                .with(filter)
-                .with(filter)
-                .with(filter)
-                .with(filter)
                 .progress(this::updateLoader)
                 .process()
                 .thenAccept(this::updateCanvas)

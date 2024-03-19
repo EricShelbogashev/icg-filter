@@ -33,6 +33,10 @@ public class Image {
         return defaultColor;
     }
 
+    public int type() {
+        return image.getType();
+    }
+
     public void defaultColor(int defaultColor) {
         this.defaultColor = defaultColor;
     }
