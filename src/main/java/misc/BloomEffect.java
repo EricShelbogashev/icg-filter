@@ -5,6 +5,9 @@ package misc;
  * 2. Apply gaussian blur
  * 3. Mix with original image to increase brightness */
 
+import core.filter.FilterExecutor;
+import model.filter.leonid.GaussianBlurFilter;
+
 import java.awt.image.BufferedImage;
 
 import static java.lang.Thread.sleep;
@@ -25,6 +28,22 @@ public class BloomEffect {
         this.radius = radius;
     }
 
+    private static int getResultRGB(int rgb1, int rgb2) {
+        int red1 = ColorUtils.red(rgb1);
+        int green1 = ColorUtils.green(rgb1);
+        int blue1 = ColorUtils.blue(rgb1);
+
+        int red2 = ColorUtils.red(rgb2);
+        int green2 = ColorUtils.green(rgb2);
+        int blue2 = ColorUtils.blue(rgb2);
+
+        int red = Math.min(red1 + red2, 255);
+        int green = Math.min(green1 + green2, 255);
+        int blue = Math.min(blue1 + blue2, 255);
+
+        return ColorUtils.rgb(red, green, blue);
+    }
+
     private void mixImages(BufferedImage image1, BufferedImage image2) {
         for (int y = 0; y < image1.getHeight(); y++) {
             for (int x = 0; x < image1.getWidth(); x++) {
@@ -39,34 +58,30 @@ public class BloomEffect {
         }
     }
 
-    private static int getResultRGB(int rgb1, int rgb2) {
-        int red1 = ColorRGB.getRed(rgb1);
-        int green1 = ColorRGB.getGreen(rgb1);
-        int blue1 = ColorRGB.getBlue(rgb1);
 
-        int red2 = ColorRGB.getRed(rgb2);
-        int green2 = ColorRGB.getGreen(rgb2);
-        int blue2 = ColorRGB.getBlue(rgb2);
-
-        int red = Math.min(red1 + red2, 255);
-        int green = Math.min(green1 + green2, 255);
-        int blue = Math.min(blue1 + blue2, 255);
-
-        return ColorRGB.getRGB(red, green, blue);
-    }
 
     public BufferedImage applyEffect() throws InterruptedException {
         // Define bloom mask
-        BloomFilter filter = new BloomFilter(glowFactor, threshold);
+        BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
+        GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
+
         BufferedImage buffer = originalImage;
         ImageProcessor processor = new ImageProcessor(buffer);
-        bloomMask = processor.apply(filter, System.out::println);
 
-        sleep(500);
+        // Get bloom mask
+        FilterExecutor.of(buffer)
+                .with(bloomFilter)
+                .with(blurFilter)
+                // mixImages(originalImage, buffer);
+                .threads(4);
+
+
+
+
 
         // Blur bloom mask
         // TODO
-//        GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
+//        ;
 //        processor = new ImageProcessor(bloomMask);
 //        buffer = processor.apply(blurFilter, System.out::println);
 //

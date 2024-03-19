@@ -74,15 +74,15 @@ public class Dithering {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int pixelColor = image.getRGB(x, y);
-                int red = ColorRGB.getRed(pixelColor);
-                int green = ColorRGB.getGreen(pixelColor);
-                int blue = ColorRGB.getBlue(pixelColor);
+                int red = ColorUtils.red(pixelColor);
+                int green = ColorUtils.green(pixelColor);
+                int blue = ColorUtils.blue(pixelColor);
 
                 // Применение дизеринга к каждому каналу цвета
                 int newRed = findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize], redQuantizationRank);
                 int newGreen = findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize], greenQuantizationRank);
                 int newBlue = findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize], blueQuantizationRank);
-                pixelColor = ColorRGB.getRGB(newRed, newGreen, newBlue);
+                pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);
 
                 // Установка нового цвета пикселя
                 resultImage.setRGB(x, y, pixelColor);
