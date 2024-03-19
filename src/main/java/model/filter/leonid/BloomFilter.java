@@ -1,4 +1,4 @@
-package misc;
+package model.filter.leonid;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;

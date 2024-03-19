@@ -1,4 +1,4 @@
-package misc;
+package model.filter.leonid;
 
 public class ColorUtils {
     static public int red(int rgb) {

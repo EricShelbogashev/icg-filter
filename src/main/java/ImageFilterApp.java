@@ -1,11 +1,12 @@
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.filter.Image;
-import misc.BloomFilter;
+import model.filter.leonid.BloomFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.GaussianBlurFilter;
 import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
+import model.filter.leonid.OrderedDithering;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 public class ImageFilterApp extends JFrame {
     private JLabel imageLabel;
@@ -90,7 +90,6 @@ public class ImageFilterApp extends JFrame {
 
     private void applyBloomEffect() {
         if (originalImage != null) {
-            BufferedImage bloomMask = originalImage;
             BloomFilter bloomFilter = new BloomFilter(0.3, 0.7);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(5);
             MixFilter mixFilter = new MixFilter(new Image(originalImage));
@@ -121,9 +120,13 @@ public class ImageFilterApp extends JFrame {
         applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(5)));
         toolBar.add(applyGaussianBlur);
 
-        JButton applyBloom = new JButton("Apply Gaussian bloom");
+        JButton applyBloom = new JButton("Apply Bloom effect");
         applyBloom.addActionListener(e -> applyBloomEffect());
         toolBar.add(applyBloom);
+
+        JButton applyOrderedDithering = new JButton("Apply ordered dithering");
+        applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
+        toolBar.add(applyOrderedDithering);
 
         add(toolBar, BorderLayout.NORTH);
     }
