@@ -1,9 +1,9 @@
-package model;
+package misc;
 
 import java.awt.*;
 
 /**
- * Pattern of the filter matrix.
+ * Pattern of the model.filter matrix.
  */
 public record Pattern(Point start, Point end) {
     /**

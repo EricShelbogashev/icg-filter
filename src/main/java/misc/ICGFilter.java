@@ -1,4 +1,4 @@
-package model;
+package misc;
 
 public abstract class ICGFilter {
     private final Pattern pattern;

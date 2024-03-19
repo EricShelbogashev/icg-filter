@@ -1,4 +1,11 @@
-import model.*;
+import core.filter.Filter;
+import core.filter.FilterExecutor;
+import misc.BloomEffect;
+import misc.Dithering;
+import misc.EmbossingFilter;
+import misc.ImageProcessor;
+import model.filter.leonid.GaussianBlurFilter;
+import model.filter.leonid.MonochromeFilter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -8,13 +15,20 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
 
 public class TestApp extends JFrame {
-    private JLabel imageLabel;
+    private final JLabel imageLabel;
+    private final JProgressBar progressBar;
     private BufferedImage originalImage;
+    private final List<JButton> buttons;
 
     public TestApp() {
         super("Image Filter Application");
+        this.buttons = new ArrayList<>();
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(800, 600);
         setMaximumSize(new Dimension(1000, 1000));
@@ -22,19 +36,25 @@ public class TestApp extends JFrame {
 
         // Button for choosing an image
         JButton chooseButton = new JButton("Choose Image");
+        buttons.add(chooseButton);
         chooseButton.addActionListener((ActionEvent e) -> chooseImage());
 
-        // Button for applying filter
+        // Button for applying model.filter
         JButton filterButton = new JButton("Apply Filter");
+        buttons.add(filterButton);
         filterButton.addActionListener((ActionEvent e) -> applyMonochromeFilter());
 
         JButton filter2Button = new JButton("Apply embossing");
+        buttons.add(filter2Button);
         filter2Button.addActionListener(e -> applyEmbossingFilter());
 
         JButton ditheringFilterButton = new JButton("Apply dithering");
+        buttons.add(ditheringFilterButton);
         ditheringFilterButton.addActionListener(e -> applyDithering());
 
         JButton bloomButton = new JButton("Apply bloom");
+        buttons.add(bloomButton);
+
         bloomButton.addActionListener(e -> {
             try {
                 applyBloom();
@@ -44,6 +64,8 @@ public class TestApp extends JFrame {
         });
 
         JButton blurButton = new JButton("Apply blur");
+        buttons.add(blurButton);
+
         blurButton.addActionListener(e -> applyGaussian());
 
         // Label for displaying the image
@@ -58,6 +80,8 @@ public class TestApp extends JFrame {
         buttonPanel.add(ditheringFilterButton);
         buttonPanel.add(bloomButton);
         buttonPanel.add(blurButton);
+        progressBar = new JProgressBar(0, 100);
+        buttonPanel.add(progressBar);
 
         // Adding components to frame
         add(buttonPanel, BorderLayout.SOUTH);
@@ -97,13 +121,7 @@ public class TestApp extends JFrame {
     private void applyMonochromeFilter() {
         if (originalImage != null) {
             MonochromeFilter filter = new MonochromeFilter();
-            BufferedImage image = originalImage;
-            ImageProcessor processor = new ImageProcessor(image);
-            image = processor.apply(filter, v -> repaint());
-            originalImage = image;
-            imageLabel.setIcon(new ImageIcon(image));
-
-            this.pack();
+            applyFilter(filter);
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
@@ -112,7 +130,7 @@ public class TestApp extends JFrame {
     private void applyDithering() {
         if (originalImage != null) {
             BufferedImage image = originalImage;
-            imageLabel.setIcon(new ImageIcon(Dithering.applyDithering(image, 2, 2 , 2, Dithering.MatrixOption.eight)));
+            imageLabel.setIcon(new ImageIcon(Dithering.applyDithering(image, 2, 2, 2, Dithering.MatrixOption.eight)));
             this.pack();
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
@@ -135,16 +153,38 @@ public class TestApp extends JFrame {
     private void applyGaussian() {
         if (originalImage != null) {
             GaussianBlurFilter filter = new GaussianBlurFilter(5);
-            BufferedImage image = originalImage;
-            ImageProcessor processor = new ImageProcessor(image);
-            image = processor.apply(filter, v -> repaint());
-            originalImage = image;
-            imageLabel.setIcon(new ImageIcon(image));
-
-            this.pack();
+            applyFilter(filter);
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
+    }
+
+    private void applyFilter(Filter filter) {
+        this.buttons.forEach(JButton::disable);
+        this.setCursor(Cursor.WAIT_CURSOR);
+        FilterExecutor.of(originalImage)
+                .with(filter)
+                .progress(this::updateLoader)
+                .process()
+                .thenAccept(this::updateCanvas)
+                .exceptionally(ex -> {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                    return null;
+                });
+    }
+
+    private void updateLoader(float percent) {
+        progressBar.setValue((int) (percent * 100)); // Начальное значение прогресса
+        progressBar.setStringPainted(true); // Показывать процент выполнения
+    }
+
+    private void updateCanvas(BufferedImage image) {
+        this.originalImage = image;
+        imageLabel.setIcon(new ImageIcon(image));
+        this.setCursor(Cursor.DEFAULT_CURSOR);
+        this.revalidate();
+        this.pack();
+        this.buttons.forEach(JButton::enable);
     }
 
     public static void main(String[] args) {

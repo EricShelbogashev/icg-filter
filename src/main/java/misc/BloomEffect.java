@@ -1,4 +1,4 @@
-package model;
+package misc;
 
 /*Effect logic:
  * 1. Define bloom pixels mask
@@ -65,14 +65,15 @@ public class BloomEffect {
         sleep(500);
 
         // Blur bloom mask
-        GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
-        processor = new ImageProcessor(bloomMask);
-        buffer = processor.apply(blurFilter, System.out::println);
-
-        sleep(2000);
-
-        mixImages(originalImage, buffer);
-
+        // TODO
+//        GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
+//        processor = new ImageProcessor(bloomMask);
+//        buffer = processor.apply(blurFilter, System.out::println);
+//
+//        sleep(2000);
+//
+//        mixImages(originalImage, buffer);
+//
 
 
         // Mix blur mask with original image
