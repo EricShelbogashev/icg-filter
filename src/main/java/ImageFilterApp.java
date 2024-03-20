@@ -8,9 +8,11 @@ import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.BloomFilter;
+import model.filter.leonid.EmbossingFilter;
 import model.filter.leonid.GaussianBlurFilter;
 import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
+import model.filter.leonid.NegativeFilter;
 import model.filter.leonid.OrderedDithering;
 
 import javax.imageio.ImageIO;
@@ -179,7 +181,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyFSDitheringButton);*/
 
         JButton applyEmbossingButton = new JButton("Apply embossing");
-        applyEmbossingButton.addActionListener(e-> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        applyEmbossingButton.addActionListener(e -> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
         toolBar.add(applyEmbossingButton);
 
         add(toolBar, BorderLayout.NORTH);
@@ -248,10 +250,12 @@ public class ImageFilterApp extends JFrame {
             loadImage(selectedFile);
         }
     }
+
     private void chooseKvantLevel() {
         ChooseKvantLevel chooser = new ChooseKvantLevel(this);
         levels_kvant = chooser.selectedValues();
     }
+
     private void chooseWindowSize() {
         ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
         window_size = Integer.parseInt(chooser.selectedSize());
@@ -297,6 +301,32 @@ public class ImageFilterApp extends JFrame {
 
         pane.getViewport().addMouseListener(ma);
         pane.getViewport().addMouseMotionListener(ma);
+    }
+
+    private void applyFilters(Filter... filters) {
+        if (originalImage == null) {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+            return;
+        }
+
+        overlayPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        showOverlay(true);
+
+        FilterExecutor.Builder builder = FilterExecutor.of(originalImage);
+        for (Filter filter : filters) {
+            builder = builder.with(filter);
+        }
+        builder.progress(this::updateLoader)
+                .process()
+                .thenAccept(image -> {
+                    updateCanvas(image);
+                    showOverlay(false);
+                })
+                .exceptionally(ex -> {
+                    JOptionPane.showMessageDialog(this, "Error applying filter: " + ex.getMessage());
+                    showOverlay(false);
+                    return null;
+                });
     }
 
     public static void main(String[] args) {
