@@ -6,8 +6,8 @@ import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
-import model.filter.leonid.BloomFilter;
 import model.filter.eric.LanczosResampling;
+import model.filter.leonid.BloomFilter;
 import model.filter.leonid.GaussianBlurFilter;
 import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageFilterApp extends JFrame {
-    int [] levels_kvant = {2, 2, 2};
+    int[] levels_kvant = {2, 2, 2};
     int window_size = 5;
     private JLabel imageLabel;
     private JProgressBar progressBar;
@@ -44,7 +44,10 @@ public class ImageFilterApp extends JFrame {
         overlayPanel.setVisible(false);
         overlayPanel.setSize(this.getSize());
         overlayPanel.setPreferredSize(this.getSize());
-
+        MouseAdapter mouseAdapter = new MouseAdapter() {};
+        overlayPanel.addMouseListener(mouseAdapter);
+        overlayPanel.addMouseMotionListener(mouseAdapter);
+        overlayPanel.addMouseWheelListener(mouseAdapter);
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setString("Processing...");
@@ -89,7 +92,7 @@ public class ImageFilterApp extends JFrame {
             int newHeight = (int) (originalImage.getHeight() * ratio);
 
             final var filter = new LanczosResampling(newWidth, newHeight);
-            applyFilter(filter);
+            applyFilters(filter);
         } else {
             JOptionPane.showMessageDialog(this, "No image loaded to fit to screen.");
         }
@@ -100,7 +103,7 @@ public class ImageFilterApp extends JFrame {
             BloomFilter bloomFilter = new BloomFilter(0.3, 0.7);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(5);
             MixFilter mixFilter = new MixFilter(new Image(originalImage));
-            applyFilter(bloomFilter, blurFilter, mixFilter);
+            applyFilters(bloomFilter, blurFilter, mixFilter);
 
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
@@ -112,7 +115,7 @@ public class ImageFilterApp extends JFrame {
             WaterShedFilter waterShedFilter = new WaterShedFilter(levels_kvant);
             ColorStretchFilter colorStretchFilter = new ColorStretchFilter(levels_kvant);
             FillColorFilter fillColorFilter = new FillColorFilter();
-            applyFilter(waterShedFilter, colorStretchFilter, fillColorFilter);
+            applyFilters(waterShedFilter, colorStretchFilter, fillColorFilter);
 
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
@@ -140,11 +143,11 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(fitToScreenButton);
 
         JButton applyMonochromeButton = new JButton("Apply Monochrome");
-        applyMonochromeButton.addActionListener(e -> applyFilter(new MonochromeFilter()));
+        applyMonochromeButton.addActionListener(e -> applyFilters(new MonochromeFilter()));
         toolBar.add(applyMonochromeButton);
 
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
-        applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(window_size)));
+        applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
         toolBar.add(applyGaussianBlur);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
@@ -156,14 +159,14 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyWaterShedButton);
 
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
-        applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
+        applyOrderedDithering.addActionListener(e -> applyFilters(new OrderedDithering(60, 60, 60)));
         toolBar.add(applyOrderedDithering);
 
         add(toolBar, BorderLayout.NORTH);
     }
 
 
-    private void applyFilter(Filter... filters) {
+    private void applyFilters(Filter... filters) {
         if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
@@ -176,9 +179,7 @@ public class ImageFilterApp extends JFrame {
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
-
-        builder
-                .progress(this::updateLoader)
+        builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(image -> {
                     updateCanvas(image);
@@ -225,10 +226,12 @@ public class ImageFilterApp extends JFrame {
             loadImage(selectedFile);
         }
     }
+
     private void chooseKvantLevel() {
         ChooseKvantLevel chooser = new ChooseKvantLevel(this);
         levels_kvant = chooser.selectedValues();
     }
+
     private void chooseWindowSize() {
         ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
         window_size = Integer.parseInt(chooser.selectedSize());
