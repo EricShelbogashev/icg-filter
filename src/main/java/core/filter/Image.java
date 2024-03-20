@@ -47,4 +47,6 @@ public class Image {
     public int blue(int x, int y) {
         return color(x, y) & 0xFF;
     }
+
+    public int alpha(int x, int y) {return (color(x, y) >> 24) & 0xFF;}
 }

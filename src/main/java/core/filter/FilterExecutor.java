@@ -150,9 +150,8 @@ public final class FilterExecutor {
                 futures.add(future);
             }
             return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                    .thenRun(() -> futures.forEach(CompletableFuture::join))
                     .thenApply(v -> {
-                        //executorService.shutdown();
+                        futures.forEach(CompletableFuture::join);
                         return result;
                     });
         }
