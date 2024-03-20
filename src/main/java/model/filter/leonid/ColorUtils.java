@@ -18,7 +18,7 @@ public class ColorUtils {
     }
     static public int rgb(int red, int green, int blue, int alpha) {return (alpha << 24) | (red << 16) | (green << 8) | blue;}
 
-    static public int alpha(int rgb) {return (255 >> 24) & 0xFF;}
+    static public int alpha(int rgb) {return (rgb >> 24) & 0xFF;}
 
 
     // Returns brightness value [0, 1]
@@ -50,16 +50,13 @@ public class ColorUtils {
         return ColorUtils.rgb(red, green, blue);
     }
 
-    public static int findClosestColor(int color, int quantizationRank) {
-        int quantum = 255/(quantizationRank);
-        int quantCount;
-        if (color != 0) {
-            quantCount = color/quantum;
-        }
-        else {
-            quantCount = 0;
-        }
 
-        return Math.min(quantCount * quantum, 255);
+    public static int findClosestColor(int color, int quantizationDeg){
+            if (color < 0)
+                return 0;
+            if (color > 255)
+                 return 255;
+            float del = (float)(quantizationDeg - 1);
+            return (int)((float)(Math.round((float)color / 255 * del)) / del * 255);
     }
 }
