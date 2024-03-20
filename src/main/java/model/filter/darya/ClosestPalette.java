@@ -11,8 +11,8 @@ public class ClosestPalette {
             if (result[i] > 255)
                 result[i] = 255;
             float del = (float)(kv[i] - 1);
-            result[i] = (int)((float)((int)((float)result[i] / 255 * del)) / del * 255);
+            result[i] = (int)((float)(Math.round((float)result[i] / 255 * del)) / del * 255);
         }
-        return ColorUtils.rgb(red, green, blue);
+        return ColorUtils.rgb(result[0], result[1], result[2], alpha);
     }
 }
