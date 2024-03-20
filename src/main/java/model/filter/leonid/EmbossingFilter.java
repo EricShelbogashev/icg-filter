@@ -3,7 +3,6 @@ package model.filter.leonid;
 import core.filter.Image;
 import core.filter.MatrixFilter;
 
-
 public class EmbossingFilter extends MatrixFilter {
 
     @Override
@@ -13,19 +12,21 @@ public class EmbossingFilter extends MatrixFilter {
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                curColor = image.color(x + i, y + j);
-                int koef = getKoef(i + 1, j + 1);
+                curColor = image.red(x + i, y + j);
+                int koef = getKoef(i+1, j+1);
                 curColor *= koef;
                 resultColor += curColor;
             }
         }
 
+        int alpha = image.alpha(x, y); // извлечение альфа-канала
         int grayColor = resultColor;
         grayColor = Math.max(grayColor, 0); // ограничение значения в диапазоне [0, 255]
         grayColor = Math.min(grayColor, 255);
 
-        return grayColor;
+        return (alpha << 24) | (grayColor << 16) | (grayColor << 8) | grayColor;
     }
+
 
     public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP}
 
