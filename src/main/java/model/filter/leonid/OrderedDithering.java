@@ -7,7 +7,6 @@ public class OrderedDithering extends MatrixFilter {
 
     public enum MatrixOption {two, four, eight}
 
-    // Матрица упорядоченного дизеринга 8x8
     static int[][] ditherMatrix8 = {
             {0, 32, 8, 40, 2, 34, 10, 42},
             {48, 16, 56, 24, 50, 18, 58, 26},
@@ -30,19 +29,6 @@ public class OrderedDithering extends MatrixFilter {
             {0,2},
             {3, 1}
     };
-
-    private static int findClosestColor(int color, int quantizationRank) {
-        int quantum = 255/quantizationRank;
-        int quantCount;
-        if (color != 0) {
-            quantCount = color/quantum;
-        }
-        else {
-            quantCount = 0;
-        }
-
-        return Math.min(quantCount * quantum, 255);
-    }
 
     int redQuantizationRank, greenQuantizationRank, blueQuantizationRank;
 
@@ -107,9 +93,9 @@ public class OrderedDithering extends MatrixFilter {
         int blue = ColorUtils.blue(pixelColor);
 
         // Применение дизеринга к каждому каналу цвета
-        int newRed = findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize], redQuantizationRank);
-        int newGreen = findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize], greenQuantizationRank);
-        int newBlue = findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize], blueQuantizationRank);
+        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize], redQuantizationRank);
+        int newGreen = ColorUtils.findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize], greenQuantizationRank);
+        int newBlue = ColorUtils.findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize], blueQuantizationRank);
         pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);
         return pixelColor;
     }

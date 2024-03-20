@@ -6,12 +6,8 @@ import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
-import model.filter.leonid.BloomFilter;
+import model.filter.leonid.*;
 import model.filter.eric.LanczosResampling;
-import model.filter.leonid.GaussianBlurFilter;
-import model.filter.leonid.MixFilter;
-import model.filter.leonid.MonochromeFilter;
-import model.filter.leonid.OrderedDithering;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -119,6 +115,17 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    /*private void applyFSDithering() {
+        if (originalImage != null) {
+            FSDithering fsDithering = new FSDithering(2, 2, 2);
+            applyFilter(fsDithering);
+
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }*/
+
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
@@ -143,6 +150,10 @@ public class ImageFilterApp extends JFrame {
         applyMonochromeButton.addActionListener(e -> applyFilter(new MonochromeFilter()));
         toolBar.add(applyMonochromeButton);
 
+        JButton applyNegativeButton = new JButton("Apply Negative");
+        applyNegativeButton.addActionListener(e -> applyFilter(new NegativeFilter()));
+        toolBar.add(applyNegativeButton);
+
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
         applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(window_size)));
         toolBar.add(applyGaussianBlur);
@@ -158,6 +169,10 @@ public class ImageFilterApp extends JFrame {
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
         applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
         toolBar.add(applyOrderedDithering);
+
+        /*JButton applyFSDitheringButton = new JButton("Apply FSDithering");
+        applyFSDitheringButton.addActionListener(e -> applyFSDithering());
+        toolBar.add(applyFSDitheringButton);*/
 
         add(toolBar, BorderLayout.NORTH);
     }
