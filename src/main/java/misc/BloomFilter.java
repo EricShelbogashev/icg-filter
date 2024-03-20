@@ -33,9 +33,9 @@ public class BloomFilter extends ICGFilter{
     @Override
     public int apply(MatrixView matrixView) {
         int pivotRGB =  matrixView.get(0, 0);
-        int pivotRed = ColorRGB.getRed(pivotRGB);
-        int pivotGreen = ColorRGB.getGreen(pivotRGB);
-        int pivotBlue = ColorRGB.getBlue(pivotRGB);
+        int pivotRed = ColorUtils.red(pivotRGB);
+        int pivotGreen = ColorUtils.green(pivotRGB);
+        int pivotBlue = ColorUtils.blue(pivotRGB);
 
         int resultRed = 0;
         int resultGreen = 0;

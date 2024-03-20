@@ -13,7 +13,7 @@ public class ColorUtils {
         return rgb & 0xFF;
     }
 
-    static int rgb(int red, int green, int blue) {
+    public static int rgb(int red, int green, int blue) {
         return (255 << 24) | (red << 16) | (green << 8) | (blue);
     }
     static int rgb(int red, int green, int blue, int alpha) {return (alpha << 24) | (red << 16) | (green << 8) | blue;}
