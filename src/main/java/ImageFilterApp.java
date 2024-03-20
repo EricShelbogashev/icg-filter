@@ -8,13 +8,7 @@ import model.filter.darya.FillColorFilter;
 import model.filter.darya.MyFloydDithering;
 import model.filter.darya.WaterShedFilter;
 import model.filter.eric.LanczosResampling;
-import model.filter.leonid.BloomFilter;
-//import model.filter.leonid.EmbossingFilter;
-import model.filter.leonid.GaussianBlurFilter;
-import model.filter.leonid.MixFilter;
-import model.filter.leonid.MonochromeFilter;
-import model.filter.leonid.NegativeFilter;
-import model.filter.leonid.OrderedDithering;
+import model.filter.leonid.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -122,7 +116,7 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    /*private void applyFSDithering() {
+    private void applyFSDithering() {
         if (originalImage != null) {
             FSDithering fsDithering = new FSDithering(2, 2, 2);
             applyFilter(fsDithering);
@@ -131,7 +125,7 @@ public class ImageFilterApp extends JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
-    }*/
+    }
 
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
@@ -174,16 +168,16 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyWaterShedButton);
 
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
-        applyOrderedDithering.addActionListener(e -> applyFilter( new MyFloydDithering(levels_kvant)));
+        applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(16, 16, 16)));
         toolBar.add(applyOrderedDithering);
 
-        /*JButton applyFSDitheringButton = new JButton("Apply FSDithering");
-        applyFSDitheringButton.addActionListener(e -> applyFSDithering());
-        toolBar.add(applyFSDitheringButton);*/
+        JButton applyFSDitheringButton = new JButton("Apply FSDithering");
+        applyFSDitheringButton.addActionListener(e -> applyFSDithering()) ;
+        toolBar.add(applyFSDitheringButton);
 
-        //JButton applyEmbossingButton = new JButton("Apply embossing");
-        //applyEmbossingButton.addActionListener(e -> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
-        //toolBar.add(applyEmbossingButton);
+        JButton applyEmbossingButton = new JButton("Apply embossing");
+        applyEmbossingButton.addActionListener(e -> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        toolBar.add(applyEmbossingButton);
 
         add(toolBar, BorderLayout.NORTH);
     }
