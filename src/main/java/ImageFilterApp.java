@@ -202,17 +202,6 @@ public class ImageFilterApp extends JFrame {
         if (!progressBar.isStringPainted()) {
             progressBar.setStringPainted(true);
         }
-
-        if (progressValue >= 100) {
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                progressBar.setVisible(false);
-            });
-        }
     }
 
     private void updateCanvas(BufferedImage image) {
