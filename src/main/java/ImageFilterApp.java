@@ -1,6 +1,11 @@
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.filter.Image;
+import model.ChooseKvantLevel;
+import model.ChooseWindowSize;
+import model.filter.darya.ColorStretchFilter;
+import model.filter.darya.FillColorFilter;
+import model.filter.darya.WaterShedFilter;
 import model.filter.leonid.BloomFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.GaussianBlurFilter;
@@ -19,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageFilterApp extends JFrame {
+    int [] levels_kvant = {2, 2, 2};
+    int window_size = 5;
     private JLabel imageLabel;
     private JProgressBar progressBar;
     private BufferedImage originalImage;
@@ -100,6 +107,18 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void applyWaterShed() {
+        if (originalImage != null) {
+            WaterShedFilter waterShedFilter = new WaterShedFilter(levels_kvant);
+            ColorStretchFilter colorStretchFilter = new ColorStretchFilter(levels_kvant);
+            FillColorFilter fillColorFilter = new FillColorFilter();
+            applyFilter(waterShedFilter, colorStretchFilter, fillColorFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
@@ -107,6 +126,14 @@ public class ImageFilterApp extends JFrame {
         JButton chooseImageButton = new JButton("Choose Image");
         chooseImageButton.addActionListener(e -> chooseImage());
         toolBar.add(chooseImageButton);
+
+        JButton chooseKvant = new JButton("Choose Kv Level");
+        chooseKvant.addActionListener(e -> chooseKvantLevel());
+        toolBar.add(chooseKvant);
+
+        JButton chooseWind = new JButton("Choose Window S");
+        chooseWind.addActionListener(e -> chooseWindowSize());
+        toolBar.add(chooseWind);
 
         JButton fitToScreenButton = new JButton("Fit to Screen");
         fitToScreenButton.addActionListener(e -> fitImageToScreen());
@@ -117,12 +144,16 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyMonochromeButton);
 
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
-        applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(5)));
+        applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(window_size)));
         toolBar.add(applyGaussianBlur);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
         applyBloom.addActionListener(e -> applyBloomEffect());
         toolBar.add(applyBloom);
+
+        JButton applyWaterShedButton = new JButton("Apply Watershed");
+        applyWaterShedButton.addActionListener(e -> applyWaterShed());
+        toolBar.add(applyWaterShedButton);
 
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
         applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
@@ -204,6 +235,14 @@ public class ImageFilterApp extends JFrame {
             File selectedFile = fileChooser.getSelectedFile();
             loadImage(selectedFile);
         }
+    }
+    private void chooseKvantLevel() {
+        ChooseKvantLevel chooser = new ChooseKvantLevel(this);
+        levels_kvant = chooser.selectedValues();
+    }
+    private void chooseWindowSize() {
+        ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
+        window_size = Integer.parseInt(chooser.selectedSize());
     }
 
     private void loadImage(File imageFile) {

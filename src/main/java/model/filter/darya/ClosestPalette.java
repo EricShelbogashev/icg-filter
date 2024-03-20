@@ -1,6 +1,6 @@
 package model.filter.darya;
 
-import misc.ColorUtils;
+import model.filter.leonid.ColorUtils;
 
 public class ClosestPalette {
     public static int find_closest_palette_color(int red, int green, int blue, int alpha, int[]kv){

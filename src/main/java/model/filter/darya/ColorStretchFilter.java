@@ -4,7 +4,7 @@ import core.filter.Image;
 import core.filter.MatrixFilter;
 
 public class ColorStretchFilter extends MatrixFilter {
-    private int[] kv = {16, 16, 16};
+    private int[] kv;
 
     public ColorStretchFilter(int[] kv) {
         this.kv = kv;
@@ -19,9 +19,9 @@ public class ColorStretchFilter extends MatrixFilter {
             float koef = 1.0f / 25;
             for (int i = -2; i < 2; i++)
                 for (int j = -2; j < 2; j++) {
-                    err_red += (((image.color(x + i, y + j) >> 16) & 0xFF)) * koef;
-                    err_green += (((image.color(x + i, y + j) >> 8) & 0xFF)) * koef;
-                    err_blue += (((image.color(x + i, y+ j)) & 0xFF)) * koef;
+                    err_red += (image.red(x + i, y + j) * koef);
+                    err_green += (image.green(x + i, y + j) * koef);
+                    err_blue += (image.blue(x + i, y+ j) * koef);
                 }
             int r = ClosestPalette.find_closest_palette_color((int)err_red, (int)err_green, (int)err_blue, alpha, kv);
             return r;
