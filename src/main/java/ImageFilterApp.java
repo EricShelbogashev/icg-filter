@@ -174,6 +174,10 @@ public class ImageFilterApp extends JFrame {
         applyFSDitheringButton.addActionListener(e -> applyFSDithering());
         toolBar.add(applyFSDitheringButton);*/
 
+        JButton applyEmbossingButton = new JButton("Apply embossing");
+        applyEmbossingButton.addActionListener(e-> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        toolBar.add(applyEmbossingButton);
+
         add(toolBar, BorderLayout.NORTH);
     }
 
