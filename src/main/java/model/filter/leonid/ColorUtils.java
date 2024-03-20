@@ -49,4 +49,17 @@ public class ColorUtils {
 
         return ColorUtils.rgb(red, green, blue);
     }
+
+    public static int findClosestColor(int color, int quantizationRank) {
+        int quantum = 255/(quantizationRank);
+        int quantCount;
+        if (color != 0) {
+            quantCount = color/quantum;
+        }
+        else {
+            quantCount = 0;
+        }
+
+        return Math.min(quantCount * quantum, 255);
+    }
 }

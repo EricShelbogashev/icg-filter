@@ -44,10 +44,7 @@ public class ImageFilterApp extends JFrame {
         overlayPanel.setVisible(false);
         overlayPanel.setSize(this.getSize());
         overlayPanel.setPreferredSize(this.getSize());
-        MouseAdapter mouseAdapter = new MouseAdapter() {};
-        overlayPanel.addMouseListener(mouseAdapter);
-        overlayPanel.addMouseMotionListener(mouseAdapter);
-        overlayPanel.addMouseWheelListener(mouseAdapter);
+
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setString("Processing...");
@@ -115,12 +112,23 @@ public class ImageFilterApp extends JFrame {
             WaterShedFilter waterShedFilter = new WaterShedFilter(levels_kvant);
             ColorStretchFilter colorStretchFilter = new ColorStretchFilter(levels_kvant);
             FillColorFilter fillColorFilter = new FillColorFilter();
-            applyFilters(waterShedFilter, colorStretchFilter, fillColorFilter);
+            applyFilter(waterShedFilter, colorStretchFilter, fillColorFilter);
 
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
+
+    /*private void applyFSDithering() {
+        if (originalImage != null) {
+            FSDithering fsDithering = new FSDithering(2, 2, 2);
+            applyFilter(fsDithering);
+
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }*/
 
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
@@ -143,11 +151,15 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(fitToScreenButton);
 
         JButton applyMonochromeButton = new JButton("Apply Monochrome");
-        applyMonochromeButton.addActionListener(e -> applyFilters(new MonochromeFilter()));
+        applyMonochromeButton.addActionListener(e -> applyFilter(new MonochromeFilter()));
         toolBar.add(applyMonochromeButton);
 
+        JButton applyNegativeButton = new JButton("Apply Negative");
+        applyNegativeButton.addActionListener(e -> applyFilter(new NegativeFilter()));
+        toolBar.add(applyNegativeButton);
+
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
-        applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        applyGaussianBlur.addActionListener(e -> applyFilter(new GaussianBlurFilter(window_size)));
         toolBar.add(applyGaussianBlur);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
@@ -159,14 +171,22 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyWaterShedButton);
 
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
-        applyOrderedDithering.addActionListener(e -> applyFilters(new OrderedDithering(60, 60, 60)));
+        applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
         toolBar.add(applyOrderedDithering);
+
+        /*JButton applyFSDitheringButton = new JButton("Apply FSDithering");
+        applyFSDitheringButton.addActionListener(e -> applyFSDithering());
+        toolBar.add(applyFSDitheringButton);*/
+
+        JButton applyEmbossingButton = new JButton("Apply embossing");
+        applyEmbossingButton.addActionListener(e-> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        toolBar.add(applyEmbossingButton);
 
         add(toolBar, BorderLayout.NORTH);
     }
 
 
-    private void applyFilters(Filter... filters) {
+    private void applyFilter(Filter... filters) {
         if (originalImage == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
@@ -179,7 +199,9 @@ public class ImageFilterApp extends JFrame {
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
-        builder.progress(this::updateLoader)
+
+        builder
+                .progress(this::updateLoader)
                 .process()
                 .thenAccept(image -> {
                     updateCanvas(image);
@@ -226,12 +248,10 @@ public class ImageFilterApp extends JFrame {
             loadImage(selectedFile);
         }
     }
-
     private void chooseKvantLevel() {
         ChooseKvantLevel chooser = new ChooseKvantLevel(this);
         levels_kvant = chooser.selectedValues();
     }
-
     private void chooseWindowSize() {
         ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
         window_size = Integer.parseInt(chooser.selectedSize());
