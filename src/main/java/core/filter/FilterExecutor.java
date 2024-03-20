@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,20 +15,23 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class FilterExecutor {
     static class Progress {
-        private final AtomicInteger cap;
+        private final float cap;
+        private final AtomicInteger subsNumber;
         private final AtomicReference<Float> accumulator;
         private final Consumer<Float> listener;
 
         public Progress(int capacity, Consumer<Float> listener) {
-            this.cap = new AtomicInteger(capacity);
+            this.cap = capacity;
+            this.subsNumber = new AtomicInteger(capacity);
             this.listener = listener;
             this.accumulator = new AtomicReference<>(0f);
         }
 
         void submit(float chunk) {
-            float progress = accumulator.accumulateAndGet(chunk, Float::sum);
+            float progress = accumulator.accumulateAndGet(chunk / cap, Float::sum);
             listener.accept(progress);
         }
 
@@ -50,7 +52,7 @@ public final class FilterExecutor {
         }
 
         SharedProgress share(int capacity) {
-            final var get = cap.decrementAndGet();
+            final var get = subsNumber.decrementAndGet();
             if (get < 0) {
                 throw new IllegalStateException("it is not possible to request more shares");
             }
@@ -58,15 +60,11 @@ public final class FilterExecutor {
         }
     }
 
-    public static BufferedImage run(BufferedImage image, Filter filter) throws ExecutionException, InterruptedException {
-        final var future = of(image).with(filter).process();
-        return future.get();
-    }
-
     public static Builder of(BufferedImage image) {
         return new Builder(image);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     static public class Builder {
         private final BufferedImage image;
         private final Collection<Filter> filters;
@@ -151,10 +149,12 @@ public final class FilterExecutor {
                 CompletableFuture<Void> future = CompletableFuture.supplyAsync(job, executorService);
                 futures.add(future);
             }
-            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenApply(v -> {
-                futures.forEach(CompletableFuture::join);
-                return result;
-            });
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenRun(() -> futures.forEach(CompletableFuture::join))
+                    .thenApply(v -> {
+                        //executorService.shutdown();
+                        return result;
+                    });
         }
 
         private static List<Supplier<Void>> buildMatrixFilterJobs(Image origin, BufferedImage result, MatrixFilter filter, int maxNumberOfThreads, @Nullable Progress progress) {
