@@ -13,7 +13,7 @@ public class FillColorFilter extends MatrixFilter {
         int r = ((alpha & 0xFF) << 24) |
                 ((((image.red(x, y) / 8) * 10 + 40) & 0xFF) << 16) |
                 ((((image.green(x, y) / 8) * 20 + 40) & 0xFF) << 8) |
-                ((((image.blue(x, y) / 8) * 40 + 40) & 0xFF));
+                ((((image.blue(x, y) / 8) * 30 + 40) & 0xFF));
         return r;
     }
 }

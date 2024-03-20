@@ -5,10 +5,11 @@ import model.ChooseKvantLevel;
 import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
+import model.filter.darya.MyFloydDithering;
 import model.filter.darya.WaterShedFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.BloomFilter;
-import model.filter.leonid.EmbossingFilter;
+//import model.filter.leonid.EmbossingFilter;
 import model.filter.leonid.GaussianBlurFilter;
 import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
@@ -173,16 +174,16 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyWaterShedButton);
 
         JButton applyOrderedDithering = new JButton("Apply ordered dithering");
-        applyOrderedDithering.addActionListener(e -> applyFilter(new OrderedDithering(60, 60, 60)));
+        applyOrderedDithering.addActionListener(e -> applyFilter( new MyFloydDithering(levels_kvant)));
         toolBar.add(applyOrderedDithering);
 
         /*JButton applyFSDitheringButton = new JButton("Apply FSDithering");
         applyFSDitheringButton.addActionListener(e -> applyFSDithering());
         toolBar.add(applyFSDitheringButton);*/
 
-        JButton applyEmbossingButton = new JButton("Apply embossing");
-        applyEmbossingButton.addActionListener(e -> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
-        toolBar.add(applyEmbossingButton);
+        //JButton applyEmbossingButton = new JButton("Apply embossing");
+        //applyEmbossingButton.addActionListener(e -> applyFilter(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        //toolBar.add(applyEmbossingButton);
 
         add(toolBar, BorderLayout.NORTH);
     }
