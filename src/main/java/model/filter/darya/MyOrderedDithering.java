@@ -21,23 +21,23 @@ public class MyOrderedDithering extends CustomFilter {
         for (int i = 0; i < image.width(); i++)
             for (int j = 0; j < image.height(); j++) {
                 int oldpix = image.color(i, j);
-                if (kv[0] == 4)
+                if (kv[0] <= 4)
                     red = image.red(i, j) + 32 - M3[j % 8][i % 8];
-                if (kv[1] == 4)
-                    green = image.green(i, j) + 32 - M3[j % 8][i % 8];
-                if (kv[2] == 4)
-                    blue = image.blue(i, j) + 32 - M3[j % 8][i % 8];
-                if (kv[0] == 16)
+                else if (kv[0] <= 16)
                     red = image.red(i, j) + 8 - M2[j % 4][i % 4];
-                if (kv[1] == 16)
-                    green = image.green(i, j) + 8 - M2[j % 4][i % 4];
-                if (kv[2] == 16)
-                    blue = image.blue(i, j) + 8 - M2[j % 4][i % 4];
-                if (kv[0] == 64)
+                else if (kv[0] <= 64)
                     red = image.red(i, j) + 2 - M1[j % 2][i % 2];
-                if (kv[1] == 64)
+                if (kv[1] <= 4)
+                    green = image.green(i, j) + 32 - M3[j % 8][i % 8];
+                else if (kv[1] <= 16)
+                    green = image.green(i, j) + 8 - M2[j % 4][i % 4];
+                else if (kv[1] <= 64)
                     green = image.green(i, j) + 2 - M1[j % 2][i % 2];
-                if (kv[2] == 64)
+                if (kv[2] <= 4)
+                    blue = image.blue(i, j) + 32 - M3[j % 8][i % 8];
+                else if (kv[2] <= 16)
+                    blue = image.blue(i, j) + 8 - M2[j % 4][i % 4];
+                else if (kv[2] <= 64)
                     blue = image.blue(i, j) + 2 - M1[j % 2][i % 2];
                 int alpha = (oldpix >> 24) & 0xFF;
                 if (red == -1000 || green == -1000 || blue == -1000)
