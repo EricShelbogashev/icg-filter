@@ -5,6 +5,8 @@ import core.filter.MatrixFilter;
 
 public class EmbossingFilter extends MatrixFilter {
 
+    int brightnessIncrease = 64;
+
     @Override
     protected int apply(Image image, int x, int y) {
         int curColor;
@@ -12,15 +14,15 @@ public class EmbossingFilter extends MatrixFilter {
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                curColor = image.red(x + i, y + j);
-                int koef = getKoef(i+1, j+1);
+                curColor = ColorUtils.getBrightness(image.red(x + i, y + j));
+                int koef = getKoef(i + 1, j + 1);
                 curColor *= koef;
                 resultColor += curColor;
             }
         }
 
         int alpha = image.alpha(x, y); // извлечение альфа-канала
-        int grayColor = resultColor;
+        int grayColor = resultColor + brightnessIncrease;
         grayColor = Math.max(grayColor, 0); // ограничение значения в диапазоне [0, 255]
         grayColor = Math.min(grayColor, 255);
 

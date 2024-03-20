@@ -22,7 +22,7 @@ public class ColorUtils {
 
 
     // Returns brightness value [0, 1]
-    static public double brightness(int rgb) {
+    static public double getNormalizeBrightness(int rgb) {
 
         // Normalize chanel values to [0, 1]
         double normalizedRed = red(rgb) / 255.0;
@@ -40,6 +40,10 @@ public class ColorUtils {
     static public int getMonochrome(int rgb) {
 
         return rgb((int) (0.299 * red(rgb)), (int) (0.587 * green(rgb)), (int) (0.114 * blue(rgb)), alpha(rgb));
+    }
+
+    static public int getBrightness(int rgb) {
+        return (red(rgb) + green(rgb) + blue(rgb))/3;
     }
 
     public static int sum(int rgb1, int rgb2) {
