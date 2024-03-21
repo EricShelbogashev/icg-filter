@@ -4,13 +4,11 @@ import core.options.Setting;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 public class SettingsDialogGenerator {
 
-    public static void generateAndShowDialog(List<Setting<?>> settings, Runnable onClose) {
+    public static void generateAndShowDialog(List<Setting<?>> settings) {
         JFrame frame = new JFrame("Настройки");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
@@ -39,19 +37,5 @@ public class SettingsDialogGenerator {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                onClose.run();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                super.windowClosed(e);
-                onClose.run();
-            }
-        });
     }
 }

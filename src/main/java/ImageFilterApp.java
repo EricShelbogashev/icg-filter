@@ -45,7 +45,17 @@ public class ImageFilterApp extends JFrame {
     public ImageFilterApp() {
         super("Image Filter Application");
         initializeUI();
+        initSettings();
+    }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            ImageFilterApp frame = new ImageFilterApp();
+            frame.setVisible(true);
+        });
+    }
+
+    private void initSettings() {
         settings.put("fit",
                 List.of(
                         OptionsFactory.settingEnum(
@@ -57,13 +67,6 @@ public class ImageFilterApp extends JFrame {
                         )
                 )
         );
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            ImageFilterApp frame = new ImageFilterApp();
-            frame.setVisible(true);
-        });
     }
 
     private void createOverlayPanel() {
@@ -257,10 +260,8 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void chooseFitAlgorithm() {
-        final List<Setting<?>> newSettings = settings.get("fit");
-        SettingsDialogGenerator.generateAndShowDialog(newSettings, () -> {
-            settings.put("fit", newSettings);
-        });
+        final List<Setting<?>> prefs = settings.get("fit");
+        SettingsDialogGenerator.generateAndShowDialog(prefs);
     }
 
     private void chooseImage() {
