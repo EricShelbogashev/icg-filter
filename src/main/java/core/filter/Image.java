@@ -36,6 +36,12 @@ public class Image {
         return image.getRGB(clampedX, clampedY);
     }
 
+    public void setColor(int x, int y, int rgb) {
+        if (x >= 0 && x < image.getWidth() && y >= 0 && y < image.getHeight()) {
+            image.setRGB(x, y, rgb);
+        }
+    }
+
     public int red(int x, int y) {
         return color(x, y) >> 16 & 0xFF;
     }
