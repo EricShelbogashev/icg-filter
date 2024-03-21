@@ -57,4 +57,21 @@ public class Image {
     public int alpha(int x, int y) {
         return (color(x, y) >> 24) & 0xFF;
     }
+
+    public static Image empty(int width, int height) {
+        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        return new Image(bufferedImage);
+    }
+
+    public static Image copyOf(Image other) {
+        final var width = other.width();
+        final var height = other.height();
+        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                bufferedImage.setRGB(x, y, other.color(x, y));
+            }
+        }
+        return new Image(bufferedImage);
+    }
 }

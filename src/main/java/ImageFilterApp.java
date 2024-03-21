@@ -10,6 +10,7 @@ import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
+import model.filter.eric.VHSFilter;
 import model.filter.leonid.BloomFilter;
 import model.filter.leonid.EmbossingFilter;
 import model.filter.leonid.FSDithering;
@@ -206,6 +207,10 @@ public class ImageFilterApp extends JFrame {
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
         applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
         toolBar.add(applyGaussianBlur);
+
+        JButton applyVhs = new JButton("Apply VHS");
+        applyVhs.addActionListener(e -> applyFilters(new VHSFilter()));
+        toolBar.add(applyVhs);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
         applyBloom.addActionListener(e -> applyBloomEffect());
