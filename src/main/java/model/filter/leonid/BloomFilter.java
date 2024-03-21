@@ -26,10 +26,10 @@ public class BloomFilter extends MatrixFilter {
         int resultGreen = 0;
         int resultBlue = 0;
 
-        if (ColorUtils.getNormalizeBrightness(image.color(x,y)) >= threshold) {
-            resultRed = Math.min((int)(image.red(x, y) * glowFactor) ,255);
-            resultGreen = Math.min((int)(image.green(x, y) * glowFactor), 255);
-            resultBlue = Math.min((int)(image.blue(x, y) * glowFactor), 255);
+        if (ColorUtils.getNormalizeBrightness(image.color(x, y)) >= threshold) {
+            resultRed = Math.min((int) (image.red(x, y) * glowFactor), 255);
+            resultGreen = Math.min((int) (image.green(x, y) * glowFactor), 255);
+            resultBlue = Math.min((int) (image.blue(x, y) * glowFactor), 255);
         }
 
         return ColorUtils.rgb(resultRed, resultGreen, resultBlue);

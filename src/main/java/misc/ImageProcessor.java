@@ -9,23 +9,6 @@ import java.util.stream.Stream;
 public class ImageProcessor {
     private final BufferedImage image;
 
-    static class Progress {
-        private final double capacity;
-        private final AtomicInteger accumulator;
-        private final Consumer<Double> listener;
-
-        public Progress(int capacity, Consumer<Double> listener) {
-            this.capacity = capacity;
-            this.accumulator = new AtomicInteger(0);
-            this.listener = listener;
-        }
-
-        public void submit() {
-            double progress = accumulator.incrementAndGet() / capacity;
-            listener.accept(progress);
-        }
-    }
-
     public ImageProcessor(BufferedImage image) {
         this.image = image;
     }
@@ -48,5 +31,22 @@ public class ImageProcessor {
 
     private void applyFilter(BufferedImage resultImage, int color, Point pivot) {
         resultImage.setRGB(pivot.x, pivot.y, color);
+    }
+
+    static class Progress {
+        private final double capacity;
+        private final AtomicInteger accumulator;
+        private final Consumer<Double> listener;
+
+        public Progress(int capacity, Consumer<Double> listener) {
+            this.capacity = capacity;
+            this.accumulator = new AtomicInteger(0);
+            this.listener = listener;
+        }
+
+        public void submit() {
+            double progress = accumulator.incrementAndGet() / capacity;
+            listener.accept(progress);
+        }
     }
 }

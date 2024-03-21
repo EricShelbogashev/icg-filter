@@ -7,25 +7,23 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class ChooseKvantLevel extends JDialog {
-    private String[] items = {"2", "4", "8", "16", "32", "64", "128"};
-    private JComboBox value_red;
-    private JComboBox value_green;
-    private JComboBox value_blue;
+public class ChooseQuantumLevel extends JDialog {
     public boolean is_new = false;
-    public int[] selectedValues(){
-        return new int[]{Integer.parseInt(items[value_red.getSelectedIndex()]), Integer.parseInt(items[value_green.getSelectedIndex()]), Integer.parseInt(items[value_blue.getSelectedIndex()])};
-    }
-    public ChooseKvantLevel(JFrame owner){
+    private final String[] items = {"2", "4", "8", "16", "32", "64", "128"};
+    private final JComboBox value_red;
+    private final JComboBox value_green;
+    private final JComboBox value_blue;
+
+    public ChooseQuantumLevel(JFrame owner) {
         super(owner);
-        setSize(400,200);
+        setSize(400, 200);
         setLocationRelativeTo(owner);
         setModalityType(ModalityType.TOOLKIT_MODAL);
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ChooseKvantLevel.this.setVisible(false);
+                ChooseQuantumLevel.this.setVisible(false);
             }
         });
         JPanel grid = new JPanel();
@@ -68,12 +66,16 @@ public class ChooseKvantLevel extends JDialog {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ChooseKvantLevel.this.is_new = true;
-                ChooseKvantLevel.this.setVisible(false);
+                ChooseQuantumLevel.this.is_new = true;
+                ChooseQuantumLevel.this.setVisible(false);
             }
         });
         getContentPane().add(grid);
         pack();
         setVisible(true);
+    }
+
+    public int[] selectedValues() {
+        return new int[]{Integer.parseInt(items[value_red.getSelectedIndex()]), Integer.parseInt(items[value_green.getSelectedIndex()]), Integer.parseInt(items[value_blue.getSelectedIndex()])};
     }
 }

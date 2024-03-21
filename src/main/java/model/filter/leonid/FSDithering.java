@@ -20,21 +20,18 @@ public class FSDithering extends CustomFilter {
     float chooseFactor(int xOffset, int yOffset) {
         if (xOffset == 1 && yOffset == 0) {
             return 7.0f / 16;
-        }
-        else if (xOffset == -1 && yOffset == 1) {
+        } else if (xOffset == -1 && yOffset == 1) {
             return 1.0f / 16;
-        }
-        else if (xOffset == 0 && yOffset == 1) {
+        } else if (xOffset == 0 && yOffset == 1) {
             return 5.0f / 16;
-        }
-
-        else if (xOffset == 1 && yOffset == 1) {
+        } else if (xOffset == 1 && yOffset == 1) {
             return 3.0f / 16;
         }
 
         return 0;
 
     }
+
     void setError(Image image, int x, int y, int xOffset, int yOffset, int[] quantError) {
         int red = image.red(x + xOffset, y + yOffset);
         red += (int) (quantError[0] * chooseFactor(xOffset, yOffset));
@@ -52,7 +49,7 @@ public class FSDithering extends CustomFilter {
     protected BufferedImage apply(Image image) {
         for (int y = 0; y < image.bufferedImage().getHeight(); y++) {
             for (int x = 0; x < image.bufferedImage().getWidth(); x++) {
-                int oldRed = image.red(x,y);
+                int oldRed = image.red(x, y);
                 int oldGreen = image.green(x, y);
                 int oldBlue = image.blue(x, y);
 

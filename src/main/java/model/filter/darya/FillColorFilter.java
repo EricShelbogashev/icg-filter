@@ -4,9 +4,10 @@ import core.filter.Image;
 import core.filter.MatrixFilter;
 
 public class FillColorFilter extends MatrixFilter {
-    public FillColorFilter(){
+    public FillColorFilter() {
 
     }
+
     @Override
     protected int apply(Image image, int x, int y) {
         int alpha = (image.color(x, y) >> 24) & 0xFF;

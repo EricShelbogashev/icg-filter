@@ -5,7 +5,32 @@ import core.filter.MatrixFilter;
 
 public class EmbossingFilter extends MatrixFilter {
 
+    static int[][] rightTopLight = {
+            {0, 1, 2},
+            {-1, 1, 1},
+            {-2, -1, 0}
+    };
+    static int[][] leftTopLight = {
+            {2, 1, 0},
+            {1, 1, -1},
+            {0, -1, -2}
+    };
+    static int[][] leftBottomLight = {
+            {0, -1, -2},
+            {1, 1, -1},
+            {2, 1, 0}
+    };
+    static int[][] rightBottomLight = {
+            {-2, -1, 0},
+            {-1, 1, 1},
+            {0, 1, 2}
+    };
     int brightnessIncrease = 64;
+    Light lightPosition;
+
+    public EmbossingFilter(Light lightPosition) {
+        this.lightPosition = lightPosition;
+    }
 
     @Override
     protected int apply(Image image, int x, int y) {
@@ -29,35 +54,6 @@ public class EmbossingFilter extends MatrixFilter {
         return (alpha << 24) | (grayColor << 16) | (grayColor << 8) | grayColor;
     }
 
-
-    public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP}
-
-    static int[][] rightTopLight = {
-            {0, 1, 2},
-            {-1, 1, 1},
-            {-2, -1, 0}
-    };
-
-    static int[][] leftTopLight = {
-            {2, 1, 0},
-            {1, 1, -1},
-            {0, -1, -2}
-    };
-
-    static int[][] leftBottomLight = {
-            {0, -1, -2},
-            {1, 1, -1},
-            {2, 1, 0}
-    };
-
-    static int[][] rightBottomLight = {
-            {-2, -1, 0},
-            {-1, 1, 1},
-            {0, 1, 2}
-    };
-
-    Light lightPosition;
-
     private int getKoef(int x, int y) {
         if (lightPosition == Light.LEFT_TOP) {
             return leftTopLight[x][y];
@@ -70,8 +66,6 @@ public class EmbossingFilter extends MatrixFilter {
         }
     }
 
-    public EmbossingFilter(Light lightPosition) {
-        this.lightPosition = lightPosition;
-    }
+    public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP}
 
 }

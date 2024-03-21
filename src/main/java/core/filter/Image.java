@@ -3,8 +3,8 @@ package core.filter;
 import java.awt.image.BufferedImage;
 
 public class Image {
-    private final BufferedImage image;
     public static final int DEFAULT_ALPHA = 0xFF;
+    private final BufferedImage image;
 
     public Image(BufferedImage image) {
         this.image = image;
@@ -54,5 +54,7 @@ public class Image {
         return color(x, y) & 0xFF;
     }
 
-    public int alpha(int x, int y) {return (color(x, y) >> 24) & 0xFF;}
+    public int alpha(int x, int y) {
+        return (color(x, y) >> 24) & 0xFF;
+    }
 }
