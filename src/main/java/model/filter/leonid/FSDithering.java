@@ -74,7 +74,7 @@ public class FSDithering extends CustomFilter {
         green += (int) (quantError[1] * chooseFactor(xOffset, yOffset));
 
         int blue = image.blue(x + xOffset, y + yOffset);
-        blue += (int) (quantError[1] * chooseFactor(xOffset, yOffset));
+        blue += (int) (quantError[2] * chooseFactor(xOffset, yOffset));
 
         image.setColor(x + xOffset, y + yOffset, ColorUtils.rgb(red, green, blue));
     }
@@ -93,7 +93,7 @@ public class FSDithering extends CustomFilter {
 
                 int[] quantError = {oldRed - newRed, oldGreen - newGreen, oldBlue - newBlue};
 
-                image.setColor(newRed, newGreen, newBlue);
+                image.setColor(x, y, ColorUtils.rgb(newRed, newGreen, newBlue));
 
                 // Spread error
                 setError(image, x, y, 0, 1, quantError);
