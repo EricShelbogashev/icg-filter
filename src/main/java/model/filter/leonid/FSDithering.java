@@ -81,8 +81,8 @@ public class FSDithering extends CustomFilter {
 
     @Override
     protected BufferedImage apply(Image image) {
-        for (int x = 0; x < image.bufferedImage().getWidth(); x++) {
-            for (int y = 0; y < image.bufferedImage().getHeight(); y++) {
+        for (int y = 0; y < image.bufferedImage().getHeight(); y++) {
+            for (int x = 0; x < image.bufferedImage().getWidth(); x++) {
                 int oldRed = image.red(x,y);
                 int oldGreen = image.green(x, y);
                 int oldBlue = image.blue(x, y);
