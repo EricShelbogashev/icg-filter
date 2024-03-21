@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.Map;
 
 public class ImageFilterApp extends JFrame {
+    private final Map<String, List<Setting<?>>> settings = new HashMap<>();
     int[] levels_kvant = {2, 2, 2};
     int window_size = 5;
     private JLabel imageLabel;
     private JProgressBar progressBar;
     private BufferedImage originalImage;
     private JPanel overlayPanel;
-    private final Map<String, List<Setting<?>>> settings = new HashMap<>();
 
     public ImageFilterApp() {
         super("Image Filter Application");
@@ -169,8 +169,6 @@ public class ImageFilterApp extends JFrame {
         if (originalImage != null) {
             FSDithering fsDithering = new FSDithering(2, 2, 2);
             applyFilters(fsDithering);
-
-
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }

@@ -8,11 +8,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class ChooseQuantumLevel extends JDialog {
-    public boolean is_new = false;
     private final String[] items = {"2", "4", "8", "16", "32", "64", "128"};
     private final JComboBox value_red;
     private final JComboBox value_green;
     private final JComboBox value_blue;
+    public boolean is_new = false;
 
     public ChooseQuantumLevel(JFrame owner) {
         super(owner);

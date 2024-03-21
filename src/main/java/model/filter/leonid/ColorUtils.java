@@ -1,6 +1,9 @@
 package model.filter.leonid;
 
 public class ColorUtils {
+    private ColorUtils() {
+    }
+
     static public int red(int rgb) {
         return (rgb >> 16) & 0xFF;
     }
@@ -57,6 +60,10 @@ public class ColorUtils {
         int blue = Math.min(ColorUtils.blue(rgb2) + ColorUtils.blue(rgb1), 255);
 
         return ColorUtils.rgb(red, green, blue);
+    }
+
+    public static int componentsToRgb(int[] components) {
+        return rgb(components[0], components[1], components[2]);
     }
 
 

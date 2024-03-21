@@ -8,15 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 public class VHSFilter extends CustomFilter {
-    @Override
-    protected BufferedImage apply(Image image) {
-        var applied = image;
-        applied = applyFadedColorEffect(applied);
-        applied = applyColorNoiseEffect(applied, 50);
-        applied = applyStripedAndShiftEffect(applied, 30, 8);
-        return applied.bufferedImage();
-    }
-
     public static Image applyFadedColorEffect(Image image) {
         final var height = image.height();
         final var width = image.width();
@@ -80,5 +71,14 @@ public class VHSFilter extends CustomFilter {
         }
 
         return result;
+    }
+
+    @Override
+    protected BufferedImage apply(Image image) {
+        var applied = image;
+        applied = applyFadedColorEffect(applied);
+        applied = applyColorNoiseEffect(applied, 50);
+        applied = applyStripedAndShiftEffect(applied, 30, 8);
+        return applied.bufferedImage();
     }
 }

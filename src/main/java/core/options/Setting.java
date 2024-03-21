@@ -11,13 +11,9 @@ public abstract class Setting<T> {
     protected final String label;
     protected final String description;
     protected final List<Function<T, String>> restrictions;
-    protected T value;
     protected final Class<T> type;
     protected final String id;
-
-    public String getId() {
-        return id;
-    }
+    protected T value;
 
     public Setting(T defaultValue, String label, String description, List<Function<T, String>> restrictions, Class<T> type, String id) {
         this.label = label;
@@ -26,6 +22,10 @@ public abstract class Setting<T> {
         this.value = defaultValue;
         this.type = type;
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public final String label() {

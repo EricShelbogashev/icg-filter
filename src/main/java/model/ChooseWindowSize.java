@@ -9,9 +9,9 @@ import java.awt.event.WindowEvent;
 
 
 public class ChooseWindowSize extends JDialog {
-    public boolean is_new = false;
     private final String[] items = {"3", "5", "7", "9", "11"};
     private final JComboBox value_type;
+    public boolean is_new = false;
 
     public ChooseWindowSize(JFrame owner, int ind) {
         super(owner);
