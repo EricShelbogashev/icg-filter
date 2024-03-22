@@ -67,7 +67,34 @@ public class ImageFilterApp extends JFrame {
                                 "fit_algo"
                         )
                 )
+
         );
+
+        settings.put("FSDithering",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень кванования красного цвета",
+                                "",
+                                2, 128,
+                                "redDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень квантования зеленого цвета",
+                                "",
+                                2, 128,
+                                "greenDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень квантования синего цвета",
+                                "",
+                                2, 128,
+                                "blueDegree"
+                        )
+
+                ));
     }
 
     private void createOverlayPanel() {
@@ -167,8 +194,52 @@ public class ImageFilterApp extends JFrame {
 
     private void applyFSDithering() {
         if (originalImage != null) {
-            FSDithering fsDithering = new FSDithering(2, 2, 2);
-            applyFilters(fsDithering);
+            final var s = settings.getOrDefault("FSDithering", null);
+            // if filter didn't configured
+            if (s == null) {
+                final var filter = new FSDithering(2, 2, 2);
+                applyFilters(filter);
+            }
+            else {
+                final var redSetting = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst();
+                int redRank;
+                final var greenSetting = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst();
+                int greenRank;
+                var blueSetting = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst();
+                int blueRank;
+
+                if (redSetting.isEmpty()) {
+                    redRank = 2;
+                }
+                else {
+                    redRank = redSetting.get().value();
+                }
+                if (greenSetting.isEmpty()) {
+                    greenRank = 2;
+                }
+                else {
+                    greenRank = greenSetting.get().value();
+                }
+                if (blueSetting.isEmpty()) {
+                    blueRank = 2;
+                }
+                else {
+                    blueRank = blueSetting.get().value();
+                }
+                FSDithering filter = new FSDithering(redRank, greenRank, blueRank);
+                applyFilters(filter);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseDitheringOrder() {
+        if (originalImage != null) {
+            final List<Setting<?>> newSettings = settings.get("FSDithering");
+            SettingsDialogGenerator.generateAndShowDialog(newSettings, this::applyFSDithering);
+
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
@@ -227,7 +298,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(chooseFitAlgorithm);
 
         JButton applyFSDitheringButton = new JButton("Apply FSDithering");
-        applyFSDitheringButton.addActionListener(e -> applyFSDithering());
+        applyFSDitheringButton.addActionListener(e -> chooseDitheringOrder());
         toolBar.add(applyFSDitheringButton);
 
         JButton applyEmbossingButton = new JButton("Apply embossing");
