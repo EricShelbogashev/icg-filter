@@ -50,13 +50,11 @@ public class SettingsDialogGenerator {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                onClose.run();
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
                 super.windowClosed(e);
-                onClose.run();
             }
         });
     }

@@ -70,7 +70,7 @@ public class ImageFilterApp extends JFrame {
 
         );
 
-        settings.put("FSDithering",
+        settings.put("dithering",
                 List.of(
                         OptionsFactory.settingInteger(
                                 2,
@@ -92,8 +92,14 @@ public class ImageFilterApp extends JFrame {
                                 "",
                                 2, 128,
                                 "blueDegree"
+                        ),
+                        OptionsFactory.settingEnum(
+                                DitheringMethod.ORDERED,
+                                "метод дизеренга",
+                                "",
+                                DitheringMethod.class,
+                                "ditherMethod"
                         )
-
                 ));
     }
 
@@ -192,42 +198,38 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void applyFSDithering() {
-        if (originalImage != null) {
-            final var s = settings.getOrDefault("FSDithering", null);
-            // if filter didn't configured
-            if (s == null) {
-                final var filter = new FSDithering(2, 2, 2);
-                applyFilters(filter);
-            }
-            else {
-                final var redSetting = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst();
-                int redRank;
-                final var greenSetting = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst();
-                int greenRank;
-                var blueSetting = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst();
-                int blueRank;
-
-                if (redSetting.isEmpty()) {
-                    redRank = 2;
-                }
-                else {
-                    redRank = redSetting.get().value();
-                }
-                if (greenSetting.isEmpty()) {
-                    greenRank = 2;
-                }
-                else {
-                    greenRank = greenSetting.get().value();
-                }
-                if (blueSetting.isEmpty()) {
-                    blueRank = 2;
-                }
-                else {
-                    blueRank = blueSetting.get().value();
-                }
+    private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
+        switch (ditheringMethod) {
+            case FLOYD_STEINBERG -> {
                 FSDithering filter = new FSDithering(redRank, greenRank, blueRank);
                 applyFilters(filter);
+            }
+            case ORDERED ->  {
+                OrderedDithering filter = new OrderedDithering(redRank, greenRank, blueRank);
+                applyFilters(filter);
+            }
+        }
+    }
+
+    private void parseDitherArgs() {
+        if (originalImage != null) {
+            final var s = settings.getOrDefault("dithering", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyDithering(DitheringMethod.ORDERED, 2, 2, 2);
+            }
+
+            else {
+                final int redRank = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst().get().value();
+                final int greenRank = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst().get().value();
+                final int blueRank = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst().get().value();
+                final DitheringMethod ditherMethod = s.stream().filter(it -> it.getId().equals("ditherMethod")).findFirst().get().value();
+
+
+                applyDithering(ditherMethod, redRank, greenRank, blueRank);
+
+
             }
 
         } else {
@@ -279,15 +281,11 @@ public class ImageFilterApp extends JFrame {
         applyWaterShedButton.addActionListener(e -> applyWaterShed());
         toolBar.add(applyWaterShedButton);
 
-        JButton applyOrderedDithering = new JButton("Apply ordered dithering");
-        applyOrderedDithering.addActionListener(e -> applyFilters(new OrderedDithering(16, 16, 16)));
-        toolBar.add(applyOrderedDithering);
-
         JButton chooseFitAlgorithm = new JButton("chooseFitAlgorithm");
         chooseFitAlgorithm.addActionListener(e -> chooseFitAlgorithm());
         toolBar.add(chooseFitAlgorithm);
 
-        JButton applyFSDitheringButton = new JButton("Apply FSDithering");
+        JButton applyFSDitheringButton = new JButton("Apply dithering");
         applyFSDitheringButton.addActionListener(e -> chooseDitheringOrder());
         toolBar.add(applyFSDitheringButton);
 
@@ -328,14 +326,15 @@ public class ImageFilterApp extends JFrame {
         SettingsDialogGenerator.generateAndShowDialog(prefs, () -> settings.put("fit", prefs));
     }
 
+    private enum DitheringMethod {FLOYD_STEINBERG, ORDERED}
+
     private void chooseDitheringOrder() {
         if (originalImage != null) {
-            final List<Setting<?>> newSettings = settings.get("FSDithering");
-            SettingsDialogGenerator.generateAndShowDialog(newSettings, () -> {
-                settings.put("FSDithering", newSettings);
-                applyFSDithering();
+            final List<Setting<?>> prefs = settings.get("dithering");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("dithering", prefs);
+                parseDitherArgs();
             });
-
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
