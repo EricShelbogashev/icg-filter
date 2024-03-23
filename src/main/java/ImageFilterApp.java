@@ -375,42 +375,52 @@ public class ImageFilterApp extends JFrame {
 
         JButton fitToScreenButton = new JButton("Fit to Screen");
         fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
+        fitToScreenButton.setToolTipText("Fit image to screen size");
         toolBar.add(fitToScreenButton);
 
         JButton applyMonochromeButton = new JButton("Apply Monochrome");
         applyMonochromeButton.addActionListener(e -> applyFilters(new MonochromeFilter()));
+        applyMonochromeButton.setToolTipText("Apply Monochrome filter");
         toolBar.add(applyMonochromeButton);
 
         JButton applyNegativeButton = new JButton("Apply Negative");
         applyNegativeButton.addActionListener(e -> applyFilters(new NegativeFilter()));
+        applyNegativeButton.setToolTipText("Apply Negative (color invert) filter");
         toolBar.add(applyNegativeButton);
 
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
         applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
         toolBar.add(applyGaussianBlur);
 
         JButton applyVhs = new JButton("Apply VHS");
         applyVhs.addActionListener(e -> applyFilters(new VHSFilter()));
+        applyVhs.setToolTipText("Apply VHS filter");
         toolBar.add(applyVhs);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
         applyBloom.addActionListener(e -> chooseBloomArgs());
+        applyBloom.setToolTipText("Apply Bloom filter");
         toolBar.add(applyBloom);
 
         JButton applyWaterShedButton = new JButton("Apply Watershed");
         applyWaterShedButton.addActionListener(e -> applyWaterShed());
+        applyWaterShedButton.setToolTipText("Apply Watershed filter");
         toolBar.add(applyWaterShedButton);
 
-        JButton applyFSDitheringButton = new JButton("Apply dithering");
-        applyFSDitheringButton.addActionListener(e -> chooseDitheringOrder());
-        toolBar.add(applyFSDitheringButton);
+        JButton applyDitheringButton = new JButton("Apply dithering");
+        applyDitheringButton.addActionListener(e -> chooseDitheringOrder());
+        applyDitheringButton.setToolTipText("Apply dithering");
+        toolBar.add(applyDitheringButton);
 
         JButton applyEmbossingButton = new JButton("Apply embossing");
         applyEmbossingButton.addActionListener(e -> chooseEmbossingArgs());
+        applyEmbossingButton.setToolTipText("Apply embossing");
         toolBar.add(applyEmbossingButton);
 
         JToggleButton switchImageButton = new JToggleButton("Show original image");
         switchImageButton.addActionListener(e -> onSwitchImagePressed(switchImageButton));
+        switchImageButton.setToolTipText("Switches image to original\\edited version");
         toolBar.add(switchImageButton);
 
         add(toolBar, BorderLayout.NORTH);
@@ -523,6 +533,9 @@ public class ImageFilterApp extends JFrame {
                 button.setSelected(true);
 
             }
+        }
+         else {
+        JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
 
     }
