@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ImageFilterApp extends JFrame {
     private final Map<String, List<Setting<?>>> settings = new HashMap<>();
@@ -363,6 +362,7 @@ public class ImageFilterApp extends JFrame {
 
         JButton chooseImageButton = new JButton("Choose Image");
         chooseImageButton.addActionListener(e -> chooseImage());
+        chooseImageButton.setToolTipText("Choose image for editing");
         toolBar.add(chooseImageButton);
 
         /*JButton chooseKvant = new JButton("Choose Kv Level");
