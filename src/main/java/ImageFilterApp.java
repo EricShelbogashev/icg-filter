@@ -14,7 +14,7 @@ import model.filter.eric.VHSFilter;
 import model.filter.leonid.BloomFilter;
 import model.filter.leonid.EmbossingFilter;
 import model.filter.leonid.FSDithering;
-import model.filter.leonid.GaussianBlurFilter;
+import model.filter.darya.GaussianBlurFilter;
 import model.filter.leonid.MixFilter;
 import model.filter.leonid.MonochromeFilter;
 import model.filter.leonid.NegativeFilter;
