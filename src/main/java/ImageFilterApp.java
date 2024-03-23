@@ -127,6 +127,24 @@ public class ImageFilterApp extends JFrame {
                                 "radius"
                         )
                 ));
+
+        settings.put("embossing",
+                List.of(
+                        OptionsFactory.settingEnum(
+                                EmbossingFilter.Light.LEFT_TOP,
+                                "Источник света",
+                                "",
+                                EmbossingFilter.Light.class,
+                                "light"
+                        ),
+                        OptionsFactory.settingInteger(
+                                64,
+                                "Сдвиг яркости",
+                                "",
+                                0, 255,
+                                "brightness"
+                        )
+                ));
     }
 
     private void createOverlayPanel() {
@@ -239,6 +257,38 @@ public class ImageFilterApp extends JFrame {
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
             MixFilter mixFilter = new MixFilter(new Image(originalImage));
             applyFilters(bloomFilter, blurFilter, mixFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseEmbossingArgs() {
+        if (originalImage != null) {
+            final List<Setting<?>> prefs = settings.get("embossing");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("embossing", prefs);
+                parseEmbossingArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseEmbossingArgs() {
+        if (originalImage != null) {
+            final var s = settings.getOrDefault("embossing", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP, 64));
+            }
+
+            else {
+                final EmbossingFilter.Light light = s.stream().filter(it -> it.getId().equals("light")).findFirst().get().value();
+                final int brightnessIncrease = s.stream().filter(it -> it.getId().equals("brightness")).findFirst().get().value();
+                applyFilters(new EmbossingFilter(light, brightnessIncrease));
+            }
 
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
@@ -358,7 +408,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyFSDitheringButton);
 
         JButton applyEmbossingButton = new JButton("Apply embossing");
-        applyEmbossingButton.addActionListener(e -> applyFilters(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP)));
+        applyEmbossingButton.addActionListener(e -> chooseEmbossingArgs());
         toolBar.add(applyEmbossingButton);
 
         add(toolBar, BorderLayout.NORTH);

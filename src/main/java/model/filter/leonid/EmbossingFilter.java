@@ -5,12 +5,12 @@ import core.filter.MatrixFilter;
 
 public class EmbossingFilter extends MatrixFilter {
 
-    static int[][] rightTopLight = {
+    static int[][] leftTopLight = {
             {0, 1, 2},
             {-1, 1, 1},
             {-2, -1, 0}
     };
-    static int[][] leftTopLight = {
+    static int[][] rightTopLight = {
             {2, 1, 0},
             {1, 1, -1},
             {0, -1, -2}
@@ -25,11 +25,12 @@ public class EmbossingFilter extends MatrixFilter {
             {-1, 1, 1},
             {0, 1, 2}
     };
-    int brightnessIncrease = 64;
+    int brightnessIncrease;
     Light lightPosition;
 
-    public EmbossingFilter(Light lightPosition) {
+    public EmbossingFilter(Light lightPosition, int brightnessIncrease) {
         this.lightPosition = lightPosition;
+        this.brightnessIncrease = brightnessIncrease;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class EmbossingFilter extends MatrixFilter {
             }
         }
 
-        int alpha = image.alpha(x, y); // извлечение альфа-канала
+        int alpha = image.alpha(x, y);
         int grayColor = resultColor + brightnessIncrease;
         grayColor = Math.max(grayColor, 0); // ограничение значения в диапазоне [0, 255]
         grayColor = Math.min(grayColor, 255);
@@ -55,17 +56,23 @@ public class EmbossingFilter extends MatrixFilter {
     }
 
     private int getKoef(int x, int y) {
-        if (lightPosition == Light.LEFT_TOP) {
-            return leftTopLight[x][y];
-        } else if (lightPosition == Light.RIGHT_BOTTOM) {
-            return rightBottomLight[x][y];
-        } else if (lightPosition == Light.RIGHT_TOP) {
-            return rightTopLight[x][y];
-        } else {
-            return leftBottomLight[x][y];
+        switch (lightPosition) {
+            case LEFT_TOP -> {
+                return leftTopLight[x][y];
+            }
+            case RIGHT_BOTTOM -> {
+                return rightBottomLight[x][y];
+            }
+            case RIGHT_TOP -> {
+                return rightTopLight[x][y];
+            }
+            case LEFT_BOTTOM -> {
+                return leftBottomLight[x][y];
+            }
         }
+        return 0;
     }
 
-    public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP}
+    public enum Light {LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP, LEFT_BOTTOM}
 
 }
