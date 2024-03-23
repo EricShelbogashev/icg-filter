@@ -430,13 +430,17 @@ public class ImageFilterApp extends JFrame {
         blur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
         filterMenu.add(blur);
 
-        JMenuItem bloomFilter = new JMenuItem("Bloom");
-        bloomFilter.addActionListener(e -> chooseBloomArgs());
-        filterMenu.add(bloomFilter);
+        JMenuItem bloom = new JMenuItem("Bloom");
+        bloom.addActionListener(e -> chooseBloomArgs());
+        filterMenu.add(bloom);
 
         JMenuItem embossing = new JMenuItem("Embossing");
         embossing.addActionListener(e -> chooseEmbossingArgs());
         filterMenu.add(embossing);
+
+        JMenuItem vhs = new JMenuItem("VHS");
+        vhs.addActionListener(e -> applyFilters(new VHSFilter()));
+        filterMenu.add(vhs);
 
         return filterMenu;
     }
@@ -446,15 +450,18 @@ public class ImageFilterApp extends JFrame {
         helpMenu.setText("Help");
 
         JMenuItem aboutProgram = new JMenuItem("About program");
-        String aboutMessage = "ICGFilter is program for applying filters.\n Authors: \n" +
-                "Shelbogashev Eric\n" +
-                "Shaikhutdinov Leonid\n" +
-                "Avtsinova Daria\n" +
-                "Kulakov Michael\n" +
-                "Bochkarev Egor \n"
+        String aboutMessage = """
+                ICGFilter is program for applying filters.
+                 Authors:\s
+                Shelbogashev Eric
+                Shaikhutdinov Leonid
+                Avtsinova Daria
+                Kulakov Michael
+                Bochkarev Egor\s
+                """
                 ;
         aboutProgram.addActionListener(e->JOptionPane.showMessageDialog(this,  aboutMessage));
-        add(aboutProgram);
+        helpMenu.add(aboutProgram);
         return helpMenu;
     }
 
@@ -464,14 +471,39 @@ public class ImageFilterApp extends JFrame {
         fit.addActionListener(e -> chooseFitAlgorithm());
         modifyMenu.add(fit);
 
+        JMenuItem dithering = new JMenuItem("Dither");
+        dithering.addActionListener(e -> chooseDitheringOrder());
+        modifyMenu.add(dithering);
+
         return modifyMenu;
     }
+
+    private JMenu createFileMenu() {
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem open = new JMenuItem("Open");
+        open.addActionListener(e->chooseImage());
+        fileMenu.add(open);
+
+        JMenuItem save = new JMenuItem("Save");
+        // TODO: Add save image function
+        fileMenu.add(save);
+
+        JMenuItem saveAs = new JMenuItem("Save as");
+        // TODO: Add save as image function
+        fileMenu.add(saveAs);
+
+        return fileMenu;
+    }
+
+
 
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         menuBar.add(createHelpMenu());
+        menuBar.add(createFileMenu());
         menuBar.add(createFilterMenu());
+        menuBar.add(createModifyMenu());
 
         setJMenuBar(menuBar);
     }
