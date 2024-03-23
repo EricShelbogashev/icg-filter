@@ -235,16 +235,6 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void chooseDitheringOrder() {
-        if (originalImage != null) {
-            final List<Setting<?>> newSettings = settings.get("FSDithering");
-            SettingsDialogGenerator.generateAndShowDialog(newSettings, this::applyFSDithering);
-
-        } else {
-            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-        }
-    }
-
     private void createToolbar() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
@@ -335,7 +325,20 @@ public class ImageFilterApp extends JFrame {
 
     private void chooseFitAlgorithm() {
         final List<Setting<?>> prefs = settings.get("fit");
-        SettingsDialogGenerator.generateAndShowDialog(prefs);
+        SettingsDialogGenerator.generateAndShowDialog(prefs, () -> settings.put("fit", prefs));
+    }
+
+    private void chooseDitheringOrder() {
+        if (originalImage != null) {
+            final List<Setting<?>> newSettings = settings.get("FSDithering");
+            SettingsDialogGenerator.generateAndShowDialog(newSettings, () -> {
+                settings.put("FSDithering", newSettings);
+                applyFSDithering();
+            });
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
     }
 
     private void chooseImage() {
