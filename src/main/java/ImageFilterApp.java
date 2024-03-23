@@ -35,11 +35,8 @@ public class ImageFilterApp extends JFrame {
     private JLabel imageLabel;
     private JProgressBar progressBar;
     private BufferedImage currentImage;
-
     private BufferedImage editedImage;
-
     boolean isOriginalImage;
-
     private BufferedImage originalImage;
     private JPanel overlayPanel;
 
@@ -181,6 +178,7 @@ public class ImageFilterApp extends JFrame {
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
         isOriginalImage = false;
+        createMenuBar();
         createToolbar();
         JScrollPane jScrollPane = new JScrollPane(imageLabel);
         addMouseDragFeature(jScrollPane);
@@ -373,7 +371,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(chooseWind);
 
         JButton fitToScreenButton = new JButton("Fit to Screen");
-        fitToScreenButton.addActionListener(e -> fitImageToScreen());
+        fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
         toolBar.add(fitToScreenButton);
 
         JButton applyMonochromeButton = new JButton("Apply Monochrome");
@@ -400,10 +398,6 @@ public class ImageFilterApp extends JFrame {
         applyWaterShedButton.addActionListener(e -> applyWaterShed());
         toolBar.add(applyWaterShedButton);
 
-        JButton chooseFitAlgorithm = new JButton("chooseFitAlgorithm");
-        chooseFitAlgorithm.addActionListener(e -> chooseFitAlgorithm());
-        toolBar.add(chooseFitAlgorithm);
-
         JButton applyFSDitheringButton = new JButton("Apply dithering");
         applyFSDitheringButton.addActionListener(e -> chooseDitheringOrder());
         toolBar.add(applyFSDitheringButton);
@@ -417,6 +411,69 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(switchImageButton);
 
         add(toolBar, BorderLayout.NORTH);
+    }
+
+    private JMenu createFilterMenu() {
+        JMenu filterMenu = new JMenu();
+        filterMenu.setText("Filter");
+
+        JMenuItem monochrome = new JMenuItem("Monochrome");
+        monochrome.addActionListener(e -> applyFilters(new MonochromeFilter()));
+        filterMenu.add(monochrome);
+
+        JMenuItem negative= new JMenuItem("Negative");
+        negative.addActionListener(e -> applyFilters(new NegativeFilter()));
+        filterMenu.add(negative);
+
+        JMenuItem blur = new JMenuItem("Gaussian blur");
+        // TODO: Переписать actionListener через функцию вызова окна выбора параметров фильтра Гаусса
+        blur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        filterMenu.add(blur);
+
+        JMenuItem bloomFilter = new JMenuItem("Bloom");
+        bloomFilter.addActionListener(e -> chooseBloomArgs());
+        filterMenu.add(bloomFilter);
+
+        JMenuItem embossing = new JMenuItem("Embossing");
+        embossing.addActionListener(e -> chooseEmbossingArgs());
+        filterMenu.add(embossing);
+
+        return filterMenu;
+    }
+
+    private JMenu createHelpMenu() {
+        JMenu helpMenu = new JMenu();
+        helpMenu.setText("Help");
+
+        JMenuItem aboutProgram = new JMenuItem("About program");
+        String aboutMessage = "ICGFilter is program for applying filters.\n Authors: \n" +
+                "Shelbogashev Eric\n" +
+                "Shaikhutdinov Leonid\n" +
+                "Avtsinova Daria\n" +
+                "Kulakov Michael\n" +
+                "Bochkarev Egor \n"
+                ;
+        aboutProgram.addActionListener(e->JOptionPane.showMessageDialog(this,  aboutMessage));
+        add(aboutProgram);
+        return helpMenu;
+    }
+
+    private JMenu createModifyMenu() {
+        JMenu modifyMenu = new JMenu("Modify");
+        JMenuItem fit = new JMenuItem("Fit image to screen");
+        fit.addActionListener(e -> chooseFitAlgorithm());
+        modifyMenu.add(fit);
+
+        return modifyMenu;
+    }
+
+    private void createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        menuBar.add(createHelpMenu());
+        menuBar.add(createFilterMenu());
+
+        setJMenuBar(menuBar);
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
@@ -461,7 +518,10 @@ public class ImageFilterApp extends JFrame {
 
     private void chooseFitAlgorithm() {
         final List<Setting<?>> prefs = settings.get("fit");
-        SettingsDialogGenerator.generateAndShowDialog(prefs, () -> settings.put("fit", prefs));
+        SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+            settings.put("fit", prefs);
+            fitImageToScreen();
+        });
     }
 
     private void chooseImage() {
