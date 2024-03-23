@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ImageFilterApp extends JFrame {
     private final Map<String, List<Setting<?>>> settings = new HashMap<>();
@@ -39,6 +40,8 @@ public class ImageFilterApp extends JFrame {
     boolean isOriginalImage;
     private BufferedImage originalImage;
     private JPanel overlayPanel;
+
+    private File outputFile;
 
     private enum DitheringMethod {FLOYD_STEINBERG, ORDERED}
 
@@ -362,13 +365,13 @@ public class ImageFilterApp extends JFrame {
         chooseImageButton.addActionListener(e -> chooseImage());
         toolBar.add(chooseImageButton);
 
-        JButton chooseKvant = new JButton("Choose Kv Level");
+        /*JButton chooseKvant = new JButton("Choose Kv Level");
         chooseKvant.addActionListener(e -> chooseQuantumLevel());
-        toolBar.add(chooseKvant);
+        toolBar.add(chooseKvant);*/
 
-        JButton chooseWind = new JButton("Choose Window S");
+        /*JButton chooseWind = new JButton("Choose Window S");
         chooseWind.addActionListener(e -> chooseWindowSize());
-        toolBar.add(chooseWind);
+        toolBar.add(chooseWind);*/
 
         JButton fitToScreenButton = new JButton("Fit to Screen");
         fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
@@ -485,17 +488,15 @@ public class ImageFilterApp extends JFrame {
         fileMenu.add(open);
 
         JMenuItem save = new JMenuItem("Save");
-        // TODO: Add save image function
+        save.addActionListener(e->saveFile());
         fileMenu.add(save);
 
         JMenuItem saveAs = new JMenuItem("Save as");
-        // TODO: Add save as image function
+        saveAs.addActionListener(e->saveFileAs());
         fileMenu.add(saveAs);
 
         return fileMenu;
     }
-
-
 
     private void createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
@@ -509,18 +510,21 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
-        if (isOriginalImage) {
-            isOriginalImage = false;
-            updateCanvas(editedImage);
-            button.setSelected(false);
+        if (currentImage != null){
+            if (isOriginalImage) {
+                isOriginalImage = false;
+                updateCanvas(editedImage);
+                button.setSelected(false);
 
-        }
-        else {
-            isOriginalImage = true;
-            updateCanvas(originalImage);
-            button.setSelected(true);
+            }
+            else {
+                isOriginalImage = true;
+                updateCanvas(originalImage);
+                button.setSelected(true);
 
+            }
         }
+
     }
 
     private void updateLoader(float percent) {
@@ -584,6 +588,36 @@ public class ImageFilterApp extends JFrame {
             imageLabel.setIcon(new ImageIcon(currentImage));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
+        }
+    }
+
+    public void saveFileAs() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            // Получаем выбранный файл
+            File selectedFile = fileChooser.getSelectedFile();
+
+            // Сохраняем BufferedImage в выбранный файл
+            if (!selectedFile.getName().toLowerCase().endsWith(".png")) {
+                selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
+            }
+            outputFile = selectedFile;
+            saveFile();
+        }
+    }
+
+    public void saveFile() {
+        if (outputFile == null) {
+            saveFileAs();
+        }
+        else {
+            try {
+                ImageIO.write(currentImage, "png", outputFile);
+                System.out.println("Изображение успешно сохранено в " + outputFile.getAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Ошибка при сохранении изображения: " + e.getMessage());
+            }
         }
     }
 
