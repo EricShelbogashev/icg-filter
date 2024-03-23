@@ -11,14 +11,8 @@ import model.filter.darya.WaterShedFilter;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
 import model.filter.eric.VHSFilter;
-import model.filter.leonid.BloomFilter;
-import model.filter.leonid.EmbossingFilter;
-import model.filter.leonid.FSDithering;
+import model.filter.leonid.*;
 import model.filter.darya.GaussianBlurFilter;
-import model.filter.leonid.MixFilter;
-import model.filter.leonid.MonochromeFilter;
-import model.filter.leonid.NegativeFilter;
-import model.filter.leonid.OrderedDithering;
 import model.options.SettingsDialogGenerator;
 
 import javax.imageio.ImageIO;
@@ -40,6 +34,12 @@ public class ImageFilterApp extends JFrame {
     int window_size = 5;
     private JLabel imageLabel;
     private JProgressBar progressBar;
+    private BufferedImage currentImage;
+
+    private BufferedImage editedImage;
+
+    boolean isOriginalImage;
+
     private BufferedImage originalImage;
     private JPanel overlayPanel;
 
@@ -180,6 +180,7 @@ public class ImageFilterApp extends JFrame {
         imageLabel = new JLabel("", SwingConstants.CENTER);
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
+        isOriginalImage = false;
         createToolbar();
         JScrollPane jScrollPane = new JScrollPane(imageLabel);
         addMouseDragFeature(jScrollPane);
@@ -190,14 +191,14 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void fitImageToScreen() {
-        if (originalImage != null) {
+        if (currentImage != null) {
             Dimension screenSize = this.getSize();
-            double widthRatio = screenSize.getWidth() / originalImage.getWidth();
-            double heightRatio = screenSize.getHeight() / originalImage.getHeight();
+            double widthRatio = screenSize.getWidth() / currentImage.getWidth();
+            double heightRatio = screenSize.getHeight() / currentImage.getHeight();
             double ratio = Math.min(widthRatio, heightRatio);
 
-            int newWidth = (int) (originalImage.getWidth() * ratio);
-            int newHeight = (int) (originalImage.getHeight() * ratio);
+            int newWidth = (int) (currentImage.getWidth() * ratio);
+            int newHeight = (int) (currentImage.getHeight() * ratio);
 
             final var s = settings.getOrDefault("fit", null);
             if (s == null) {
@@ -219,7 +220,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void chooseBloomArgs() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("bloom");
             SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
                 settings.put("bloom", prefs);
@@ -231,7 +232,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void parseBloomArgs() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final var s = settings.getOrDefault("bloom", null);
 
             // if filter didn't configured
@@ -252,10 +253,10 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void applyBloomEffect(float glowFactor, float threshold, int radius) {
-        if (originalImage != null) {
+        if (editedImage != null) {
             BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
-            MixFilter mixFilter = new MixFilter(new Image(originalImage));
+            MixFilter mixFilter = new MixFilter(new Image(editedImage));
             applyFilters(bloomFilter, blurFilter, mixFilter);
 
         } else {
@@ -264,7 +265,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void chooseEmbossingArgs() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("embossing");
             SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
                 settings.put("embossing", prefs);
@@ -276,7 +277,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void parseEmbossingArgs() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final var s = settings.getOrDefault("embossing", null);
 
             // if filter didn't configured
@@ -296,7 +297,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void applyWaterShed() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             WaterShedFilter waterShedFilter = new WaterShedFilter(levels_kvant);
             ColorStretchFilter colorStretchFilter = new ColorStretchFilter(levels_kvant);
             FillColorFilter fillColorFilter = new FillColorFilter();
@@ -321,7 +322,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void chooseDitheringOrder() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("dithering");
             SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
                 settings.put("dithering", prefs);
@@ -333,7 +334,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void parseDitherArgs() {
-        if (originalImage != null) {
+        if (editedImage != null) {
             final var s = settings.getOrDefault("dithering", null);
 
             // if filter didn't configured
@@ -411,7 +412,26 @@ public class ImageFilterApp extends JFrame {
         applyEmbossingButton.addActionListener(e -> chooseEmbossingArgs());
         toolBar.add(applyEmbossingButton);
 
+        JToggleButton switchImageButton = new JToggleButton("Show original image");
+        switchImageButton.addActionListener(e -> onSwitchImagePressed(switchImageButton));
+        toolBar.add(switchImageButton);
+
         add(toolBar, BorderLayout.NORTH);
+    }
+
+    private void onSwitchImagePressed(JToggleButton button) {
+        if (isOriginalImage) {
+            isOriginalImage = false;
+            updateCanvas(editedImage);
+            button.setSelected(false);
+
+        }
+        else {
+            isOriginalImage = true;
+            updateCanvas(originalImage);
+            button.setSelected(true);
+
+        }
     }
 
     private void updateLoader(float percent) {
@@ -428,7 +448,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void updateCanvas(BufferedImage image) {
-        this.originalImage = image;
+        this.currentImage = image;
         imageLabel.setIcon(new ImageIcon(image));
         resetUIAfterProcessing();
     }
@@ -466,8 +486,10 @@ public class ImageFilterApp extends JFrame {
 
     private void loadImage(File imageFile) {
         try {
-            originalImage = ImageIO.read(imageFile);
-            imageLabel.setIcon(new ImageIcon(originalImage));
+            currentImage = ImageIO.read(imageFile);
+            originalImage = ImageUtils.copy(currentImage);
+            editedImage = ImageUtils.copy(currentImage);
+            imageLabel.setIcon(new ImageIcon(currentImage));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
         }
@@ -507,7 +529,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void applyFilters(Filter... filters) {
-        if (originalImage == null) {
+        if (currentImage == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
         }
@@ -515,14 +537,16 @@ public class ImageFilterApp extends JFrame {
         overlayPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(originalImage);
+        FilterExecutor.Builder builder = FilterExecutor.of(editedImage);
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
         builder.progress(this::updateLoader)
                 .process()
-                .thenAccept(image -> {
-                    updateCanvas(image);
+                .thenAccept(newImage -> {
+                    originalImage = ImageUtils.copy(editedImage);
+                    editedImage = ImageUtils.copy(newImage);
+                    updateCanvas(editedImage);
                     showOverlay(false);
                 })
                 .exceptionally(ex -> {
