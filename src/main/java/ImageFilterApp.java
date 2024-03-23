@@ -43,6 +43,8 @@ public class ImageFilterApp extends JFrame {
     private BufferedImage originalImage;
     private JPanel overlayPanel;
 
+    private enum DitheringMethod {FLOYD_STEINBERG, ORDERED}
+
     public ImageFilterApp() {
         super("Image Filter Application");
         initializeUI();
@@ -99,6 +101,30 @@ public class ImageFilterApp extends JFrame {
                                 "",
                                 DitheringMethod.class,
                                 "ditherMethod"
+                        )
+                ));
+
+        settings.put("bloom",
+                List.of(
+                        OptionsFactory.settingFloat(
+                                0.3f,
+                                "сила свечения",
+                                "",
+                                0, 1,
+                                "glowFactor"
+                        ),
+                        OptionsFactory.settingFloat(
+                                0.7f,
+                                "пороговое значение",
+                                "",
+                                0, 1,
+                                "threshold"
+                        ),
+                        OptionsFactory.settingInteger(
+                                5,
+                                "Радиус",
+                                "", 1, 100,
+                                "radius"
                         )
                 ));
     }
@@ -174,10 +200,43 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void applyBloomEffect() {
+    private void chooseBloomArgs() {
         if (originalImage != null) {
-            BloomFilter bloomFilter = new BloomFilter(0.3, 0.7);
-            GaussianBlurFilter blurFilter = new GaussianBlurFilter(5);
+            final List<Setting<?>> prefs = settings.get("bloom");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("bloom", prefs);
+                parseBloomArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseBloomArgs() {
+        if (originalImage != null) {
+            final var s = settings.getOrDefault("bloom", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyBloomEffect(0.3f, 0.7f, 5);
+            }
+
+            else {
+                final float glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
+                final float threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
+                final int radius = s.stream().filter(it -> it.getId().equals("radius")).findFirst().get().value();
+                applyBloomEffect(glowFactor, threshold, radius);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applyBloomEffect(float glowFactor, float threshold, int radius) {
+        if (originalImage != null) {
+            BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
+            GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
             MixFilter mixFilter = new MixFilter(new Image(originalImage));
             applyFilters(bloomFilter, blurFilter, mixFilter);
 
@@ -211,6 +270,18 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void chooseDitheringOrder() {
+        if (originalImage != null) {
+            final List<Setting<?>> prefs = settings.get("dithering");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("dithering", prefs);
+                parseDitherArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void parseDitherArgs() {
         if (originalImage != null) {
             final var s = settings.getOrDefault("dithering", null);
@@ -226,10 +297,7 @@ public class ImageFilterApp extends JFrame {
                 final int blueRank = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst().get().value();
                 final DitheringMethod ditherMethod = s.stream().filter(it -> it.getId().equals("ditherMethod")).findFirst().get().value();
 
-
                 applyDithering(ditherMethod, redRank, greenRank, blueRank);
-
-
             }
 
         } else {
@@ -274,7 +342,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyVhs);
 
         JButton applyBloom = new JButton("Apply Bloom effect");
-        applyBloom.addActionListener(e -> applyBloomEffect());
+        applyBloom.addActionListener(e -> chooseBloomArgs());
         toolBar.add(applyBloom);
 
         JButton applyWaterShedButton = new JButton("Apply Watershed");
@@ -324,20 +392,6 @@ public class ImageFilterApp extends JFrame {
     private void chooseFitAlgorithm() {
         final List<Setting<?>> prefs = settings.get("fit");
         SettingsDialogGenerator.generateAndShowDialog(prefs, () -> settings.put("fit", prefs));
-    }
-
-    private enum DitheringMethod {FLOYD_STEINBERG, ORDERED}
-
-    private void chooseDitheringOrder() {
-        if (originalImage != null) {
-            final List<Setting<?>> prefs = settings.get("dithering");
-            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
-                settings.put("dithering", prefs);
-                parseDitherArgs();
-            });
-        } else {
-            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-        }
     }
 
     private void chooseImage() {
