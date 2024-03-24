@@ -1,8 +1,8 @@
 package model.bochkarev;
 
-import model.ICGFilter;
-import model.MatrixView;
-import model.Pattern;
+import misc.ICGFilter;
+import misc.MatrixView;
+import misc.Pattern;
 
 import java.awt.*;
 

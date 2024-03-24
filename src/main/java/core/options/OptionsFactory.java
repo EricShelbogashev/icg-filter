@@ -8,8 +8,8 @@ public class OptionsFactory {
 
     public static Setting<Integer> settingInteger(int defaultValue, String label, String hint, int min, int max, String id) {
         return new Setting<>(defaultValue, label, hint, List.of(
-                value -> value < min ? "должно быть больше или равно " + min : null,
-                value -> value > max ? "должно быть меньше или равно " + max : null
+                value -> value < min ? "should be grater or equal to " + min : null,
+                value -> value > max ? "should be less or equal to " + max : null
         ), Integer.class, id) {
             @Override
             public JComponent createComponent() {
@@ -26,8 +26,8 @@ public class OptionsFactory {
 
     public static Setting<Float> settingFloat(float defaultValue, String label, String hint, float min, float max, String id) {
         return new Setting<>(defaultValue, label, hint, List.of(
-                value -> value < min ? "должно быть больше или равно " + min : null,
-                value -> value > max ? "должно быть меньше или равно " + max : null
+                value -> value < min ? "should be grater or equal to " + min : null,
+                value -> value > max ? "should be less or equal to " + max : null
         ), Float.class, id) {
             @Override
             public JComponent createComponent() {
@@ -40,8 +40,8 @@ public class OptionsFactory {
 
     public static Setting<Range> settingRange(Range defaultValue, String label, String hint, Range bounds, String id) {
         return new Setting<>(defaultValue, label, hint, List.of(
-                value -> bounds.start() > value.start() ? "диапазон должен начинаться с " + bounds.start() : null,
-                value -> bounds.end() < value.end() ? "диапазон должен заканчиваться на " + bounds.end() : null
+                value -> bounds.start() > value.start() ? "The range should start with " + bounds.start() : null,
+                value -> bounds.end() < value.end() ? "The range should end with " + bounds.end() : null
         ), Range.class, id) {
             @Override
             public JComponent createComponent() {
@@ -57,9 +57,9 @@ public class OptionsFactory {
                     value(newValue);
                 });
 
-                panel.add(new JLabel("Начало:"));
+                panel.add(new JLabel("Start:"));
                 panel.add(startSpinner);
-                panel.add(new JLabel("Конец:"));
+                panel.add(new JLabel("End:"));
                 panel.add(endSpinner);
 
                 return panel;
