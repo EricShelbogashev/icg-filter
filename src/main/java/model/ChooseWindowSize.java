@@ -9,17 +9,13 @@ import java.awt.event.WindowEvent;
 
 
 public class ChooseWindowSize extends JDialog {
-    private String[] items = {"3", "5","7", "9", "11"};
-    private JComboBox value_type;
+    private final String[] items = {"3", "5", "7", "9", "11"};
+    private final JComboBox value_type;
     public boolean is_new = false;
-    public String selectedSize(){
-        if (value_type.getSelectedIndex() < items.length && value_type.getSelectedIndex() >= 0)
-            return items[value_type.getSelectedIndex()];
-        return "3";
-    }
-    public ChooseWindowSize(JFrame owner, int ind){
+
+    public ChooseWindowSize(JFrame owner, int ind) {
         super(owner);
-        setSize(400,200);
+        setSize(400, 200);
         setLocationRelativeTo(owner);
         setModalityType(ModalityType.TOOLKIT_MODAL);
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -56,5 +52,11 @@ public class ChooseWindowSize extends JDialog {
         getContentPane().add(grid);
         pack();
         setVisible(true);
+    }
+
+    public String selectedSize() {
+        if (value_type.getSelectedIndex() < items.length && value_type.getSelectedIndex() >= 0)
+            return items[value_type.getSelectedIndex()];
+        return "3";
     }
 }

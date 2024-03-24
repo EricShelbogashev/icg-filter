@@ -1,6 +1,6 @@
 package misc;
 
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;

@@ -17,6 +17,10 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public final class FilterExecutor {
+    public static Builder of(BufferedImage image) {
+        return new Builder(image);
+    }
+
     static class Progress {
         private final float cap;
         private final AtomicInteger subsNumber;
@@ -35,6 +39,13 @@ public final class FilterExecutor {
             listener.accept(progress);
         }
 
+        SharedProgress share(int capacity) {
+            final var get = subsNumber.decrementAndGet();
+            if (get < 0) {
+                throw new IllegalStateException("it is not possible to request more shares");
+            }
+            return new SharedProgress(capacity, this::submit);
+        }
 
         private static class SharedProgress {
             private final float capacity;
@@ -50,18 +61,6 @@ public final class FilterExecutor {
                 consumer.accept(chunk);
             }
         }
-
-        SharedProgress share(int capacity) {
-            final var get = subsNumber.decrementAndGet();
-            if (get < 0) {
-                throw new IllegalStateException("it is not possible to request more shares");
-            }
-            return new SharedProgress(capacity, this::submit);
-        }
-    }
-
-    public static Builder of(BufferedImage image) {
-        return new Builder(image);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -76,56 +75,6 @@ public final class FilterExecutor {
             Objects.requireNonNull(image, "image must not be null");
             this.image = image;
             filters = new ArrayList<>();
-        }
-
-        public Builder with(Filter filter) {
-            Objects.requireNonNull(filter, "filter must not be null");
-            this.filters.add(filter);
-            return this;
-        }
-
-        public Builder executor(ExecutorService executorService) {
-            Objects.requireNonNull(executorService, "executor service must not be null");
-            this.executorService = executorService;
-            return this;
-        }
-
-        public Builder progress(Consumer<Float> listener) {
-            Objects.requireNonNull(listener, "progress listener must not be null");
-            this.listener = listener;
-            return this;
-        }
-
-        public Builder threads(int n) {
-            if (n <= 0) {
-                throw new IllegalArgumentException("number of threads must be positive");
-            }
-            this.numberOfThreads = n;
-            return this;
-        }
-
-        public CompletableFuture<BufferedImage> process() {
-            if (numberOfThreads <= 0) {
-                numberOfThreads = Runtime.getRuntime().availableProcessors();
-            }
-
-            if (executorService == null) {
-                executorService = Executors.newFixedThreadPool(numberOfThreads);
-            }
-
-            return buildPipeline();
-        }
-
-        private CompletableFuture<BufferedImage> buildPipeline() {
-            CompletableFuture<BufferedImage> future = CompletableFuture.completedFuture(image);
-
-            var progress = listener == null ? null : new Progress(filters.size(), listener);
-
-            for (Filter filter : filters) {
-                future = future.thenCompose(image -> processFilter(image, filter, numberOfThreads, executorService, progress));
-            }
-
-            return future;
         }
 
         private static CompletableFuture<BufferedImage> processFilter(BufferedImage image, Filter filter, int numberOfThreads, ExecutorService executorService, @Nullable Progress progress) {
@@ -191,6 +140,56 @@ public final class FilterExecutor {
                 final var wrapper = new Image(image);
                 return filter.apply(wrapper);
             }, executorService);
+        }
+
+        public Builder with(Filter filter) {
+            Objects.requireNonNull(filter, "filter must not be null");
+            this.filters.add(filter);
+            return this;
+        }
+
+        public Builder executor(ExecutorService executorService) {
+            Objects.requireNonNull(executorService, "executor service must not be null");
+            this.executorService = executorService;
+            return this;
+        }
+
+        public Builder progress(Consumer<Float> listener) {
+            Objects.requireNonNull(listener, "progress listener must not be null");
+            this.listener = listener;
+            return this;
+        }
+
+        public Builder threads(int n) {
+            if (n <= 0) {
+                throw new IllegalArgumentException("number of threads must be positive");
+            }
+            this.numberOfThreads = n;
+            return this;
+        }
+
+        public CompletableFuture<BufferedImage> process() {
+            if (numberOfThreads <= 0) {
+                numberOfThreads = Runtime.getRuntime().availableProcessors();
+            }
+
+            if (executorService == null) {
+                executorService = Executors.newFixedThreadPool(numberOfThreads);
+            }
+
+            return buildPipeline();
+        }
+
+        private CompletableFuture<BufferedImage> buildPipeline() {
+            CompletableFuture<BufferedImage> future = CompletableFuture.completedFuture(image);
+
+            var progress = listener == null ? null : new Progress(filters.size(), listener);
+
+            for (Filter filter : filters) {
+                future = future.thenCompose(image -> processFilter(image, filter, numberOfThreads, executorService, progress));
+            }
+
+            return future;
         }
     }
 }

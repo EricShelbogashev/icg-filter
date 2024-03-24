@@ -1,10 +1,12 @@
 package core.filter;
 
+import model.filter.leonid.ColorUtils;
+
 import java.awt.image.BufferedImage;
 
 public class Image {
-    private final BufferedImage image;
     public static final int DEFAULT_ALPHA = 0xFF;
+    private final BufferedImage image;
 
     public Image(BufferedImage image) {
         this.image = image;
@@ -12,6 +14,23 @@ public class Image {
 
     public static int buildColor(int red, int green, int blue) {
         return Image.DEFAULT_ALPHA << 24 | (red << 16) | (green << 8) | blue;
+    }
+
+    public static Image empty(int width, int height) {
+        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        return new Image(bufferedImage);
+    }
+
+    public static Image copyOf(Image other) {
+        final var width = other.width();
+        final var height = other.height();
+        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                bufferedImage.setRGB(x, y, other.color(x, y));
+            }
+        }
+        return new Image(bufferedImage);
     }
 
     public int width() {
@@ -36,6 +55,21 @@ public class Image {
         return image.getRGB(clampedX, clampedY);
     }
 
+    public int[] components(int x, int y) {
+        final var color = color(x, y);
+        return new int[]{
+                ColorUtils.red(color),
+                ColorUtils.green(color),
+                ColorUtils.blue(color)
+        };
+    }
+
+    public void setColor(int x, int y, int rgb) {
+        if (x >= 0 && x < image.getWidth() && y >= 0 && y < image.getHeight()) {
+            image.setRGB(x, y, rgb);
+        }
+    }
+
     public int red(int x, int y) {
         return color(x, y) >> 16 & 0xFF;
     }
@@ -48,5 +82,7 @@ public class Image {
         return color(x, y) & 0xFF;
     }
 
-    public int alpha(int x, int y) {return (color(x, y) >> 24) & 0xFF;}
+    public int alpha(int x, int y) {
+        return (color(x, y) >> 24) & 0xFF;
+    }
 }

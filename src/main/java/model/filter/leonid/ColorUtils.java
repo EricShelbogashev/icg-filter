@@ -1,6 +1,9 @@
 package model.filter.leonid;
 
 public class ColorUtils {
+    private ColorUtils() {
+    }
+
     static public int red(int rgb) {
         return (rgb >> 16) & 0xFF;
     }
@@ -16,9 +19,14 @@ public class ColorUtils {
     static public int rgb(int red, int green, int blue) {
         return (255 << 24) | (red << 16) | (green << 8) | (blue);
     }
-    static public int rgb(int red, int green, int blue, int alpha) {return (alpha << 24) | (red << 16) | (green << 8) | blue;}
 
-    static public int alpha(int rgb) {return (rgb >> 24) & 0xFF;}
+    static public int rgb(int red, int green, int blue, int alpha) {
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    }
+
+    static public int alpha(int rgb) {
+        return (rgb >> 24) & 0xFF;
+    }
 
 
     // Returns brightness value [0, 1]
@@ -43,7 +51,7 @@ public class ColorUtils {
     }
 
     static public int getBrightness(int rgb) {
-        return (red(rgb) + green(rgb) + blue(rgb))/3;
+        return (red(rgb) + green(rgb) + blue(rgb)) / 3;
     }
 
     public static int sum(int rgb1, int rgb2) {
@@ -54,13 +62,17 @@ public class ColorUtils {
         return ColorUtils.rgb(red, green, blue);
     }
 
+    public static int componentsToRgb(int[] components) {
+        return rgb(components[0], components[1], components[2]);
+    }
 
-    public static int findClosestColor(int color, int quantizationDeg){
-            if (color < 0)
-                return 0;
-            if (color > 255)
-                 return 255;
-            float del = (float)(quantizationDeg - 1);
-            return (int)((float)(Math.round((float)color / 255 * del)) / del * 255);
+
+    public static int findClosestColor(int color, int quantizationDeg) {
+        if (color < 0)
+            return 0;
+        if (color > 255)
+            return 255;
+        float del = (float) (quantizationDeg - 1);
+        return (int) ((float) (Math.round((float) color / 255 * del)) / del * 255);
     }
 }

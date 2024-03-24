@@ -9,14 +9,9 @@ public class BloomFilter extends MatrixFilter {
     private final double glowFactor;
     double threshold;
 
-    public BloomFilter(double glowFactor, double threshold) {
+    public BloomFilter(float glowFactor, float threshold) {
         this.glowFactor = glowFactor;
         this.threshold = threshold;
-    }
-
-    public BloomFilter() {
-        this.glowFactor = 0.3;
-        this.threshold = 0.7;
     }
 
 
@@ -26,10 +21,10 @@ public class BloomFilter extends MatrixFilter {
         int resultGreen = 0;
         int resultBlue = 0;
 
-        if (ColorUtils.getNormalizeBrightness(image.color(x,y)) >= threshold) {
-            resultRed = Math.min((int)(image.red(x, y) * glowFactor) ,255);
-            resultGreen = Math.min((int)(image.green(x, y) * glowFactor), 255);
-            resultBlue = Math.min((int)(image.blue(x, y) * glowFactor), 255);
+        if (ColorUtils.getNormalizeBrightness(image.color(x, y)) >= threshold) {
+            resultRed = Math.min((int) (image.red(x, y) * glowFactor), 255);
+            resultGreen = Math.min((int) (image.green(x, y) * glowFactor), 255);
+            resultBlue = Math.min((int) (image.blue(x, y) * glowFactor), 255);
         }
 
         return ColorUtils.rgb(resultRed, resultGreen, resultBlue);
