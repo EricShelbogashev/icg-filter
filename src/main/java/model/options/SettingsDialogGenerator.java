@@ -11,7 +11,7 @@ import java.util.List;
 public class SettingsDialogGenerator {
 
     public static void generateAndShowDialog(List<Setting<?>> settings, Runnable onClose) {
-        JFrame frame = new JFrame("Настройки");
+        JFrame frame = new JFrame("Options");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 

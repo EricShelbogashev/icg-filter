@@ -44,7 +44,7 @@ public abstract class Setting<T> {
     public final void value(Object value) {
         if (!validate(value).isEmpty()) {
             throw new IllegalArgumentException(
-                    "передаваемый объект '%s' не является допустимым для заданных ограничений '%s'".formatted(
+                    "The object '%s' you are trying to pass through is not permitted due to given restrictions '%s'".formatted(
                             value, restrictions
                     )
             );
@@ -54,7 +54,7 @@ public abstract class Setting<T> {
 
     public final Collection<String> validate(Object value) {
         if (!type.isInstance(value)) {
-            return List.of("передаваемый объект '%s' не является типом '%s'".formatted(value, type.getName()));
+            return List.of("The object '%s' you are trying to pass through are not type '%s'".formatted(value, type.getName()));
         }
 
         final T cast = type.cast(value);
