@@ -3,8 +3,6 @@ import core.filter.FilterExecutor;
 import core.filter.Image;
 import core.options.OptionsFactory;
 import core.options.Setting;
-import model.ChooseQuantumLevel;
-import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
@@ -131,7 +129,7 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingEnum(
                                 EmbossingFilter.Light.LEFT_TOP,
-                                "Источник света",
+                                "источник света",
                                 "",
                                 EmbossingFilter.Light.class,
                                 "light"
@@ -142,6 +140,30 @@ public class ImageFilterApp extends JFrame {
                                 "",
                                 0, 255,
                                 "brightness"
+                        )
+                ));
+        settings.put("watershed",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень кванования красного цвета",
+                                "",
+                                2, 128,
+                                "redDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень",
+                                "",
+                                2, 128,
+                                "greenDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "степень кванования синего цвета",
+                                "",
+                                2, 128,
+                                "blueDegree"
                         )
                 ));
     }
@@ -308,6 +330,37 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void chooseWaterShedArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("watershed");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("watershed", prefs);
+                parseWaterShedArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseWaterShedArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("watershed", null);
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new WaterShedFilter(new int[]{2, 2, 2}));
+            }
+            else {
+                levels_kvant[0] = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst().get().value();
+                levels_kvant[1] = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst().get().value();
+                levels_kvant[2] = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst().get().value();
+                applyWaterShed();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
             case FLOYD_STEINBERG -> {
@@ -365,14 +418,6 @@ public class ImageFilterApp extends JFrame {
         chooseImageButton.setToolTipText("Choose image for editing");
         toolBar.add(chooseImageButton);
 
-        /*JButton chooseKvant = new JButton("Choose Kv Level");
-        chooseKvant.addActionListener(e -> chooseQuantumLevel());
-        toolBar.add(chooseKvant);*/
-
-        /*JButton chooseWind = new JButton("Choose Window S");
-        chooseWind.addActionListener(e -> chooseWindowSize());
-        toolBar.add(chooseWind);*/
-
         JButton fitToScreenButton = new JButton("Fit to Screen");
         fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
         fitToScreenButton.setToolTipText("Fit image to screen size");
@@ -403,8 +448,8 @@ public class ImageFilterApp extends JFrame {
         applyBloom.setToolTipText("Apply Bloom filter");
         toolBar.add(applyBloom);
 
-        JButton applyWaterShedButton = new JButton("Apply Watershed");
-        applyWaterShedButton.addActionListener(e -> applyWaterShed());
+        JButton applyWaterShedButton = new JButton("waterShed");
+        applyWaterShedButton.addActionListener(e -> chooseWaterShedArgs());
         applyWaterShedButton.setToolTipText("Apply Watershed filter");
         toolBar.add(applyWaterShedButton);
 
@@ -464,7 +509,9 @@ public class ImageFilterApp extends JFrame {
 
         JMenuItem aboutProgram = new JMenuItem("About program");
         String aboutMessage = """
-                ICGFilter is program for applying filters.
+                ICGFilter is program for applying filters. You have to choose and load an image before
+                applying and for some of filters you have to choose some parameters. Also there is
+                opportunity for showing original image.
                  Authors:\s
                 Shelbogashev Eric
                 Shaikhutdinov Leonid
@@ -583,15 +630,6 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void chooseQuantumLevel() {
-        ChooseQuantumLevel chooser = new ChooseQuantumLevel(this);
-        levels_kvant = chooser.selectedValues();
-    }
-
-    private void chooseWindowSize() {
-        ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
-        window_size = Integer.parseInt(chooser.selectedSize());
-    }
 
     private void loadImage(File imageFile) {
         try {
@@ -627,7 +665,7 @@ public class ImageFilterApp extends JFrame {
         else {
             try {
                 ImageIO.write(currentImage, "png", outputFile);
-                System.out.println("Изображение успешно сохранено в " + outputFile.getAbsolutePath());
+                System.out.println("изображение успешно сохранено в " + outputFile.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Ошибка при сохранении изображения: " + e.getMessage());
             }
