@@ -146,21 +146,21 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень кванования красного цвета",
+                                "red colour level of quantization",
                                 "",
                                 2, 128,
                                 "redDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень",
+                                "green colour level of quantization",
                                 "",
                                 2, 128,
                                 "greenDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень кванования синего цвета",
+                                "blue colour level of quantization",
                                 "",
                                 2, 128,
                                 "blueDegree"
