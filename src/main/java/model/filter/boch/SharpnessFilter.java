@@ -1,23 +1,28 @@
 package model.bochkarev;
 
+import core.filter.Image;
+import core.filter.MatrixFilter;
 import misc.ICGFilter;
 import misc.MatrixView;
 import misc.Pattern;
 
 import java.awt.*;
 
-public class SharpnessFilter extends ICGFilter
+public class SharpnessFilter extends MatrixFilter
 {
-    public SharpnessFilter(Pattern pattern)
+    int strength = 1;
+
+    public SharpnessFilter(int strength)
     {
-        super(new Pattern(new Point(-1, -1), new Point(1, 1)));
+        this.strength = strength;
     }
+
     @Override
-    public int apply(MatrixView matrixView)
+    protected int apply(Image image, int x, int y)
     {
-        int[] one = new int[] {0, -1, 0};
-        int[] two = new int[] {-1, 5, -1};
-        int[] three = new int[] {0, -1, 0};
+        int[] one = new int[] {0, -1 * strength, 0};
+        int[] two = new int[] {-1 * strength, 5 * strength, -1 * strength};
+        int[] three = new int[] {0, -1 * strength, 0};
         int[][] matrix = new int[][] {one, two, three};
 
 
@@ -30,15 +35,15 @@ public class SharpnessFilter extends ICGFilter
         {
             for(int j = -1; j < 2; j++)
             {
-                int rgb = matrixView.get(i, j);
+                int rgb = image.color(i + x, j + y);
                 redResult += ((rgb >> 16) & 0xFF) * matrix[i+1][j+1];
                 greenResult += ((rgb >> 8) & 0xFF) * matrix[i+1][j+1];
                 blueResult += ((rgb) & 0xFF) * matrix[i+1][j+1];
             }
         }
-        redResult = Math.min(Math.max(redResult, 0), 255);
-        greenResult = Math.min(Math.max(greenResult, 0), 255);
-        blueResult = Math.min(Math.max(blueResult, 0), 255);
+        redResult = Math.min(Math.max(redResult / strength, 0), 255);
+        greenResult = Math.min(Math.max(greenResult / strength, 0), 255);
+        blueResult = Math.min(Math.max(blueResult / strength, 0), 255);
         return ((int) alphaResult << 24) | ((int) redResult << 16) | ((int) greenResult << 8) | ((int) blueResult);
     }
 }
