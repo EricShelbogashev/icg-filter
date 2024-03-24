@@ -5,7 +5,7 @@ import model.ChooseKvantLevel;
 import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
-import model.filter.darya.MyFloydDithering;
+import model.filter.darya.FDither;
 import model.filter.darya.WaterShedFilter;
 import model.filter.eric.LanczosResampling;
 import model.filter.leonid.*;
@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ImageFilterApp extends JFrame {
-    int[] levels_kvant = {2, 2, 2};
+    int[] levels_kvant = {64, 64, 64};
     int window_size = 5;
     private JLabel imageLabel;
     private JProgressBar progressBar;
@@ -172,7 +172,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyOrderedDithering);
 
         JButton applyFSDitheringButton = new JButton("Apply FSDithering");
-        applyFSDitheringButton.addActionListener(e -> applyFSDithering()) ;
+        applyFSDitheringButton.addActionListener(e -> applyFilter(new FDither(levels_kvant))) ;
         toolBar.add(applyFSDitheringButton);
 
         JButton applyEmbossingButton = new JButton("Apply embossing");
