@@ -1,4 +1,4 @@
-package model.filter.leonid;
+package model.filter.darya;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
