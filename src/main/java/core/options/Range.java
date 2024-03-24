@@ -3,7 +3,7 @@ package core.options;
 public record Range(int start, int end) implements Comparable<Range> {
     public Range {
         if (start > end) {
-            throw new IllegalArgumentException("начало диапазона должно быть больше, чем конец");
+            throw new IllegalArgumentException("The start of your range should be greater than it's end");
         }
     }
 

@@ -60,7 +60,7 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingEnum(
                                 FitAlgorithm.BILINEAR,
-                                "выберите алгоритм",
+                                "choose algorythm",
                                 "",
                                 FitAlgorithm.class,
                                 "fit_algo"
@@ -73,28 +73,28 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень кванования красного цвета",
+                                "red colour level of quantization",
                                 "",
                                 2, 128,
                                 "redDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень квантования зеленого цвета",
+                                "green colour level of quantization",
                                 "",
                                 2, 128,
                                 "greenDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень квантования синего цвета",
+                                "blue colour level of quantization",
                                 "",
                                 2, 128,
                                 "blueDegree"
                         ),
                         OptionsFactory.settingEnum(
                                 DitheringMethod.ORDERED,
-                                "метод дизеренга",
+                                "Dithering method",
                                 "",
                                 DitheringMethod.class,
                                 "ditherMethod"
@@ -105,21 +105,21 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingFloat(
                                 0.3f,
-                                "сила свечения",
+                                "strength",
                                 "",
                                 0, 1,
                                 "glowFactor"
                         ),
                         OptionsFactory.settingFloat(
                                 0.7f,
-                                "пороговое значение",
+                                "threshold",
                                 "",
                                 0, 1,
                                 "threshold"
                         ),
                         OptionsFactory.settingInteger(
                                 5,
-                                "Радиус",
+                                "radius",
                                 "", 1, 100,
                                 "radius"
                         )
@@ -129,14 +129,14 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingEnum(
                                 EmbossingFilter.Light.LEFT_TOP,
-                                "источник света",
+                                "Light source",
                                 "",
                                 EmbossingFilter.Light.class,
                                 "light"
                         ),
                         OptionsFactory.settingInteger(
                                 64,
-                                "Сдвиг яркости",
+                                "Brightness shift",
                                 "",
                                 0, 255,
                                 "brightness"
@@ -146,21 +146,21 @@ public class ImageFilterApp extends JFrame {
                 List.of(
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень кванования красного цвета",
+                                "red colour level of quantization",
                                 "",
                                 2, 128,
                                 "redDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень",
+                                "green colour level of quantization",
                                 "",
                                 2, 128,
                                 "greenDegree"
                         ),
                         OptionsFactory.settingInteger(
                                 2,
-                                "степень кванования синего цвета",
+                                "blue colour level of quantization",
                                 "",
                                 2, 128,
                                 "blueDegree"
