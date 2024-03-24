@@ -10,16 +10,17 @@ import java.awt.*;
 
 public class GammaFilter extends MatrixFilter
 {
-    float gamma = 3;
+    int gamm = 300;
 
-    public GammaFilter(float gamma)
+    public GammaFilter(int gamma)
     {
-        this.gamma = gamma;
+        this.gamm = gamma;
     }
 
     @Override
     protected int apply(Image image, int x, int y)
     {
+        float gamma = (float) gamm / 100;
         int rgb = image.color(x, y);
         int redResult = (int) (255 * Math.pow(((rgb >> 16) & 0xFF) / (float) 255, gamma));
         int greenResult = (int) (255 * Math.pow(((rgb >> 8) & 0xFF) / (float) 255, gamma));

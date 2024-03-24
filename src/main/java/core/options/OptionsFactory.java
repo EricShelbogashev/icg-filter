@@ -32,7 +32,7 @@ public class OptionsFactory {
             @Override
             public JComponent createComponent() {
                 JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.floatValue(), min, max, 0.1));
-                spinner.addChangeListener(e -> value(spinner.getValue()));
+                spinner.addVetoableChangeListener(e -> value(spinner.getValue()));
                 return spinner;
             }
         };

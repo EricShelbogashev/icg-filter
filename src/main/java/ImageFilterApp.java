@@ -115,7 +115,7 @@ public class ImageFilterApp extends JFrame {
                                 0, 1,
                                 "glowFactor"
                         ),
-                        OptionsFactory.settingFloat(
+                        OptionsFactory.settingFloat(+
                                 0.7f,
                                 "threshold",
                                 "",
@@ -149,11 +149,11 @@ public class ImageFilterApp extends JFrame {
                 ));
         settings.put("gamma",
                 List.of(
-                        OptionsFactory.settingFloat(
-                                0.7f,
+                        OptionsFactory.settingInteger(
+                                500,
                                 "factor",
                                 "",
-                                0f, 10f,
+                                1, 1000,
                                 "gammaFactor"
                         )
                 ));
@@ -253,7 +253,7 @@ public class ImageFilterApp extends JFrame {
             JOptionPane.showMessageDialog(this, "No image loaded to fit to screen.");
         }
     }
-/*
+
     private void chooseMotionBlurArgs() {
         if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("motionBlur");
@@ -294,12 +294,12 @@ public class ImageFilterApp extends JFrame {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
-*/
+
     private void chooseGammaArgs() {
         if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("gamma");
             SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
-                settings.put("gammaFactor", prefs);
+                settings.put("gamma", prefs);
                 parseGammaArgs();
             });
         } else {
@@ -309,15 +309,15 @@ public class ImageFilterApp extends JFrame {
 
     private void parseGammaArgs() {
         if (editedImage != null) {
-            final var s = settings.getOrDefault("gammaFactor", null);
+            final var s = settings.getOrDefault("gamma", null);
 
             // if filter didn't configured
             if (s == null) {
-                applyGammaEffect(1f);
+                applyGammaEffect(300);
             }
 
             else {
-                final float gamma = s.stream().filter(it -> it.getId().equals("gammaFactor")).findFirst().get().value();
+                final int gamma = s.stream().filter(it -> it.getId().equals("gammaFactor")).findFirst().get().value();
                 applyGammaEffect(gamma);
             }
 
@@ -326,7 +326,7 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void applyGammaEffect(float gamma) {
+    private void applyGammaEffect(int gamma) {
         if (editedImage != null) {
             GammaFilter gammaFilter = new GammaFilter(gamma);
             applyFilters(gammaFilter);
@@ -335,12 +335,12 @@ public class ImageFilterApp extends JFrame {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
-/*
+
     private void chooseSharpnessArgs() {
         if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("sharpness");
             SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
-                settings.put("sharpnessStrength", prefs);
+                settings.put("sharpness", prefs);
                 parseSharpnessArgs();
             });
         } else {
@@ -350,7 +350,7 @@ public class ImageFilterApp extends JFrame {
 
     private void parseSharpnessArgs() {
         if (editedImage != null) {
-            final var s = settings.getOrDefault("sharpnessStrength", null);
+            final var s = settings.getOrDefault("sharpness", null);
 
             // if filter didn't configured
             if (s == null) {
@@ -376,7 +376,7 @@ public class ImageFilterApp extends JFrame {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
-*/
+
     private void chooseBloomArgs() {
         if (editedImage != null) {
             final List<Setting<?>> prefs = settings.get("bloom");
@@ -577,8 +577,8 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyEmbossingButton);
 
         JButton applyMotionBlurButton = new JButton("Apply motion blur");
-        //applyMotionBlurButton.addActionListener(e -> chooseMotionBlurArgs());
-        applyMotionBlurButton.addActionListener(e -> applyFilters(new MotionBlurFilter(1)));
+        applyMotionBlurButton.addActionListener(e -> chooseMotionBlurArgs());
+        //applyMotionBlurButton.addActionListener(e -> applyFilters(new MotionBlurFilter(1)));
         applyMotionBlurButton.setToolTipText("Apply motion blur");
         toolBar.add(applyMotionBlurButton);
 
@@ -589,8 +589,8 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyGammaButton);
 
         JButton applySharpnessButton = new JButton("Apply sharpness");
-        //applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
-        applySharpnessButton.addActionListener(e -> applyFilters(new SharpnessFilter(1)));
+        applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
+        //applySharpnessButton.addActionListener(e -> applyFilters(new SharpnessFilter(1)));
         applySharpnessButton.setToolTipText("Apply sharpness");
         toolBar.add(applySharpnessButton);
 
