@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -107,18 +108,18 @@ public class ImageFilterApp extends JFrame {
 
         settings.put("bloom",
                 List.of(
-                        OptionsFactory.settingInteger(
-                                30,
+                        OptionsFactory.settingFloat(
+                                0.3f,
                                 "strength",
                                 "",
-                                0, 100,
+                                0, 1,
                                 "glowFactor"
                         ),
-                        OptionsFactory.settingInteger(
-                                70,
+                        OptionsFactory.settingFloat(
+                                0.7f,
                                 "threshold",
                                 "",
-                                0, 100,
+                                0, 1,
                                 "threshold"
                         ),
                         OptionsFactory.settingInteger(
@@ -446,10 +447,10 @@ public class ImageFilterApp extends JFrame {
 
             // if filter didn't configured
             if (s == null) {
-                applyBloomEffect(30, 70, 5);
+                applyBloomEffect(0.3f, 0.7f, 5);
             } else {
-                final int glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
-                final int threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
+                final float glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
+                final float threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
                 final int radius = s.stream().filter(it -> it.getId().equals("radius")).findFirst().get().value();
                 applyBloomEffect(glowFactor, threshold, radius);
             }
@@ -459,7 +460,7 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void applyBloomEffect(int glowFactor, int threshold, int radius) {
+    private void applyBloomEffect(float glowFactor, float threshold, int radius) {
         if (editedImage != null) {
             BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
@@ -661,6 +662,8 @@ public class ImageFilterApp extends JFrame {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
 
+
+
         JButton chooseImageButton = new JButton("Choose Image");
         chooseImageButton.addActionListener(e -> chooseImage());
         chooseImageButton.setToolTipText("Choose image for editing");
@@ -671,19 +674,23 @@ public class ImageFilterApp extends JFrame {
         fitToScreenButton.setToolTipText("Fit image to screen size");
         toolBar.add(fitToScreenButton);
 
-        JButton applyMonochromeButton = new JButton("Apply Monochrome");
+        JButton applyMonochromeButton = new JButton("");
         applyMonochromeButton.addActionListener(e -> applyFilters(new MonochromeFilter()));
         applyMonochromeButton.setToolTipText("Apply Monochrome filter");
+        applyMonochromeButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("monochromeIcon.png"))));
         toolBar.add(applyMonochromeButton);
 
-        JButton applyNegativeButton = new JButton("Apply Negative");
+        JButton applyNegativeButton = new JButton("");
         applyNegativeButton.addActionListener(e -> applyFilters(new NegativeFilter()));
         applyNegativeButton.setToolTipText("Apply Negative (color invert) filter");
+        applyNegativeButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("invertIcon.png"))));
         toolBar.add(applyNegativeButton);
 
-        JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
+        JButton applyGaussianBlur = new JButton("");
         applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
         applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
+        applyGaussianBlur.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("blurIcon.png"))));
+
         toolBar.add(applyGaussianBlur);
 
         JButton applyVhs = new JButton("Apply VHS");
@@ -758,7 +765,7 @@ public class ImageFilterApp extends JFrame {
     private JMenu createFilterMenu() {
         JMenu filterMenu = new JMenu();
         filterMenu.setText("Filter");
-
+        
         JMenuItem monochrome = new JMenuItem("Monochrome");
         monochrome.addActionListener(e -> applyFilters(new MonochromeFilter()));
         filterMenu.add(monochrome);
