@@ -4,6 +4,7 @@ import core.filter.CustomFilter;
 import core.filter.Image;
 import model.filter.leonid.ColorUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -26,6 +27,30 @@ public class VHSFilter extends CustomFilter {
             }
         }
         return result;
+    }
+
+    public static Image applyAnaglyphEffect(Image sourceImage) {
+        int width = sourceImage.width();
+        int height = sourceImage.height();
+        BufferedImage resultImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        int shift = 8;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                final var red = sourceImage.red(x, y);
+                int blueGreen = 0;
+                if (x + shift < width) {
+                    Color shiftedColor = new Color(sourceImage.color(x + shift, y));
+                    blueGreen = (shiftedColor.getGreen() << 8) & 0x00FF00 | shiftedColor.getBlue() & 0x0000FF;
+                }
+
+                int combinedColor = red | blueGreen;
+                resultImage.setRGB(x, y, combinedColor);
+            }
+        }
+
+        return new Image(resultImage);
     }
 
     public static Image applyStripedAndShiftEffect(Image image, int stripeHeight, int shiftValue) {

@@ -1020,14 +1020,13 @@ public class ImageFilterApp extends JFrame {
         overlayPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(editedImage);
+        FilterExecutor.Builder builder = FilterExecutor.of(originalImage);
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    originalImage = ImageUtils.copy(editedImage);
                     editedImage = ImageUtils.copy(newImage);
                     updateCanvas(editedImage);
                     showOverlay(false);
