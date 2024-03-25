@@ -756,6 +756,10 @@ public class ImageFilterApp extends JFrame {
         sharpness.addActionListener(e -> chooseSharpnessArgs());
         filterMenu.add(sharpness);
 
+        JMenuItem watershed = new JMenuItem("WaterShed");
+        watershed.addActionListener(e -> chooseWaterShedArgs());
+        filterMenu.add(watershed);
+
         JMenuItem wind = new JMenuItem("Wind");
         wind.addActionListener(e -> chooseWindArgs());
         filterMenu.add(wind);
