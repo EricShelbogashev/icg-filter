@@ -106,18 +106,18 @@ public class ImageFilterApp extends JFrame {
 
         settings.put("bloom",
                 List.of(
-                        OptionsFactory.settingFloat(
-                                0.3f,
+                        OptionsFactory.settingInteger(
+                                30,
                                 "strength",
                                 "",
-                                0, 1,
+                                0, 100,
                                 "glowFactor"
                         ),
-                        OptionsFactory.settingFloat(
-                                0.7f,
+                        OptionsFactory.settingInteger(
+                                70,
                                 "threshold",
                                 "",
-                                0, 1,
+                                0, 100,
                                 "threshold"
                         ),
                         OptionsFactory.settingInteger(
@@ -445,10 +445,10 @@ public class ImageFilterApp extends JFrame {
 
             // if filter didn't configured
             if (s == null) {
-                applyBloomEffect(0.3f, 0.7f, 5);
+                applyBloomEffect(30, 70, 5);
             } else {
-                final float glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
-                final float threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
+                final int glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
+                final int threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
                 final int radius = s.stream().filter(it -> it.getId().equals("radius")).findFirst().get().value();
                 applyBloomEffect(glowFactor, threshold, radius);
             }
@@ -458,7 +458,7 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void applyBloomEffect(float glowFactor, float threshold, int radius) {
+    private void applyBloomEffect(int glowFactor, int threshold, int radius) {
         if (editedImage != null) {
             BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
@@ -793,6 +793,10 @@ public class ImageFilterApp extends JFrame {
         JMenuItem sharpness = new JMenuItem("Sharpness");
         sharpness.addActionListener(e -> chooseSharpnessArgs());
         filterMenu.add(sharpness);
+
+        JMenuItem watershed = new JMenuItem("WaterShed");
+        watershed.addActionListener(e -> chooseWaterShedArgs());
+        filterMenu.add(watershed);
 
         JMenuItem wind = new JMenuItem("Wind");
         wind.addActionListener(e -> chooseWindArgs());
