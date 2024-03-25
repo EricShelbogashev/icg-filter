@@ -202,7 +202,7 @@ public class ImageFilterApp extends JFrame {
         settings.put("roberts",
                 List.of(
                         OptionsFactory.settingInteger(
-                                128,
+                                28,
                                 "binarize",
                                 "",
                                 0, 254,
@@ -608,9 +608,62 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void chooseSobelArgs(){}
+    private void chooseSobelArgs(){
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("sobel");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("sobel", prefs);
+                parseSobelArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
 
-    private void chooseRobertsArgs(){}
+    private void parseSobelArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("sobel", null);
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new SobelFilter(128));
+            } else {
+                int binarize = s.stream().filter(it -> it.getId().equals("binarize")).findFirst().get().value();
+                SobelFilter filter = new SobelFilter(binarize);
+                applyFilters(filter);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+    private void chooseRobertsArgs(){
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("roberts");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("roberts", prefs);
+                parseRobertsArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseRobertsArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("roberts", null);
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new RobertsFilter(28));
+            } else {
+                int binarize = s.stream().filter(it -> it.getId().equals("binarize")).findFirst().get().value();
+                RobertsFilter filter = new RobertsFilter(binarize);
+                applyFilters(filter);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
 
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
@@ -769,13 +822,15 @@ public class ImageFilterApp extends JFrame {
         applyVhs.setToolTipText("Apply VHS filter");
         toolBar.add(applyVhs);
 
-        JButton applySobel = new JButton("Sobel");
-        applySobel.addActionListener(e -> applyFilters(new SobelFilter(128)));
+        JButton applySobel = new JButton();
+        applySobel.addActionListener(e -> chooseSobelArgs());
+        applySobel.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("sobel.png"))));
         applySobel.setToolTipText("Apply Sobel filter");
         toolBar.add(applySobel);
 
-        JButton applyRoberts = new JButton("Roberts");
-        applyRoberts.addActionListener(e -> applyFilters(new RobertsFilter(28)));
+        JButton applyRoberts = new JButton();
+        applyRoberts.addActionListener(e -> chooseRobertsArgs());
+        applyRoberts.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("roberts.png"))));
         applyRoberts.setToolTipText("Apply Roberts filter");
         toolBar.add(applyRoberts);
 
