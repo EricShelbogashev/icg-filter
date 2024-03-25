@@ -9,6 +9,7 @@ public class WindFilter extends CustomFilter {
     private final int windStrength; // Сила ветра
     private final int threshold; // Сила ветра
     private final Direction windDirection;
+    private int directionCoeff = 0;
 
     public WindFilter(Direction windDirection, int windStrength, int threshold) {
 
@@ -19,8 +20,75 @@ public class WindFilter extends CustomFilter {
 
     @Override
     protected BufferedImage apply(Image image) {
+        switch (windDirection) {
+            case TOP -> {
+                directionCoeff = 1;
+                return verticalWind(image);
+            }
+            case BOTTOM -> {
+                directionCoeff = -1;
+                return verticalWind(image);
+            }
+            case RIGHT -> {
+                directionCoeff = 1;
+                return horizontalWind(image);
+            }
+            case LEFT -> {
+                directionCoeff = -1;
+                return horizontalWind(image);
+            }
+            default -> {
+                return image.bufferedImage();
+            }
+        }
+    }
 
+    private BufferedImage verticalWind(Image image) {
+        int width = image.width();
+        int height = image.height();
+        Image result = Image.copyOf(image);
+        for (int v = 0; v < height; v++) {
+            for (int u = 0; u < width; u++) {
+                if (Math.random() < 0.3) {
+                    continue;
+                }
+                int randomStrength = windStrength + (int) (windStrength * (width / 100) * Math.random());
+                int firstPix = result.color(u, v);
+                int lastPix = firstPix;
+                int pix = firstPix;
 
+                int i;
+                for (i = 1; i <= randomStrength; i++) {
+                    if (v + i * directionCoeff < 0) {
+                        pix = result.color(u, 0);
+                    } else if (v + i * directionCoeff >= height) {
+                        pix = result.color(u, height - 1);
+                    } else {
+                        pix = result.color(u, v + i * directionCoeff);
+                    }
+                    int lumaDif = lumaDifference(pix, lastPix);
+                    lastPix = pix;
+                    if (lumaDif > threshold) {
+                        break;
+                    }
+                }
+                int lumaDif = lumaDifference(firstPix, lastPix);
+                if (lumaDif <= threshold) {
+                    continue;
+                }
+                for (int j = 0; j <= i; j++) {
+                    int blendedPixel = lerp(pix, firstPix, randomStrength, j);
+                    if (v + j * directionCoeff >= 0 && v + j * directionCoeff < height) {
+                        result.setColor(u, v + j * directionCoeff, getAverageColor(blendedPixel, image.color(u, v + j * directionCoeff)));
+                    }
+                }
+
+            }
+        }
+        return result.bufferedImage();
+    }
+
+    private BufferedImage horizontalWind(Image image) {
         int width = image.width();
         int height = image.height();
         Image result = Image.copyOf(image);
@@ -37,12 +105,12 @@ public class WindFilter extends CustomFilter {
 
                 int i;
                 for (i = 1; i <= randomStrength; i++) {
-                    if (u + i < 0) {
+                    if (u + i * directionCoeff < 0) {
                         pix = result.color(0, v);
-                    } else if (u + i >= width) {
+                    } else if (u + i * directionCoeff >= width) {
                         pix = result.color(width - 1, v);
                     } else {
-                        pix = result.color(u + i, v);
+                        pix = result.color(u + i * directionCoeff, v);
                     }
                     int lumaDif = lumaDifference(pix, lastPix);
                     lastPix = pix;
@@ -56,8 +124,8 @@ public class WindFilter extends CustomFilter {
                 }
                 for (int j = 0; j <= i; j++) {
                     int blendedPixel = lerp(pix, firstPix, randomStrength, j);
-                    if (u + j >= 0 && u + j < width) {
-                        result.setColor(u + j, v, getAverageColor(blendedPixel, image.color(u + j, v)));
+                    if (u + j * directionCoeff >= 0 && u + j * directionCoeff < width) {
+                        result.setColor(u + j * directionCoeff, v, blendedPixel);
                     }
                 }
 
