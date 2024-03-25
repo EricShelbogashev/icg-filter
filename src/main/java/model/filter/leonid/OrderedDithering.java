@@ -66,13 +66,17 @@ public class OrderedDithering extends MatrixFilter {
         }
         else if (minQuantizationRank >= 64) {
             matrixSize = 2;
-            ditherMatrix = ditherMatrix8;
+            ditherMatrix = ditherMatrix2;
+            normalizer = 2;
         } else if (minQuantizationRank >= 16) {
             matrixSize = 4;
-            ditherMatrix = ditherMatrix8;
+            ditherMatrix = ditherMatrix4;
+            normalizer = 8;
         } else {
+            // quantization rank = 4
             matrixSize = 8;
             ditherMatrix = ditherMatrix8;
+            normalizer = 32;
         }
     }
 
