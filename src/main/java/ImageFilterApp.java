@@ -182,6 +182,16 @@ public class ImageFilterApp extends JFrame {
                                 "gammaFactor"
                         )
                 ));
+        settings.put("gauss",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                3,
+                                "gauss window",
+                                "",
+                                3, 11,
+                                "window"
+                        )
+                ));
 
         settings.put("motionBlur",
                 List.of(
@@ -544,6 +554,44 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void applyGaussianBlur() {
+        if (editedImage != null) {
+            GaussianBlurFilter filter = new GaussianBlurFilter(window_size);
+            applyFilters(filter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseGaussianBlurArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("gauss");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("gauss", prefs);
+                parseGaussianBlurArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseGaussianBlurArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("gauss", null);
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new GaussianBlurFilter(3));
+            } else {
+                window_size = s.stream().filter(it -> it.getId().equals("window")).findFirst().get().value();
+                applyGaussianBlur();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
             case FLOYD_STEINBERG -> {
@@ -689,7 +737,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyNegativeButton);
 
         JButton applyGaussianBlur = new JButton("");
-        applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        applyGaussianBlur.addActionListener(e -> chooseGaussianBlurArgs());
         applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
         applyGaussianBlur.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("blurIcon.png"))));
 
@@ -787,8 +835,7 @@ public class ImageFilterApp extends JFrame {
         filterMenu.add(negative);
 
         JMenuItem blur = new JMenuItem("Gaussian blur");
-        // TODO: Переписать actionListener через функцию вызова окна выбора параметров фильтра Гаусса
-        blur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        blur.addActionListener(e -> chooseGaussianBlurArgs());
         filterMenu.add(blur);
 
         JMenuItem bloom = new JMenuItem("Bloom");
