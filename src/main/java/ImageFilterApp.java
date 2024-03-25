@@ -3,8 +3,6 @@ import core.filter.FilterExecutor;
 import core.filter.Image;
 import core.options.OptionsFactory;
 import core.options.Setting;
-import model.ChooseQuantumLevel;
-import model.ChooseWindowSize;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
 import model.filter.darya.WaterShedFilter;
@@ -144,6 +142,63 @@ public class ImageFilterApp extends JFrame {
                                 "brightness"
                         )
                 ));
+        settings.put("watershed",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                2,
+                                "red colour level of quantization",
+                                "",
+                                2, 128,
+                                "redDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "green colour level of quantization",
+                                "",
+                                2, 128,
+                                "greenDegree"
+                        ),
+                        OptionsFactory.settingInteger(
+                                2,
+                                "blue colour level of quantization",
+                                "",
+                                2, 128,
+                                "blueDegree"
+                        )
+                ));
+
+        settings.put("gamma",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                500,
+                                "factor",
+                                "",
+                                1, 1000,
+                                "gammaFactor"
+                        )
+                ));
+
+        settings.put("motionBlur",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                1,
+                                "strength",
+                                "",
+                                0, 10,
+                                "motionBlurStrength"
+                        )
+                ));
+
+        settings.put("sharpness",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                1,
+                                "strength",
+                                "",
+                                0, 10,
+                                "sharpnessStrength"
+                        )
+                ));
     }
 
     private void createOverlayPanel() {
@@ -216,6 +271,129 @@ public class ImageFilterApp extends JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "No image loaded to fit to screen.");
+        }
+    }
+
+    private void chooseMotionBlurArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("motionBlur");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("motionBlur", prefs);
+                parseMotionBlurArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseMotionBlurArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("motionBlur", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyMotionBlurEffect(1);
+            }
+
+            else {
+                final int strength = s.stream().filter(it -> it.getId().equals("motionBlurStrength")).findFirst().get().value();
+                applyMotionBlurEffect(strength);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applyMotionBlurEffect(int strength) {
+        if (editedImage != null) {
+            model.bochkarev.MotionBlurFilter motionBlurFilter = new model.bochkarev.MotionBlurFilter(strength);
+            applyFilters(motionBlurFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseGammaArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("gamma");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("gamma", prefs);
+                parseGammaArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseGammaArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("gamma", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyGammaEffect(300);
+            }
+
+            else {
+                final int gamma = s.stream().filter(it -> it.getId().equals("gammaFactor")).findFirst().get().value();
+                applyGammaEffect(gamma);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applyGammaEffect(int gamma) {
+        if (editedImage != null) {
+            model.bochkarev.GammaFilter gammaFilter = new model.bochkarev.GammaFilter(gamma);
+            applyFilters(gammaFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseSharpnessArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("sharpness");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("sharpness", prefs);
+                parseSharpnessArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseSharpnessArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("sharpness", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applySharpnessEffect(1);
+            }
+
+            else {
+                final int strength = s.stream().filter(it -> it.getId().equals("sharpnessStrength")).findFirst().get().value();
+                applySharpnessEffect(strength);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applySharpnessEffect(int strength) {
+        if (editedImage != null) {
+            model.bochkarev.SharpnessFilter sharpnessFilter = new model.bochkarev.SharpnessFilter(strength);
+            applyFilters(sharpnessFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
 
@@ -308,6 +486,37 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void chooseWaterShedArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("watershed");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("watershed", prefs);
+                parseWaterShedArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseWaterShedArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("watershed", null);
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new WaterShedFilter(new int[]{2, 2, 2}));
+            }
+            else {
+                levels_kvant[0] = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst().get().value();
+                levels_kvant[1] = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst().get().value();
+                levels_kvant[2] = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst().get().value();
+                applyWaterShed();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
             case FLOYD_STEINBERG -> {
@@ -365,14 +574,6 @@ public class ImageFilterApp extends JFrame {
         chooseImageButton.setToolTipText("Choose image for editing");
         toolBar.add(chooseImageButton);
 
-        /*JButton chooseKvant = new JButton("Choose Kv Level");
-        chooseKvant.addActionListener(e -> chooseQuantumLevel());
-        toolBar.add(chooseKvant);*/
-
-        /*JButton chooseWind = new JButton("Choose Window S");
-        chooseWind.addActionListener(e -> chooseWindowSize());
-        toolBar.add(chooseWind);*/
-
         JButton fitToScreenButton = new JButton("Fit to Screen");
         fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
         fitToScreenButton.setToolTipText("Fit image to screen size");
@@ -403,8 +604,8 @@ public class ImageFilterApp extends JFrame {
         applyBloom.setToolTipText("Apply Bloom filter");
         toolBar.add(applyBloom);
 
-        JButton applyWaterShedButton = new JButton("Apply Watershed");
-        applyWaterShedButton.addActionListener(e -> applyWaterShed());
+        JButton applyWaterShedButton = new JButton("waterShed");
+        applyWaterShedButton.addActionListener(e -> chooseWaterShedArgs());
         applyWaterShedButton.setToolTipText("Apply Watershed filter");
         toolBar.add(applyWaterShedButton);
 
@@ -417,6 +618,24 @@ public class ImageFilterApp extends JFrame {
         applyEmbossingButton.addActionListener(e -> chooseEmbossingArgs());
         applyEmbossingButton.setToolTipText("Apply embossing");
         toolBar.add(applyEmbossingButton);
+
+        JButton applyMotionBlurButton = new JButton("Apply motion blur");
+        applyMotionBlurButton.addActionListener(e -> chooseMotionBlurArgs());
+        //applyMotionBlurButton.addActionListener(e -> applyFilters(new MotionBlurFilter(1)));
+        applyMotionBlurButton.setToolTipText("Apply motion blur");
+        toolBar.add(applyMotionBlurButton);
+
+        JButton applyGammaButton = new JButton("Apply gamma-correction");
+        applyGammaButton.addActionListener(e -> chooseGammaArgs());
+        //applyGammaButton.addActionListener(e -> applyFilters(new GammaFilter(5f)));
+        applyGammaButton.setToolTipText("Apply gamma-correction");
+        toolBar.add(applyGammaButton);
+
+        JButton applySharpnessButton = new JButton("Apply sharpness");
+        applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
+        //applySharpnessButton.addActionListener(e -> applyFilters(new SharpnessFilter(1)));
+        applySharpnessButton.setToolTipText("Apply sharpness");
+        toolBar.add(applySharpnessButton);
 
         JToggleButton switchImageButton = new JToggleButton("Show original image");
         switchImageButton.addActionListener(e -> onSwitchImagePressed(switchImageButton));
@@ -455,6 +674,18 @@ public class ImageFilterApp extends JFrame {
         vhs.addActionListener(e -> applyFilters(new VHSFilter()));
         filterMenu.add(vhs);
 
+        JMenuItem gamma = new JMenuItem("Gamma");
+        gamma.addActionListener(e -> chooseGammaArgs());
+        filterMenu.add(gamma);
+
+        JMenuItem motionBlur = new JMenuItem("Motion Blur");
+        motionBlur.addActionListener(e -> chooseMotionBlurArgs());
+        filterMenu.add(motionBlur);
+
+        JMenuItem sharpness = new JMenuItem("Sharpness");
+        sharpness.addActionListener(e -> chooseSharpnessArgs());
+        filterMenu.add(sharpness);
+
         return filterMenu;
     }
 
@@ -464,7 +695,9 @@ public class ImageFilterApp extends JFrame {
 
         JMenuItem aboutProgram = new JMenuItem("About program");
         String aboutMessage = """
-                ICGFilter is program for applying filters.
+                ICGFilter is program for applying filters. You have to choose and load an image before
+                applying and for some of filters you have to choose some parameters. Also there is
+                opportunity for showing original image.
                  Authors:\s
                 Shelbogashev Eric
                 Shaikhutdinov Leonid
@@ -583,15 +816,6 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
-    private void chooseQuantumLevel() {
-        ChooseQuantumLevel chooser = new ChooseQuantumLevel(this);
-        levels_kvant = chooser.selectedValues();
-    }
-
-    private void chooseWindowSize() {
-        ChooseWindowSize chooser = new ChooseWindowSize(this, window_size);
-        window_size = Integer.parseInt(chooser.selectedSize());
-    }
 
     private void loadImage(File imageFile) {
         try {
@@ -627,7 +851,7 @@ public class ImageFilterApp extends JFrame {
         else {
             try {
                 ImageIO.write(currentImage, "png", outputFile);
-                System.out.println("Изображение успешно сохранено в " + outputFile.getAbsolutePath());
+                System.out.println("изображение успешно сохранено в " + outputFile.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Ошибка при сохранении изображения: " + e.getMessage());
             }
