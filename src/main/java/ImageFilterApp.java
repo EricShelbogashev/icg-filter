@@ -3,10 +3,7 @@ import core.filter.FilterExecutor;
 import core.filter.Image;
 import core.options.OptionsFactory;
 import core.options.Setting;
-import model.filter.darya.ColorStretchFilter;
-import model.filter.darya.FillColorFilter;
-import model.filter.darya.GaussianBlurFilter;
-import model.filter.darya.WaterShedFilter;
+import model.filter.darya.*;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
 import model.filter.eric.VHSFilter;
@@ -748,6 +745,16 @@ public class ImageFilterApp extends JFrame {
         applyVhs.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("videoIcon.png"))));
         applyVhs.setToolTipText("Apply VHS filter");
         toolBar.add(applyVhs);
+
+        JButton applySobel = new JButton("Sobel");
+        applySobel.addActionListener(e -> applyFilters(new SobelFilter()));
+        applySobel.setToolTipText("Apply Sobel filter");
+        toolBar.add(applySobel);
+
+        JButton applyRoberts = new JButton("Roberts");
+        applyRoberts.addActionListener(e -> applyFilters(new RobertsFilter()));
+        applyRoberts.setToolTipText("Apply Roberts filter");
+        toolBar.add(applyRoberts);
 
         JButton applyBloom = new JButton();
         applyBloom.addActionListener(e -> chooseBloomArgs());
