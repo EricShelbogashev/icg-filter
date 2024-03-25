@@ -38,7 +38,8 @@ public class VHSFilter extends CustomFilter {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                final var red = sourceImage.red(x, y);
+                Color color = new Color(sourceImage.color(x, y));
+                int red = (color.getRed() << 16) & 0xFF0000;
                 int blueGreen = 0;
                 if (x + shift < width) {
                     Color shiftedColor = new Color(sourceImage.color(x + shift, y));
@@ -102,6 +103,7 @@ public class VHSFilter extends CustomFilter {
     protected BufferedImage apply(Image image) {
         var applied = image;
         applied = applyFadedColorEffect(applied);
+        applied = applyAnaglyphEffect(applied);
         applied = applyColorNoiseEffect(applied, 50);
         applied = applyStripedAndShiftEffect(applied, 30, 8);
         return applied.bufferedImage();
