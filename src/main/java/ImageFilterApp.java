@@ -189,7 +189,26 @@ public class ImageFilterApp extends JFrame {
                                 "window"
                         )
                 ));
-
+        settings.put("sobel",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                128,
+                                "binarize",
+                                "",
+                                0, 254,
+                                "binarize"
+                        )
+                ));
+        settings.put("roberts",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                128,
+                                "binarize",
+                                "",
+                                0, 254,
+                                "binarize"
+                        )
+                ));
         settings.put("motionBlur",
                 List.of(
                         OptionsFactory.settingInteger(
@@ -589,6 +608,10 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void chooseSobelArgs(){}
+
+    private void chooseRobertsArgs(){}
+
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
             case FLOYD_STEINBERG -> {
@@ -747,12 +770,12 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyVhs);
 
         JButton applySobel = new JButton("Sobel");
-        applySobel.addActionListener(e -> applyFilters(new SobelFilter()));
+        applySobel.addActionListener(e -> applyFilters(new SobelFilter(128)));
         applySobel.setToolTipText("Apply Sobel filter");
         toolBar.add(applySobel);
 
         JButton applyRoberts = new JButton("Roberts");
-        applyRoberts.addActionListener(e -> applyFilters(new RobertsFilter()));
+        applyRoberts.addActionListener(e -> applyFilters(new RobertsFilter(28)));
         applyRoberts.setToolTipText("Apply Roberts filter");
         toolBar.add(applyRoberts);
 
@@ -872,6 +895,14 @@ public class ImageFilterApp extends JFrame {
         JMenuItem watershed = new JMenuItem("WaterShed");
         watershed.addActionListener(e -> chooseWaterShedArgs());
         filterMenu.add(watershed);
+
+        JMenuItem sobel = new JMenuItem("sobel");
+        sobel.addActionListener(e -> chooseSobelArgs());
+        filterMenu.add(sobel);
+
+        JMenuItem roberts = new JMenuItem("roberts");
+        roberts.addActionListener(e -> chooseRobertsArgs());
+        filterMenu.add(roberts);
 
         JMenuItem wind = new JMenuItem("Wind");
         wind.addActionListener(e -> chooseWindArgs());

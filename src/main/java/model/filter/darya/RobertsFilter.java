@@ -5,7 +5,10 @@ import core.filter.MatrixFilter;
 import model.filter.leonid.ColorUtils;
 
 public class RobertsFilter extends MatrixFilter {
-    public RobertsFilter(){}
+    int binarize;
+    public RobertsFilter(int binarize){
+        this.binarize = binarize;
+    }
     @Override
     protected int apply(Image image, int x, int y) {
         int oldpix = image.color(x, y);
@@ -34,6 +37,10 @@ public class RobertsFilter extends MatrixFilter {
         int resColor = (int)Math.pow(resultColor1 * resultColor1 + resultColor2 * resultColor2, 0.5);
         resColor = Math.max(resColor, 0);
         resColor = Math.min(resColor, 255);
+        if (resColor > 28)
+            resColor = 255;
+        else
+            resColor = 0;
         return (alpha << 24) | (resColor << 16) | (resColor << 8) | resColor;
     }
 
