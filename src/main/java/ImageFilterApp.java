@@ -166,6 +166,39 @@ public class ImageFilterApp extends JFrame {
                                 "blueDegree"
                         )
                 ));
+
+        settings.put("gamma",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                500,
+                                "factor",
+                                "",
+                                1, 1000,
+                                "gammaFactor"
+                        )
+                ));
+
+        settings.put("motionBlur",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                1,
+                                "strength",
+                                "",
+                                0, 10,
+                                "motionBlurStrength"
+                        )
+                ));
+
+        settings.put("sharpness",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                1,
+                                "strength",
+                                "",
+                                0, 10,
+                                "sharpnessStrength"
+                        )
+                ));
     }
 
     private void createOverlayPanel() {
@@ -238,6 +271,129 @@ public class ImageFilterApp extends JFrame {
             }
         } else {
             JOptionPane.showMessageDialog(this, "No image loaded to fit to screen.");
+        }
+    }
+
+    private void chooseMotionBlurArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("motionBlur");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("motionBlur", prefs);
+                parseMotionBlurArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseMotionBlurArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("motionBlur", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyMotionBlurEffect(1);
+            }
+
+            else {
+                final int strength = s.stream().filter(it -> it.getId().equals("motionBlurStrength")).findFirst().get().value();
+                applyMotionBlurEffect(strength);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applyMotionBlurEffect(int strength) {
+        if (editedImage != null) {
+            model.bochkarev.MotionBlurFilter motionBlurFilter = new model.bochkarev.MotionBlurFilter(strength);
+            applyFilters(motionBlurFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseGammaArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("gamma");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("gamma", prefs);
+                parseGammaArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseGammaArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("gamma", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyGammaEffect(300);
+            }
+
+            else {
+                final int gamma = s.stream().filter(it -> it.getId().equals("gammaFactor")).findFirst().get().value();
+                applyGammaEffect(gamma);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applyGammaEffect(int gamma) {
+        if (editedImage != null) {
+            model.bochkarev.GammaFilter gammaFilter = new model.bochkarev.GammaFilter(gamma);
+            applyFilters(gammaFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseSharpnessArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("sharpness");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("sharpness", prefs);
+                parseSharpnessArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseSharpnessArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("sharpness", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applySharpnessEffect(1);
+            }
+
+            else {
+                final int strength = s.stream().filter(it -> it.getId().equals("sharpnessStrength")).findFirst().get().value();
+                applySharpnessEffect(strength);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void applySharpnessEffect(int strength) {
+        if (editedImage != null) {
+            model.bochkarev.SharpnessFilter sharpnessFilter = new model.bochkarev.SharpnessFilter(strength);
+            applyFilters(sharpnessFilter);
+
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
     }
 
@@ -463,6 +619,24 @@ public class ImageFilterApp extends JFrame {
         applyEmbossingButton.setToolTipText("Apply embossing");
         toolBar.add(applyEmbossingButton);
 
+        JButton applyMotionBlurButton = new JButton("Apply motion blur");
+        applyMotionBlurButton.addActionListener(e -> chooseMotionBlurArgs());
+        //applyMotionBlurButton.addActionListener(e -> applyFilters(new MotionBlurFilter(1)));
+        applyMotionBlurButton.setToolTipText("Apply motion blur");
+        toolBar.add(applyMotionBlurButton);
+
+        JButton applyGammaButton = new JButton("Apply gamma-correction");
+        applyGammaButton.addActionListener(e -> chooseGammaArgs());
+        //applyGammaButton.addActionListener(e -> applyFilters(new GammaFilter(5f)));
+        applyGammaButton.setToolTipText("Apply gamma-correction");
+        toolBar.add(applyGammaButton);
+
+        JButton applySharpnessButton = new JButton("Apply sharpness");
+        applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
+        //applySharpnessButton.addActionListener(e -> applyFilters(new SharpnessFilter(1)));
+        applySharpnessButton.setToolTipText("Apply sharpness");
+        toolBar.add(applySharpnessButton);
+
         JToggleButton switchImageButton = new JToggleButton("Show original image");
         switchImageButton.addActionListener(e -> onSwitchImagePressed(switchImageButton));
         switchImageButton.setToolTipText("Switches image to original\\edited version");
@@ -499,6 +673,18 @@ public class ImageFilterApp extends JFrame {
         JMenuItem vhs = new JMenuItem("VHS");
         vhs.addActionListener(e -> applyFilters(new VHSFilter()));
         filterMenu.add(vhs);
+
+        JMenuItem gamma = new JMenuItem("Gamma");
+        gamma.addActionListener(e -> chooseGammaArgs());
+        filterMenu.add(gamma);
+
+        JMenuItem motionBlur = new JMenuItem("Motion Blur");
+        motionBlur.addActionListener(e -> chooseMotionBlurArgs());
+        filterMenu.add(motionBlur);
+
+        JMenuItem sharpness = new JMenuItem("Sharpness");
+        sharpness.addActionListener(e -> chooseSharpnessArgs());
+        filterMenu.add(sharpness);
 
         return filterMenu;
     }

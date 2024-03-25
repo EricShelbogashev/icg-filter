@@ -1,26 +1,30 @@
 package model.bochkarev;
 
+import core.filter.Image;
+import core.filter.MatrixFilter;
 import misc.ICGFilter;
 import misc.MatrixView;
 import misc.Pattern;
 
 import java.awt.*;
 
-public class GammaFilter extends ICGFilter
+public class GammaFilter extends MatrixFilter
 {
-    double gamma = 3;
+    int gamm = 300;
 
-    public GammaFilter(Pattern pattern)
+    public GammaFilter(int gamma)
     {
-        super(new Pattern(new Point(0, 0), new Point(0, 0)));
+        this.gamm = gamma;
     }
+
     @Override
-    public int apply(MatrixView matrixView)
+    protected int apply(Image image, int x, int y)
     {
-        int rgb = matrixView.get(0, 0);
-        int redResult = (int) (255 * Math.pow(((rgb >> 16) & 0xFF) / (double)255, gamma));
-        int greenResult = (int) (255 * Math.pow(((rgb >> 8) & 0xFF) / (double)255, gamma));
-        int blueResult = (int) (255 * Math.pow(((rgb) & 0xFF) / (double)255, gamma));
+        float gamma = (float) gamm / 100;
+        int rgb = image.color(x, y);
+        int redResult = (int) (255 * Math.pow(((rgb >> 16) & 0xFF) / (float) 255, gamma));
+        int greenResult = (int) (255 * Math.pow(((rgb >> 8) & 0xFF) / (float) 255, gamma));
+        int blueResult = (int) (255 * Math.pow(((rgb) & 0xFF) / (float)255, gamma));
         int alphaResult = 255;
 
         redResult = Math.min(Math.max(redResult, 0), 255);
