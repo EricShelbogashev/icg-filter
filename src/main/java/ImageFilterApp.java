@@ -5,14 +5,19 @@ import core.options.OptionsFactory;
 import core.options.Setting;
 import model.ChooseQuantumLevel;
 import model.ChooseWindowSize;
+import model.filter.boch.SharpnessFilter;
 import model.filter.darya.ColorStretchFilter;
 import model.filter.darya.FillColorFilter;
+import model.filter.darya.GaussianBlurFilter;
 import model.filter.darya.WaterShedFilter;
+import model.filter.eric.BilinearInterpolation;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
 import model.filter.eric.VHSFilter;
 import model.filter.leonid.*;
-import model.filter.darya.GaussianBlurFilter;
+import model.filter.mikhail.MedianFilter;
+import model.filter.mikhail.RotateImageFilter;
+import model.filter.mikhail.WindFilter;
 import model.options.SettingsDialogGenerator;
 
 import javax.imageio.ImageIO;
@@ -144,6 +149,31 @@ public class ImageFilterApp extends JFrame {
                                 "brightness"
                         )
                 ));
+
+        settings.put("wind",
+                List.of(
+                        OptionsFactory.settingEnum(
+                                WindFilter.Direction.RIGHT,
+                                "Wind direction",
+                                "",
+                                WindFilter.Direction.class,
+                                "wind_direction"
+                        ),
+                        OptionsFactory.settingInteger(
+                                3,
+                                "Threshold",
+                                "Higher values restrict the effect to fewer areas of the image.",
+                                0, 50,
+                                "wind_threshold"
+                        ),
+                        OptionsFactory.settingInteger(
+                                5,
+                                "Strength",
+                                "Higher values increase the magnitude of the effect.",
+                                0, 100,
+                                "wind_strength"
+                        )
+                ));
     }
 
     private void createOverlayPanel() {
@@ -238,9 +268,7 @@ public class ImageFilterApp extends JFrame {
             // if filter didn't configured
             if (s == null) {
                 applyBloomEffect(0.3f, 0.7f, 5);
-            }
-
-            else {
+            } else {
                 final float glowFactor = s.stream().filter(it -> it.getId().equals("glowFactor")).findFirst().get().value();
                 final float threshold = s.stream().filter(it -> it.getId().equals("threshold")).findFirst().get().value();
                 final int radius = s.stream().filter(it -> it.getId().equals("radius")).findFirst().get().value();
@@ -283,14 +311,42 @@ public class ImageFilterApp extends JFrame {
             // if filter didn't configured
             if (s == null) {
                 applyFilters(new EmbossingFilter(EmbossingFilter.Light.LEFT_TOP, 64));
-            }
-
-            else {
+            } else {
                 final EmbossingFilter.Light light = s.stream().filter(it -> it.getId().equals("light")).findFirst().get().value();
                 final int brightnessIncrease = s.stream().filter(it -> it.getId().equals("brightness")).findFirst().get().value();
                 applyFilters(new EmbossingFilter(light, brightnessIncrease));
             }
 
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void chooseWindArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("wind");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("wind", prefs);
+                parseWindArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseWindArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("wind", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new WindFilter(WindFilter.Direction.RIGHT, 5, 3));
+            } else {
+                final WindFilter.Direction direction = s.stream().filter(it -> it.getId().equals("wind_direction")).findFirst().get().value();
+                final int windThreshold = s.stream().filter(it -> it.getId().equals("wind_threshold")).findFirst().get().value();
+                final int windStrength = s.stream().filter(it -> it.getId().equals("wind_strength")).findFirst().get().value();
+                applyFilters(new WindFilter(direction, windStrength, windThreshold));
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
@@ -308,13 +364,25 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void applyWatercolor() {
+        if (editedImage != null) {
+//            WatercolorFilter watercolorFilter = new WatercolorFilter();
+//            GaussianBlurFilter gaussianBlurFilter = new GaussianBlurFilter(window_size);
+            MedianFilter medianFilter = new MedianFilter(24);
+            SharpnessFilter sharpnessFilter = new SharpnessFilter(200);
+            applyFilters(medianFilter, sharpnessFilter);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void applyDithering(DitheringMethod ditheringMethod, int redRank, int greenRank, int blueRank) {
         switch (ditheringMethod) {
             case FLOYD_STEINBERG -> {
                 FSDithering filter = new FSDithering(redRank, greenRank, blueRank);
                 applyFilters(filter);
             }
-            case ORDERED ->  {
+            case ORDERED -> {
                 OrderedDithering filter = new OrderedDithering(redRank, greenRank, blueRank);
                 applyFilters(filter);
             }
@@ -340,9 +408,7 @@ public class ImageFilterApp extends JFrame {
             // if filter didn't configured
             if (s == null) {
                 applyDithering(DitheringMethod.ORDERED, 2, 2, 2);
-            }
-
-            else {
+            } else {
                 final int redRank = s.stream().filter(it -> it.getId().equals("redDegree")).findFirst().get().value();
                 final int greenRank = s.stream().filter(it -> it.getId().equals("greenDegree")).findFirst().get().value();
                 final int blueRank = s.stream().filter(it -> it.getId().equals("blueDegree")).findFirst().get().value();
@@ -389,7 +455,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyNegativeButton);
 
         JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
-        applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
+        applyGaussianBlur.addActionListener(e -> applyFilters(new MedianFilter(window_size)));
         applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
         toolBar.add(applyGaussianBlur);
 
@@ -407,6 +473,25 @@ public class ImageFilterApp extends JFrame {
         applyWaterShedButton.addActionListener(e -> applyWaterShed());
         applyWaterShedButton.setToolTipText("Apply Watershed filter");
         toolBar.add(applyWaterShedButton);
+
+        JButton applyWatercolorButton = new JButton("Apply Watercolor");
+        applyWatercolorButton.addActionListener(e -> applyWatercolor());
+        applyWatercolorButton.setToolTipText("Apply Watercolor filter");
+        toolBar.add(applyWatercolorButton);
+
+        JButton applyRotate = new JButton("Apply rotate");
+        RotateImageFilter rotateImageFilter = new RotateImageFilter(45);
+        applyRotate.addActionListener(e -> {
+            applyFilters(rotateImageFilter);
+//            applyFilters(new BilinearInterpolation(getWidth(), getHeight()));
+        });
+        applyRotate.setToolTipText("Apply rotate");
+        toolBar.add(applyRotate);
+
+        JButton applyWindFilterButton = new JButton("Apply Wind");
+        applyWindFilterButton.addActionListener(e -> chooseWindArgs());
+        applyWindFilterButton.setToolTipText("Apply Wind filter");
+        toolBar.add(applyWindFilterButton);
 
         JButton applyDitheringButton = new JButton("Apply dithering");
         applyDitheringButton.addActionListener(e -> chooseDitheringOrder());
@@ -434,7 +519,7 @@ public class ImageFilterApp extends JFrame {
         monochrome.addActionListener(e -> applyFilters(new MonochromeFilter()));
         filterMenu.add(monochrome);
 
-        JMenuItem negative= new JMenuItem("Negative");
+        JMenuItem negative = new JMenuItem("Negative");
         negative.addActionListener(e -> applyFilters(new NegativeFilter()));
         filterMenu.add(negative);
 
@@ -450,6 +535,10 @@ public class ImageFilterApp extends JFrame {
         JMenuItem embossing = new JMenuItem("Embossing");
         embossing.addActionListener(e -> chooseEmbossingArgs());
         filterMenu.add(embossing);
+
+        JMenuItem wind = new JMenuItem("Wind");
+        embossing.addActionListener(e -> chooseWindArgs());
+        filterMenu.add(wind);
 
         JMenuItem vhs = new JMenuItem("VHS");
         vhs.addActionListener(e -> applyFilters(new VHSFilter()));
@@ -471,9 +560,8 @@ public class ImageFilterApp extends JFrame {
                 Avtsinova Daria
                 Kulakov Michael
                 Bochkarev Egor\s
-                """
-                ;
-        aboutProgram.addActionListener(e->JOptionPane.showMessageDialog(this,  aboutMessage));
+                """;
+        aboutProgram.addActionListener(e -> JOptionPane.showMessageDialog(this, aboutMessage));
         helpMenu.add(aboutProgram);
         return helpMenu;
     }
@@ -494,15 +582,15 @@ public class ImageFilterApp extends JFrame {
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         JMenuItem open = new JMenuItem("Open");
-        open.addActionListener(e->chooseImage());
+        open.addActionListener(e -> chooseImage());
         fileMenu.add(open);
 
         JMenuItem save = new JMenuItem("Save");
-        save.addActionListener(e->saveFile());
+        save.addActionListener(e -> saveFile());
         fileMenu.add(save);
 
         JMenuItem saveAs = new JMenuItem("Save as");
-        saveAs.addActionListener(e->saveFileAs());
+        saveAs.addActionListener(e -> saveFileAs());
         fileMenu.add(saveAs);
 
         return fileMenu;
@@ -520,22 +608,20 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
-        if (currentImage != null){
+        if (currentImage != null) {
             if (isOriginalImage) {
                 isOriginalImage = false;
                 updateCanvas(editedImage);
                 button.setSelected(false);
 
-            }
-            else {
+            } else {
                 isOriginalImage = true;
                 updateCanvas(originalImage);
                 button.setSelected(true);
 
             }
-        }
-         else {
-        JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
         }
 
     }
@@ -623,8 +709,7 @@ public class ImageFilterApp extends JFrame {
     public void saveFile() {
         if (outputFile == null) {
             saveFileAs();
-        }
-        else {
+        } else {
             try {
                 ImageIO.write(currentImage, "png", outputFile);
                 System.out.println("Изображение успешно сохранено в " + outputFile.getAbsolutePath());
