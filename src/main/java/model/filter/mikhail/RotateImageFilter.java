@@ -16,7 +16,7 @@ public class RotateImageFilter extends CustomFilter {
 
     @Override
     protected BufferedImage apply(Image image) {
-        double sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
+        double sin = Math.abs(Math.sin(Math.toRadians(angle))), cos = Math.abs(Math.cos(Math.toRadians(angle)));
         int w = image.width();
         int h = image.height();
         int newWidth = (int) Math.floor(w * cos + h * sin);
@@ -24,8 +24,8 @@ public class RotateImageFilter extends CustomFilter {
         GraphicsConfiguration gc = getDefaultConfiguration();
         BufferedImage result = gc.createCompatibleImage(newWidth, newHeight, Transparency.TRANSLUCENT);
         Graphics2D g = result.createGraphics();
+        g.rotate(Math.toRadians(angle), (double) w / 2, (double) h / 2);
         g.translate((newWidth - w) / 2, (newHeight - h) / 2);
-        g.rotate(angle, (double) w / 2, (double) h / 2);
         g.drawRenderedImage(image.bufferedImage(), null);
         g.dispose();
         return result;
