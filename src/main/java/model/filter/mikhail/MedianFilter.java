@@ -9,7 +9,7 @@ public class MedianFilter extends MatrixFilter {
     private final int w;
 
     public MedianFilter(int windowSize) {
-        this.w = windowSize;
+        this.w = 2;
     }
 
     @Override
