@@ -23,11 +23,7 @@ public class WindFilter extends CustomFilter {
 
         int width = image.width();
         int height = image.height();
-//        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-//        Image result = Image.empty(width, height);
         Image result = Image.copyOf(image);
-//        int randInt = new Random().nextInt(height / 2) + height / 2;
-        System.out.println("THRESHOLD: " + threshold);
         for (int u = 0; u < width; u++) {
             for (int v = 0; v < height; v++) {
 
@@ -50,7 +46,6 @@ public class WindFilter extends CustomFilter {
                     }
                     int lumaDif = lumaDifference(pix, lastPix);
                     lastPix = pix;
-                    System.out.println(lumaDif);
                     if (lumaDif > threshold) {
                         break;
                     }
@@ -63,16 +58,11 @@ public class WindFilter extends CustomFilter {
                     int blendedPixel = lerp(pix, firstPix, randomStrength, j);
                     if (u + j >= 0 && u + j < width) {
                         result.setColor(u + j, v, getAverageColor(blendedPixel, image.color(u + j, v)));
-//                        result.setColor(u + j, v, blendedPixel);
-//                        image.setColor(u + j, v, blendedPixel);
-//                        System.out.println(blendedPixel);
                     }
                 }
 
             }
         }
-
-//        return image.bufferedImage();
         return result.bufferedImage();
     }
 
@@ -101,9 +91,6 @@ public class WindFilter extends CustomFilter {
 
     // Функция для вычисления разницы luma
     private static int lumaDifference(int pix1, int pix2) {
-        int luma1 = luma(pix1);
-        int luma2 = luma(pix2);
-//        System.out.println(luma1 + " " + luma2);
         return Math.abs(luma(pix1) - luma(pix2));
     }
 
