@@ -623,6 +623,18 @@ public class ImageFilterApp extends JFrame {
         bloom.addActionListener(e -> chooseBloomArgs());
         filterMenu.add(bloom);
 
+        JMenuItem gamma = new JMenuItem("Gamma");
+        gamma.addActionListener(e -> chooseGammaArgs());
+        filterMenu.add(gamma);
+
+        JMenuItem motionBlur = new JMenuItem("Motion Blur");
+        motionBlur.addActionListener(e -> chooseMotionBlurArgs());
+        filterMenu.add(motionBlur);
+
+        JMenuItem sharpness = new JMenuItem("Sharpness");
+        sharpness.addActionListener(e -> chooseSharpnessArgs());
+        filterMenu.add(sharpness);
+
         JMenuItem embossing = new JMenuItem("Embossing");
         embossing.addActionListener(e -> chooseEmbossingArgs());
         filterMenu.add(embossing);
