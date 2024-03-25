@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ImageFilterApp extends JFrame {
     private final Map<String, List<Setting<?>>> settings = new HashMap<>();
@@ -660,8 +661,9 @@ public class ImageFilterApp extends JFrame {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
 
-        JButton chooseImageButton = new JButton("Choose Image");
+        JButton chooseImageButton = new JButton();
         chooseImageButton.addActionListener(e -> chooseImage());
+        chooseImageButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("chooseIcon.png"))));
         chooseImageButton.setToolTipText("Choose image for editing");
         toolBar.add(chooseImageButton);
 
@@ -685,8 +687,9 @@ public class ImageFilterApp extends JFrame {
         applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
         toolBar.add(applyGaussianBlur);
 
-        JButton applyVhs = new JButton("Apply VHS");
+        JButton applyVhs = new JButton();
         applyVhs.addActionListener(e -> applyFilters(new VHSFilter()));
+        applyVhs.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("videoIcon.png"))));
         applyVhs.setToolTipText("Apply VHS filter");
         toolBar.add(applyVhs);
 
@@ -695,13 +698,15 @@ public class ImageFilterApp extends JFrame {
         applyBloom.setToolTipText("Apply Bloom filter");
         toolBar.add(applyBloom);
 
-        JButton applyWaterShedButton = new JButton("waterShed");
+        JButton applyWaterShedButton = new JButton();
         applyWaterShedButton.addActionListener(e -> chooseWaterShedArgs());
+        applyWaterShedButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("waterIcon.png"))));
         applyWaterShedButton.setToolTipText("Apply Watershed filter");
         toolBar.add(applyWaterShedButton);
 
-        JButton applyDitheringButton = new JButton("Apply dithering");
+        JButton applyDitheringButton = new JButton();
         applyDitheringButton.addActionListener(e -> chooseDitheringOrder());
+        applyDitheringButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("ditherIcon.png"))));
         applyDitheringButton.setToolTipText("Apply dithering");
         toolBar.add(applyDitheringButton);
 
