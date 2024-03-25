@@ -23,11 +23,13 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ImageFilterApp extends JFrame {
     private final Map<String, List<Setting<?>>> settings = new HashMap<>();
@@ -660,6 +662,8 @@ public class ImageFilterApp extends JFrame {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
 
+
+
         JButton chooseImageButton = new JButton("Choose Image");
         chooseImageButton.addActionListener(e -> chooseImage());
         chooseImageButton.setToolTipText("Choose image for editing");
@@ -670,19 +674,23 @@ public class ImageFilterApp extends JFrame {
         fitToScreenButton.setToolTipText("Fit image to screen size");
         toolBar.add(fitToScreenButton);
 
-        JButton applyMonochromeButton = new JButton("Apply Monochrome");
+        JButton applyMonochromeButton = new JButton("");
         applyMonochromeButton.addActionListener(e -> applyFilters(new MonochromeFilter()));
         applyMonochromeButton.setToolTipText("Apply Monochrome filter");
+        applyMonochromeButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("monochromeIcon.png"))));
         toolBar.add(applyMonochromeButton);
 
-        JButton applyNegativeButton = new JButton("Apply Negative");
+        JButton applyNegativeButton = new JButton("");
         applyNegativeButton.addActionListener(e -> applyFilters(new NegativeFilter()));
         applyNegativeButton.setToolTipText("Apply Negative (color invert) filter");
+        applyNegativeButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("invertIcon.png"))));
         toolBar.add(applyNegativeButton);
 
-        JButton applyGaussianBlur = new JButton("Apply Gaussian blur");
+        JButton applyGaussianBlur = new JButton("");
         applyGaussianBlur.addActionListener(e -> applyFilters(new GaussianBlurFilter(window_size)));
         applyGaussianBlur.setToolTipText("Apply Gaussian Blur filter");
+        applyGaussianBlur.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("blurIcon.png"))));
+
         toolBar.add(applyGaussianBlur);
 
         JButton applyVhs = new JButton("Apply VHS");
