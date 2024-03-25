@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ImageFilterApp extends JFrame {
     private final Map<String, List<Setting<?>>> settings = new HashMap<>();
@@ -690,9 +691,10 @@ public class ImageFilterApp extends JFrame {
         applyVhs.setToolTipText("Apply VHS filter");
         toolBar.add(applyVhs);
 
-        JButton applyBloom = new JButton("Apply Bloom effect");
+        JButton applyBloom = new JButton();
         applyBloom.addActionListener(e -> chooseBloomArgs());
         applyBloom.setToolTipText("Apply Bloom filter");
+        applyBloom.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("bloomIcon.png"))));
         toolBar.add(applyBloom);
 
         JButton applyWaterShedButton = new JButton("waterShed");
@@ -724,7 +726,6 @@ public class ImageFilterApp extends JFrame {
 
         JButton applySharpnessButton = new JButton("Apply sharpness");
         applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
-        //applySharpnessButton.addActionListener(e -> applyFilters(new SharpnessFilter(1)));
         applySharpnessButton.setToolTipText("Apply sharpness");
         toolBar.add(applySharpnessButton);
 
@@ -733,9 +734,10 @@ public class ImageFilterApp extends JFrame {
         switchImageButton.setToolTipText("Switches image to original\\edited version");
         toolBar.add(switchImageButton);
 
-        JButton applyWatercolorButton = new JButton("Apply Watercolor");
+        JButton applyWatercolorButton = new JButton();
         applyWatercolorButton.addActionListener(e -> applyWatercolor());
         applyWatercolorButton.setToolTipText("Apply Watercolor filter");
+        applyWatercolorButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("paletteIcon.png"))));
         toolBar.add(applyWatercolorButton);
 
         JButton applyRotate = new JButton("Apply rotate");
