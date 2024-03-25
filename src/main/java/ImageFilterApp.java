@@ -670,7 +670,8 @@ public class ImageFilterApp extends JFrame {
         chooseImageButton.setToolTipText("Choose image for editing");
         toolBar.add(chooseImageButton);
 
-        JButton fitToScreenButton = new JButton("Fit to Screen");
+        JButton fitToScreenButton = new JButton();
+        fitToScreenButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("fit.png"))));
         fitToScreenButton.addActionListener(e -> chooseFitAlgorithm());
         fitToScreenButton.setToolTipText("Fit image to screen size");
         toolBar.add(fitToScreenButton);
@@ -718,30 +719,35 @@ public class ImageFilterApp extends JFrame {
         applyDitheringButton.setToolTipText("Apply dithering");
         toolBar.add(applyDitheringButton);
 
-        JButton applyEmbossingButton = new JButton("Apply embossing");
+        JButton applyEmbossingButton = new JButton();
+        applyEmbossingButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("embossingIcon.png"))));
         applyEmbossingButton.addActionListener(e -> chooseEmbossingArgs());
         applyEmbossingButton.setToolTipText("Apply embossing");
         toolBar.add(applyEmbossingButton);
 
-        JButton applyMotionBlurButton = new JButton("Apply motion blur");
+        JButton applyMotionBlurButton = new JButton();
         applyMotionBlurButton.addActionListener(e -> chooseMotionBlurArgs());
+        applyMotionBlurButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("motionBlurIcon.png"))));
         //applyMotionBlurButton.addActionListener(e -> applyFilters(new MotionBlurFilter(1)));
         applyMotionBlurButton.setToolTipText("Apply motion blur");
         toolBar.add(applyMotionBlurButton);
 
-        JButton applyGammaButton = new JButton("Apply gamma-correction");
+        JButton applyGammaButton = new JButton();
         applyGammaButton.addActionListener(e -> chooseGammaArgs());
+        applyGammaButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("blurIcon.png"))));
         //applyGammaButton.addActionListener(e -> applyFilters(new GammaFilter(5f)));
         applyGammaButton.setToolTipText("Apply gamma-correction");
         toolBar.add(applyGammaButton);
 
-        JButton applySharpnessButton = new JButton("Apply sharpness");
+        JButton applySharpnessButton = new JButton();
         applySharpnessButton.addActionListener(e -> chooseSharpnessArgs());
+        applySharpnessButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("sharpenIcon.png"))));
         applySharpnessButton.setToolTipText("Apply sharpness");
         toolBar.add(applySharpnessButton);
 
-        JToggleButton switchImageButton = new JToggleButton("Show original image");
+        JToggleButton switchImageButton = new JToggleButton();
         switchImageButton.addActionListener(e -> onSwitchImagePressed(switchImageButton));
+        switchImageButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("exposeIcon.png"))));
         switchImageButton.setToolTipText("Switches image to original\\edited version");
         toolBar.add(switchImageButton);
 
@@ -751,15 +757,17 @@ public class ImageFilterApp extends JFrame {
         applyWatercolorButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("paletteIcon.png"))));
         toolBar.add(applyWatercolorButton);
 
-        JButton applyRotate = new JButton("Apply rotate");
+        JButton applyRotate = new JButton();
 
         RotateImageFilter rotateImageFilter = new RotateImageFilter(45);
+        applyRotate.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("rotate.png"))));
         applyRotate.addActionListener(e -> applyFilters(rotateImageFilter));
         applyRotate.setToolTipText("Apply rotate");
         toolBar.add(applyRotate);
 
-        JButton applyWindFilterButton = new JButton("Apply Wind");
+        JButton applyWindFilterButton = new JButton();
         applyWindFilterButton.addActionListener(e -> chooseWindArgs());
+        applyWindFilterButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("wind.png"))));
         applyWindFilterButton.setToolTipText("Apply Wind filter");
         toolBar.add(applyWindFilterButton);
 
