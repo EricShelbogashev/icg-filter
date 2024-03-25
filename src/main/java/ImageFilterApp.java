@@ -226,6 +226,15 @@ public class ImageFilterApp extends JFrame {
                                 "wind_strength"
                         )
                 ));
+        settings.put("rotate",
+                List.of(
+                        OptionsFactory.settingInteger(
+                                90,
+                                "Angle",
+                                "Angle of rotate.",
+                                -180, 180,
+                                "rotate_angle"
+                        )));
     }
 
     private void createOverlayPanel() {
@@ -609,6 +618,34 @@ public class ImageFilterApp extends JFrame {
         }
     }
 
+    private void chooseRotateArgs() {
+        if (editedImage != null) {
+            final List<Setting<?>> prefs = settings.get("rotate");
+            SettingsDialogGenerator.generateAndShowDialog(prefs, () -> {
+                settings.put("rotate", prefs);
+                parseRotateArgs();
+            });
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
+    private void parseRotateArgs() {
+        if (editedImage != null) {
+            final var s = settings.getOrDefault("rotate", null);
+
+            // if filter didn't configured
+            if (s == null) {
+                applyFilters(new WindFilter(WindFilter.Direction.RIGHT, 5, 3));
+            } else {
+                final int rotateAngle = s.stream().filter(it -> it.getId().equals("rotate_angle")).findFirst().get().value();
+                applyFilters(new RotateImageFilter(rotateAngle));
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }
+
     private void applyWatercolor() {
         if (editedImage != null) {
             MedianFilter medianFilter = new MedianFilter(24);
@@ -702,6 +739,7 @@ public class ImageFilterApp extends JFrame {
         toolBar.add(applyWatercolorButton);
 
         JButton applyRotate = new JButton("Apply rotate");
+
         RotateImageFilter rotateImageFilter = new RotateImageFilter(45);
         applyRotate.addActionListener(e -> applyFilters(rotateImageFilter));
         applyRotate.setToolTipText("Apply rotate");
@@ -769,8 +807,7 @@ public class ImageFilterApp extends JFrame {
         filterMenu.add(watercolor);
 
         JMenuItem rotate = new JMenuItem("Rotate");
-        RotateImageFilter rotateImageFilter = new RotateImageFilter(45);
-        rotate.addActionListener(e -> applyFilters(rotateImageFilter));
+        rotate.addActionListener(e -> chooseRotateArgs());
         filterMenu.add(rotate);
 
         return filterMenu;
@@ -983,14 +1020,13 @@ public class ImageFilterApp extends JFrame {
         overlayPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(editedImage);
+        FilterExecutor.Builder builder = FilterExecutor.of(originalImage);
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    originalImage = ImageUtils.copy(editedImage);
                     editedImage = ImageUtils.copy(newImage);
                     updateCanvas(editedImage);
                     showOverlay(false);
