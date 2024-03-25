@@ -9,9 +9,10 @@ public class BloomFilter extends MatrixFilter {
     private final double glowFactor;
     double threshold;
 
-    public BloomFilter(float glowFactor, float threshold) {
-        this.glowFactor = glowFactor;
-        this.threshold = threshold;
+    public BloomFilter(int glowFactor, int threshold) {
+
+        this.glowFactor = (float) glowFactor / 100;
+        this.threshold = (float) threshold / 100;
     }
 
 
