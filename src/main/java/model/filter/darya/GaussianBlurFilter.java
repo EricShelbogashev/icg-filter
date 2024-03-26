@@ -2,6 +2,7 @@ package model.filter.darya;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
+import model.filter.leonid.ColorUtils;
 
 public class GaussianBlurFilter extends MatrixFilter {
     private final int w;
@@ -15,14 +16,14 @@ public class GaussianBlurFilter extends MatrixFilter {
         float res_r = 0;
         float res_g = 0;
         float res_b = 0;
-        int alpha = (image.color(column, row) >> 24) & 0xFF;
+        int alpha = image.alpha(column, row);
         float sigma = w / 2.1f;
         for (int x = -1 * w; x <= w; x++)
             for (int y = -1 * w; y <= w; y++) {
                 float k = (float) (1.0f / (2.0f * Math.PI * sigma * sigma) * Math.pow(2.7f, -1.0f * (x * x + y * y) / (2.0f * sigma * sigma)));
-                res_r += ((image.color(column + x, row + y) >> 16) & 0xFF) * k;
-                res_g += ((image.color(column + x, row + y) >> 8) & 0xFF) * k;
-                res_b += ((image.color(column + x, row + y)) & 0xFF) * k;
+                res_r += image.red(column + x, row + y) * k;
+                res_g += image.green(column + x, row + y) * k;
+                res_b += image.blue(column + x, row + y) * k;
             }
         if (Math.round(res_r) > 255 || Math.round(res_r) < 0)
             res_r = 255;
@@ -30,9 +31,6 @@ public class GaussianBlurFilter extends MatrixFilter {
             res_b = 255;
         if (Math.round(res_g) > 255 || Math.round(res_g) < 0)
             res_g = 255;
-        return ((alpha & 0xFF) << 24) |
-                ((Math.round(res_r) & 0xFF) << 16) |
-                ((Math.round(res_g) & 0xFF) << 8) |
-                ((Math.round(res_b) & 0xFF));
+        return ColorUtils.rgb(Math.round(res_r), Math.round(res_g), Math.round(res_b), alpha);
     }
 }
