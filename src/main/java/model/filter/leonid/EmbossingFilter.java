@@ -40,7 +40,7 @@ public class EmbossingFilter extends MatrixFilter {
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                curColor = ColorUtils.getBrightness(image.red(x + i, y + j));
+                curColor = ColorUtils.getBrightness(image.color(x + i, y + j));
                 int koef = getKoef(i + 1, j + 1);
                 curColor *= koef;
                 resultColor += curColor;
@@ -52,7 +52,7 @@ public class EmbossingFilter extends MatrixFilter {
         grayColor = Math.max(grayColor, 0); // ограничение значения в диапазоне [0, 255]
         grayColor = Math.min(grayColor, 255);
 
-        return (alpha << 24) | (grayColor << 16) | (grayColor << 8) | grayColor;
+        return ColorUtils.rgb(grayColor, grayColor, grayColor, alpha);
     }
 
     private int getKoef(int x, int y) {

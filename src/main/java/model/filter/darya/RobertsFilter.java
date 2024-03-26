@@ -12,7 +12,7 @@ public class RobertsFilter extends MatrixFilter {
     @Override
     protected int apply(Image image, int x, int y) {
         int oldpix = image.color(x, y);
-        int alpha = (oldpix >> 24) & 0xFF;
+        int alpha = ColorUtils.alpha(oldpix);
         float[][] koef = {{0.0f, -1.0f}, {1.0f, 0.0f}};
         float[][] koef2 = {{-1.0f, 0.0f}, {0.0f, 1.0f}};
         float curColor;
@@ -41,7 +41,7 @@ public class RobertsFilter extends MatrixFilter {
             resColor = 255;
         else
             resColor = 0;
-        return (alpha << 24) | (resColor << 16) | (resColor << 8) | resColor;
+        return ColorUtils.rgb(resColor, resColor, resColor, alpha);
     }
 
 }
