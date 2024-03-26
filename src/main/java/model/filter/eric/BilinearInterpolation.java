@@ -1,6 +1,7 @@
 package model.filter.eric;
 
 import core.filter.Image;
+import model.filter.leonid.ColorUtils;
 
 import java.awt.image.BufferedImage;
 
@@ -36,14 +37,14 @@ public class BilinearInterpolation extends ResamplingFilter {
     }
 
     private static int bilinearInterpolate(int a, int b, int c, int d, double xDiff, double yDiff) {
-        int red = (int) ((a >> 16 & 0xff) * (1 - xDiff) * (1 - yDiff) + (b >> 16 & 0xff) * xDiff * (1 - yDiff) +
-                (c >> 16 & 0xff) * yDiff * (1 - xDiff) + (d >> 16 & 0xff) * (xDiff * yDiff));
-        int green = (int) ((a >> 8 & 0xff) * (1 - xDiff) * (1 - yDiff) + (b >> 8 & 0xff) * xDiff * (1 - yDiff) +
-                (c >> 8 & 0xff) * yDiff * (1 - xDiff) + (d >> 8 & 0xff) * (xDiff * yDiff));
-        int blue = (int) ((a & 0xff) * (1 - xDiff) * (1 - yDiff) + (b & 0xff) * xDiff * (1 - yDiff) +
-                (c & 0xff) * yDiff * (1 - xDiff) + (d & 0xff) * (xDiff * yDiff));
+        int red = (int) (ColorUtils.red(a) * (1 - xDiff) * (1 - yDiff) + ColorUtils.red(b) * xDiff * (1 - yDiff) +
+                ColorUtils.red(c) * yDiff * (1 - xDiff) + ColorUtils.red(d) * (xDiff * yDiff));
+        int green = (int) (ColorUtils.green(a) * (1 - xDiff) * (1 - yDiff) + ColorUtils.green(b) * xDiff * (1 - yDiff) +
+                ColorUtils.green(c) * yDiff * (1 - xDiff) + ColorUtils.green(d) * (xDiff * yDiff));
+        int blue = (int) (ColorUtils.blue(a) * (1 - xDiff) * (1 - yDiff) + ColorUtils.blue(b) * xDiff * (1 - yDiff) +
+                ColorUtils.blue(c) * yDiff * (1 - xDiff) + ColorUtils.blue(d) * (xDiff * yDiff));
 
-        return 0xff000000 | (clip(red) << 16) | (clip(green) << 8) | clip(blue);
+        return  ColorUtils.rgb(clip(red), clip(green), clip(blue));
     }
 
     private static int clip(int value) {
