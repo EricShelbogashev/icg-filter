@@ -1,12 +1,8 @@
-package model.bochkarev;
+package model.filter.boch;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
-import misc.ICGFilter;
-import misc.MatrixView;
-import misc.Pattern;
-
-import java.awt.*;
+import model.filter.leonid.ColorUtils;
 
 public class GammaFilter extends MatrixFilter
 {
@@ -22,14 +18,13 @@ public class GammaFilter extends MatrixFilter
     {
         float gamma = (float) gamm / 100;
         int rgb = image.color(x, y);
-        int redResult = (int) (255 * Math.pow(((rgb >> 16) & 0xFF) / (float) 255, gamma));
-        int greenResult = (int) (255 * Math.pow(((rgb >> 8) & 0xFF) / (float) 255, gamma));
-        int blueResult = (int) (255 * Math.pow(((rgb) & 0xFF) / (float)255, gamma));
-        int alphaResult = 255;
+        int redResult = (int) (255 * Math.pow(ColorUtils.red(rgb) / (float) 255, gamma));
+        int greenResult = (int) (255 * Math.pow(ColorUtils.green(rgb) / (float) 255, gamma));
+        int blueResult = (int) (255 * Math.pow(ColorUtils.blue(rgb) / (float) 255, gamma));
 
         redResult = Math.min(Math.max(redResult, 0), 255);
         greenResult = Math.min(Math.max(greenResult, 0), 255);
         blueResult = Math.min(Math.max(blueResult, 0), 255);
-        return ((int) alphaResult << 24) | ((int) redResult << 16) | ((int) greenResult << 8) | ((int) blueResult);
+        return ColorUtils.rgb(redResult, greenResult, blueResult);
     }
 }
