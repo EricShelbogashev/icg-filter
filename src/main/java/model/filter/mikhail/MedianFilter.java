@@ -5,6 +5,8 @@ import core.filter.MatrixFilter;
 
 import java.util.Arrays;
 
+// TODO Shaikhutdinov Leonid
+
 public class MedianFilter extends MatrixFilter {
     private final int w;
 
