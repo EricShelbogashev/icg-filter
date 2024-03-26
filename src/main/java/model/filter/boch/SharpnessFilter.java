@@ -8,6 +8,8 @@ import misc.Pattern;
 
 import java.awt.*;
 
+// TODO Shiakhtudinov Leonid
+
 public class SharpnessFilter extends MatrixFilter
 {
     int strength = 1;
