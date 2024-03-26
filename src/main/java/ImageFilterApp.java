@@ -4,6 +4,7 @@ import core.filter.Image;
 import core.options.OptionsFactory;
 import core.options.Setting;
 import model.filter.boch.GammaFilter;
+import model.filter.boch.MotionBlurFilter;
 import model.filter.darya.*;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
@@ -370,7 +371,7 @@ public class ImageFilterApp extends JFrame {
 
     private void applyMotionBlurEffect(int strength) {
         if (editedImage != null) {
-            model.bochkarev.MotionBlurFilter motionBlurFilter = new model.bochkarev.MotionBlurFilter(strength);
+            MotionBlurFilter motionBlurFilter = new MotionBlurFilter(strength);
             applyFilters(motionBlurFilter);
 
         } else {

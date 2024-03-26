@@ -2,6 +2,9 @@ package model.filter.boch;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
+import model.filter.leonid.ColorUtils;
+
+import java.awt.*;
 
 // TODO Shikhutdinov Leonid
 
@@ -28,16 +31,15 @@ public class MotionBlurFilter  extends MatrixFilter
         int redResult = 0;
         int greenResult = 0;
         int blueResult = 0;
-        int alphaResult = 255;
 
         for(int i = -2; i < 3; i++)
         {
             for(int j = -2; j < 3; j++)
             {
                 int rgb = image.color(i + x, j + y);
-                redResult += ((rgb >> 16) & 0xFF) * matrix[i+2][j+2];
-                greenResult += ((rgb >> 8) & 0xFF) * matrix[i+2][j+2];
-                blueResult += ((rgb) & 0xFF) * matrix[i+2][j+2];
+                redResult += ColorUtils.red(rgb) * matrix[i+2][j+2];
+                greenResult += ColorUtils.green(rgb) * matrix[i+2][j+2];
+                blueResult += ColorUtils.blue(rgb) * matrix[i+2][j+2];
             }
         }
         redResult /= 11*strength;
@@ -46,6 +48,6 @@ public class MotionBlurFilter  extends MatrixFilter
         redResult = Math.min(Math.max(redResult, 0), 255);
         greenResult = Math.min(Math.max(greenResult, 0), 255);
         blueResult = Math.min(Math.max(blueResult, 0), 255);
-        return ((int) alphaResult << 24) | ((int) redResult << 16) | ((int) greenResult << 8) | ((int) blueResult);
+        return ColorUtils.rgb(redResult, greenResult, blueResult);
     }
 }
