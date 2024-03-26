@@ -4,9 +4,6 @@ import core.filter.Image;
 import core.filter.MatrixFilter;
 import model.filter.leonid.ColorUtils;
 
-import java.awt.*;
-
-// TODO Shikhutdinov Leonid
 
 public class MotionBlurFilter  extends MatrixFilter
 {
