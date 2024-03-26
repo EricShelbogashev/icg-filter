@@ -167,7 +167,7 @@ public class WindFilter extends CustomFilter {
     private static int lerp(int pix1, int pix2, int distance, int step) {
 
         // Разница между цветами
-        int alphaDiff = ColorUtils.alpha(pix2);
+        int alphaDiff = ColorUtils.alpha(pix2) - ColorUtils.alpha(pix1);
         int redDiff = ColorUtils.red(pix2) - ColorUtils.red(pix1);
         int greenDiff = ColorUtils.green(pix2) - ColorUtils.green(pix1);
         int blueDiff = ColorUtils.blue(pix2) - ColorUtils.blue(pix1);
