@@ -23,7 +23,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -1105,8 +1104,8 @@ public class ImageFilterApp extends JFrame {
     private void loadImage(File imageFile) {
         try {
             currentImage = ImageIO.read(imageFile);
-            originalImage = ImageUtils.copy(currentImage);
-            editedImage = ImageUtils.copy(currentImage);
+            originalImage = Image.of(currentImage);
+            editedImage = Image.of(currentImage);
             imageLabel.setIcon(new ImageIcon(currentImage));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
@@ -1191,7 +1190,7 @@ public class ImageFilterApp extends JFrame {
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    editedImage = ImageUtils.copy(newImage);
+                    editedImage = Image.of(newImage);
                     updateCanvas(editedImage);
                     showOverlay(false);
                 })

@@ -3,6 +3,8 @@ package core.filter;
 import model.filter.leonid.ColorUtils;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 
 public class Image {
     public static final int DEFAULT_ALPHA = 0xFF;
@@ -31,6 +33,13 @@ public class Image {
             }
         }
         return new Image(bufferedImage);
+    }
+
+    public static BufferedImage of(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
     public int width() {
