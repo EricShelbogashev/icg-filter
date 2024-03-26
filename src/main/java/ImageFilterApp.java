@@ -3,6 +3,7 @@ import core.filter.FilterExecutor;
 import core.filter.Image;
 import core.options.OptionsFactory;
 import core.options.Setting;
+import model.filter.boch.GammaFilter;
 import model.filter.darya.*;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
@@ -408,7 +409,7 @@ public class ImageFilterApp extends JFrame {
 
     private void applyGammaEffect(int gamma) {
         if (editedImage != null) {
-            model.bochkarev.GammaFilter gammaFilter = new model.bochkarev.GammaFilter(gamma);
+            GammaFilter gammaFilter = new GammaFilter(gamma);
             applyFilters(gammaFilter);
 
         } else {
