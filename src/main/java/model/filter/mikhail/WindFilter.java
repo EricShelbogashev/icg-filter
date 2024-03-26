@@ -2,6 +2,7 @@ package model.filter.mikhail;
 
 import core.filter.CustomFilter;
 import core.filter.Image;
+import model.filter.leonid.ColorUtils;
 
 import java.awt.image.BufferedImage;
 
@@ -135,25 +136,25 @@ public class WindFilter extends CustomFilter {
     }
 
     public static int getAverageColor(int color1, int color2) {
-        int alpha = (color1 >> 24) & 0xFF;
-        int red1 = getRed(color1);
-        int green1 = getGreen(color1);
-        int blue1 = getBlue(color1);
-        int red2 = getRed(color2);
-        int green2 = getGreen(color2);
-        int blue2 = getBlue(color2);
+        int alpha = ColorUtils.alpha(color1);
+        int red1 = ColorUtils.red(color1);
+        int green1 = ColorUtils.green(color1);
+        int blue1 = ColorUtils.blue(color1);
+        int red2 = ColorUtils.red(color2);
+        int green2 = ColorUtils.green(color2);
+        int blue2 = ColorUtils.blue(color2);
         int averageRed = (3 * red1 + red2) / 4;
         int averageGreen = (3 * green1 + green2) / 4;
         int averageBlue = (3 * blue1 + blue2) / 4;
-        return (alpha << 24) | (averageRed << 16) | (averageGreen << 8) | averageBlue;
+        return ColorUtils.rgb(averageRed, averageGreen, averageBlue, alpha);
     }
 
 
     // Функция для вычисления luma
     private static int luma(int rgb) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
+        int r = ColorUtils.red(rgb);
+        int g = ColorUtils.green(rgb);
+        int b = ColorUtils.blue(rgb);
         return (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
     }
 
@@ -166,32 +167,19 @@ public class WindFilter extends CustomFilter {
     private static int lerp(int pix1, int pix2, int distance, int step) {
 
         // Разница между цветами
-        int alphaDiff = (pix2 >> 24) & 0xFF - (pix1 >> 24) & 0xFF;
-        int redDiff = getRed(pix2) - getRed(pix1);
-        int greenDiff = getGreen(pix2) - getGreen(pix1);
-        int blueDiff = getBlue(pix2) - getBlue(pix1);
+        int alphaDiff = ColorUtils.alpha(pix2);
+        int redDiff = ColorUtils.red(pix2) - ColorUtils.red(pix1);
+        int greenDiff = ColorUtils.green(pix2) - ColorUtils.green(pix1);
+        int blueDiff = ColorUtils.blue(pix2) - ColorUtils.blue(pix1);
 
         // Интерполяция каждого компонента цвета
-        int alpha = (pix1 >> 24) & 0xFF + (alphaDiff * step) / distance;
-        int red = getRed(pix1) + (redDiff * step) / distance;
-        int green = getGreen(pix1) + (greenDiff * step) / distance;
-        int blue = getBlue(pix1) + (blueDiff * step) / distance;
+        int alpha = ColorUtils.alpha(pix1) + (alphaDiff * step) / distance;
+        int red = ColorUtils.red(pix1) + (redDiff * step) / distance;
+        int green = ColorUtils.green(pix1) + (greenDiff * step) / distance;
+        int blue = ColorUtils.blue(pix1) + (blueDiff * step) / distance;
 
         // Сборка int значения цвета
-        return (alpha << 24) | (red << 16) | (green << 8) | blue;
-    }
-
-    // Вспомогательные методы для получения компонент цвета
-    private static int getRed(int color) {
-        return (color >> 16) & 0xFF;
-    }
-
-    private static int getGreen(int color) {
-        return (color >> 8) & 0xFF;
-    }
-
-    private static int getBlue(int color) {
-        return color & 0xFF;
+        return ColorUtils.rgb(red, green, blue, alpha);
     }
 
     public enum Direction {TOP, BOTTOM, LEFT, RIGHT}
