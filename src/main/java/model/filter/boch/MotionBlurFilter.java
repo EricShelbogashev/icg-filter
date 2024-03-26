@@ -1,4 +1,4 @@
-package model.bochkarev;
+package model.filter.boch;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
