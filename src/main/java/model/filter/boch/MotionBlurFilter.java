@@ -2,11 +2,8 @@ package model.bochkarev;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
-import misc.ICGFilter;
-import misc.MatrixView;
-import misc.Pattern;
 
-import java.awt.*;
+// TODO Shikhutdinov Leonid
 
 public class MotionBlurFilter  extends MatrixFilter
 {
