@@ -2,6 +2,7 @@ package model.filter.darya;
 
 import core.filter.CustomFilter;
 import core.filter.Image;
+import model.filter.leonid.ColorUtils;
 
 import java.awt.image.BufferedImage;
 
@@ -41,10 +42,15 @@ public class MyOrderedDithering extends CustomFilter {
                     blue = image.blue(i, j) + 8 - M2[j % 4][i % 4];
                 else if (kv[2] <= 64)
                     blue = image.blue(i, j) + 2 - M1[j % 2][i % 2];
-                int alpha = (oldpix >> 24) & 0xFF;
+                int alpha = ColorUtils.alpha(oldpix);
                 if (red == -1000 || green == -1000 || blue == -1000)
                     return image.bufferedImage();
-                image.bufferedImage().setRGB(i, j, ClosestPalette.find_closest_palette_color(red, green, blue, alpha, kv));
+                image.bufferedImage().setRGB(i, j, ColorUtils.rgb(
+                        ColorUtils.findClosestColor(red, kv[0]),
+                        ColorUtils.findClosestColor(green, kv[1]),
+                        ColorUtils.findClosestColor(blue, kv[2]),
+                        alpha
+                ));
             }
         return image.bufferedImage();
     }
