@@ -2,10 +2,9 @@ package model.filter.mikhail;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
+import model.filter.leonid.ColorUtils;
 
 import java.util.Arrays;
-
-// TODO Shaikhutdinov Leonid
 
 public class MedianFilter extends MatrixFilter {
     private final int w;
@@ -27,9 +26,9 @@ public class MedianFilter extends MatrixFilter {
                 int neighborX = column + x;
                 int neighborY = row + y;
                 if (isValidPixel(image, neighborX, neighborY)) {
-                    redValues[counter] = (image.color(neighborX, neighborY) >> 16) & 0xFF;
-                    greenValues[counter] = (image.color(neighborX, neighborY) >> 8) & 0xFF;
-                    blueValues[counter] = (image.color(neighborX, neighborY)) & 0xFF;
+                    redValues[counter] = image.red(neighborX, neighborY);
+                    greenValues[counter] = image.green(neighborX, neighborY);
+                    blueValues[counter] = image.blue(neighborX, neighborY);
                 } else {
                     // Значение для пикселя за пределами изображения (например, обрезка)
                     redValues[counter] = 0;
@@ -51,10 +50,7 @@ public class MedianFilter extends MatrixFilter {
         int medianBlue = blueValues[(2 * w + 1) * w];
 
         // Формируем итоговый пиксель
-        return ((image.color(column, row) >> 24) & 0xFF) << 24 |  // Alpha остается неизменным
-                (medianRed & 0xFF) << 16 |
-                (medianGreen & 0xFF) << 8 |
-                (medianBlue & 0xFF);
+        return ColorUtils.rgb(image.alpha(column, row), medianRed, medianGreen, medianBlue);
     }
 
     // Функция для проверки, находится ли пиксель внутри изображения
