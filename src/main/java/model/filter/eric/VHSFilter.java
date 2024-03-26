@@ -82,16 +82,16 @@ public class VHSFilter extends CustomFilter {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int originalColor = image.color(x, y);
-                int alpha = (originalColor >> 24) & 0xFF;
-                int red = (originalColor >> 16) & 0xFF;
-                int green = (originalColor >> 8) & 0xFF;
-                int blue = originalColor & 0xFF;
+                int alpha = ColorUtils.alpha(originalColor);
+                int red = ColorUtils.red(originalColor);
+                int green = ColorUtils.green(originalColor);
+                int blue = ColorUtils.blue(originalColor);
 
                 red = Math.min(255, Math.max(0, red + random.nextInt(noiseIntensity * 2) - noiseIntensity));
                 green = Math.min(255, Math.max(0, green + random.nextInt(noiseIntensity * 2) - noiseIntensity));
                 blue = Math.min(255, Math.max(0, blue + random.nextInt(noiseIntensity * 2) - noiseIntensity));
 
-                int noisyColor = (alpha << 24) | (red << 16) | (green << 8) | blue;
+                int noisyColor = ColorUtils.rgb(red, green, blue, alpha);
                 result.setColor(x, y, noisyColor);
             }
         }
