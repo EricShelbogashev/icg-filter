@@ -5,6 +5,7 @@ import core.options.OptionsFactory;
 import core.options.Setting;
 import model.filter.boch.GammaFilter;
 import model.filter.boch.MotionBlurFilter;
+import model.filter.boch.SharpnessFilter;
 import model.filter.darya.*;
 import model.filter.eric.FitAlgorithm;
 import model.filter.eric.LanczosResampling;
@@ -449,7 +450,7 @@ public class ImageFilterApp extends JFrame {
 
     private void applySharpnessEffect(int strength) {
         if (editedImage != null) {
-            model.bochkarev.SharpnessFilter sharpnessFilter = new model.bochkarev.SharpnessFilter(strength);
+            SharpnessFilter sharpnessFilter = new SharpnessFilter(strength);
             applyFilters(sharpnessFilter);
 
         } else {
@@ -774,7 +775,7 @@ public class ImageFilterApp extends JFrame {
     private void applyWatercolor() {
         if (editedImage != null) {
             MedianFilter medianFilter = new MedianFilter(24);
-            model.bochkarev.SharpnessFilter sharpnessFilter = new model.bochkarev.SharpnessFilter(200);
+            SharpnessFilter sharpnessFilter = new SharpnessFilter(200);
             applyFilters(medianFilter, sharpnessFilter);
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");

@@ -1,14 +1,8 @@
-package model.bochkarev;
+package model.filter.boch;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
-import misc.ICGFilter;
-import misc.MatrixView;
-import misc.Pattern;
-
-import java.awt.*;
-
-// TODO Shiakhtudinov Leonid
+import model.filter.leonid.ColorUtils;
 
 public class SharpnessFilter extends MatrixFilter
 {
@@ -31,21 +25,20 @@ public class SharpnessFilter extends MatrixFilter
         int redResult = 0;
         int greenResult = 0;
         int blueResult = 0;
-        int alphaResult = 255;
 
         for(int i = -1; i < 2; i++)
         {
             for(int j = -1; j < 2; j++)
             {
                 int rgb = image.color(i + x, j + y);
-                redResult += ((rgb >> 16) & 0xFF) * matrix[i+1][j+1];
-                greenResult += ((rgb >> 8) & 0xFF) * matrix[i+1][j+1];
-                blueResult += ((rgb) & 0xFF) * matrix[i+1][j+1];
+                redResult += ColorUtils.red(rgb) * matrix[i+1][j+1];
+                greenResult += ColorUtils.green(rgb) * matrix[i+1][j+1];
+                blueResult += ColorUtils.blue(rgb) * matrix[i+1][j+1];
             }
         }
         redResult = Math.min(Math.max(redResult / strength, 0), 255);
         greenResult = Math.min(Math.max(greenResult / strength, 0), 255);
         blueResult = Math.min(Math.max(blueResult / strength, 0), 255);
-        return ((int) alphaResult << 24) | ((int) redResult << 16) | ((int) greenResult << 8) | ((int) blueResult);
+        return ColorUtils.rgb(redResult, greenResult, blueResult);
     }
 }
