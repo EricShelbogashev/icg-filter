@@ -6,11 +6,11 @@ import java.util.List;
 
 public class OptionsFactory {
 
-    public static Setting<Integer> settingInteger(int defaultValue, String label, String hint, int min, int max, String id) {
+    public static Setting<Integer> settingInteger(int defaultValue, String label, String hint, int min, int max) {
         return new Setting<>(defaultValue, label, hint, List.of(
                 value -> value < min ? "should be grater or equal to " + min : null,
                 value -> value > max ? "should be less or equal to " + max : null
-        ), Integer.class, id) {
+        ), Integer.class) {
             @Override
             public JComponent createComponent() {
                 JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.intValue(), min, max, 1));
@@ -20,15 +20,15 @@ public class OptionsFactory {
         };
     }
 
-    public static <T extends Enum<T>> Setting<T> settingEnum(T defaultValue, String label, String description, Class<T> type, String id) {
-        return new EnumSetting<>(defaultValue, label, description, type, id);
+    public static <T extends Enum<T>> Setting<T> settingEnum(T defaultValue, String label, String description, Class<T> type) {
+        return new EnumSetting<>(defaultValue, label, description, type);
     }
 
-    public static Setting<Float> settingFloat(float defaultValue, String label, String hint, float min, float max, String id) {
+    public static Setting<Float> settingFloat(float defaultValue, String label, String hint, float min, float max) {
         return new Setting<>(defaultValue, label, hint, List.of(
                 value -> value < min ? "should be grater or equal to " + min : null,
                 value -> value > max ? "should be less or equal to " + max : null
-        ), Float.class, id) {
+        ), Float.class) {
             @Override
             public JComponent createComponent() {
                 JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.floatValue(), min, max, 0.1));
@@ -38,11 +38,11 @@ public class OptionsFactory {
         };
     }
 
-    public static Setting<Range> settingRange(Range defaultValue, String label, String hint, Range bounds, String id) {
+    public static Setting<Range> settingRange(Range defaultValue, String label, String hint, Range bounds) {
         return new Setting<>(defaultValue, label, hint, List.of(
                 value -> bounds.start() > value.start() ? "The range should start with " + bounds.start() : null,
                 value -> bounds.end() < value.end() ? "The range should end with " + bounds.end() : null
-        ), Range.class, id) {
+        ), Range.class) {
             @Override
             public JComponent createComponent() {
                 JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));

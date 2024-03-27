@@ -5,8 +5,8 @@ import java.util.List;
 
 public class EnumSetting<E extends Enum<E>> extends Setting<E> {
 
-    public EnumSetting(E defaultValue, String label, String description, Class<E> type, String id) {
-        super(defaultValue, label, description, List.of(), type, id);
+    public EnumSetting(E defaultValue, String label, String description, Class<E> type) {
+        super(defaultValue, label, description, List.of(), type);
     }
 
     @Override
