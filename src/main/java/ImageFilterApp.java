@@ -1,3 +1,4 @@
+import core.filter.DashedBorder;
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.filter.Image;
@@ -298,6 +299,7 @@ public class ImageFilterApp extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         imageLabel = new JLabel("", SwingConstants.CENTER);
+        imageLabel.setBorder(new DashedBorder(Color.black, 2));
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
         isOriginalImage = false;
