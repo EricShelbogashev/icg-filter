@@ -10,9 +10,7 @@ import java.util.function.Consumer;
 
 public abstract class FilterViewUnit {
     protected final String filterName;
-
     protected final String tipText;
-
     protected final String iconPath;
     protected final Consumer<List<Filter>> applyFilters;
 

@@ -33,7 +33,8 @@ public class ImageFilterApp extends JFrame {
                 new WindFilterViewUnit(this::applyFilters),
                 new GammaFilterViewUnit(this::applyFilters),
                 new FitImageToScreenFilterViewUnit(this::getSize, this::applyFilters),
-                new RotateImageViewUnit(this::applyFilters));
+                new RotateImageViewUnit(this::applyFilters),
+                new BloomFilterViewUnit(this::applyFilters));
         applicationComponents = new ApplicationComponents(
                 imageLabel,
                 createOverlayPanel()
