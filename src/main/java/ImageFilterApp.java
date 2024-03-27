@@ -493,10 +493,10 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void applyBloomEffect(float glowFactor, float threshold, int radius) {
-        if (editedImage != null) {
+        if (originalImage != null) {
             BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
             GaussianBlurFilter blurFilter = new GaussianBlurFilter(radius);
-            MixFilter mixFilter = new MixFilter(new Image(editedImage));
+            MixFilter mixFilter = new MixFilter(new Image(originalImage));
             applyFilters(bloomFilter, blurFilter, mixFilter);
 
         } else {
