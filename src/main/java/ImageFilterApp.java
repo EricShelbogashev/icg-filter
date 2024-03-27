@@ -1,4 +1,3 @@
-import core.filter.DashedBorder;
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.filter.Image;
@@ -299,17 +298,16 @@ public class ImageFilterApp extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         imageLabel = new JLabel("", SwingConstants.CENTER);
-        imageLabel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(4, 4, 4, 4), // Внутренний отступ
-                new DashedBorder(Color.black, 2) // Внешняя граница - пунктирная
 
-        ));
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
         isOriginalImage = false;
         createMenuBar();
         createToolbar();
         JScrollPane jScrollPane = new JScrollPane(imageLabel);
+        jScrollPane.setViewportBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(4, 4, 4, 4), // this creates indent between frame and image area
+                BorderFactory.createDashedBorder(Color.BLACK, 5, 2)));
         addMouseDragFeature(jScrollPane);
         createOverlayPanel();
         add(jScrollPane, BorderLayout.CENTER);
