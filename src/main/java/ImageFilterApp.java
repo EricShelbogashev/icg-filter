@@ -299,7 +299,10 @@ public class ImageFilterApp extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         imageLabel = new JLabel("", SwingConstants.CENTER);
-        imageLabel.setBorder(new DashedBorder(Color.black, 2));
+        imageLabel.setBorder(BorderFactory.createCompoundBorder(
+                new DashedBorder(Color.black, 2), // Внешняя граница - пунктирная
+                BorderFactory.createEmptyBorder(4, 4, 4, 4) // Внутренний отступ
+        ));
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
         isOriginalImage = false;
