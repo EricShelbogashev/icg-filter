@@ -50,7 +50,7 @@ public class MedianFilter extends MatrixFilter {
         int medianBlue = blueValues[(2 * w + 1) * w];
 
         // Формируем итоговый пиксель
-        return ColorUtils.rgb(image.alpha(column, row), medianRed, medianGreen, medianBlue);
+        return ColorUtils.rgb(medianRed, medianGreen, medianBlue, image.alpha(column, row));
     }
 
     // Функция для проверки, находится ли пиксель внутри изображения
