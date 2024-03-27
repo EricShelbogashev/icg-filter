@@ -124,7 +124,7 @@ public class ImageFilterApp extends JFrame {
                         OptionsFactory.settingInteger(
                                 5,
                                 "radius",
-                                "", 1, 50,
+                                "", 1, 20,
                                 "radius"
                         )
                 ));
