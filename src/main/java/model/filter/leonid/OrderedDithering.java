@@ -48,6 +48,8 @@ public class OrderedDithering extends MatrixFilter {
     int matrixSize;
 
     int normalizer;
+
+    //float factor;
     int[][] ditherMatrix;
 
     public OrderedDithering(int redQuantizationRank, int greenQuantizationRank,
@@ -63,46 +65,26 @@ public class OrderedDithering extends MatrixFilter {
             matrixSize = 16;
             ditherMatrix = ditherMatrix16;
             normalizer = 128;
+            //factor = 1/128f;
         }
-        else if (minQuantizationRank >= 64) {
+        else if (minQuantizationRank >= 128) {
             matrixSize = 2;
             ditherMatrix = ditherMatrix2;
             normalizer = 2;
-        } else if (minQuantizationRank >= 16) {
+        }
+        else if (minQuantizationRank >= 64) {
             matrixSize = 4;
             ditherMatrix = ditherMatrix4;
             normalizer = 8;
+        } else if (minQuantizationRank >= 4) {
+            matrixSize = 8;
+            ditherMatrix = ditherMatrix8;
+            normalizer = 32;
         } else {
-            // quantization rank = 4
             matrixSize = 8;
             ditherMatrix = ditherMatrix8;
             normalizer = 32;
         }
-    }
-
-    private static int getMatrixSize(OrderedDithering.MatrixOption matrixOption) {
-        return switch (matrixOption) {
-            case two -> 2;
-            case four -> 4;
-            case eight -> 8;
-        };
-    }
-
-    private static int[][] getDitherMatrix(MatrixOption matrixOption) {
-        return switch (matrixOption) {
-            case two -> ditherMatrix2;
-            case four -> ditherMatrix4;
-            case eight -> ditherMatrix8;
-        };
-    }
-
-    private static int[][] getDitherMatrix(int matrixSize) {
-        return switch (matrixSize) {
-            case 2 -> ditherMatrix2;
-            case 4 -> ditherMatrix4;
-            case 8 -> ditherMatrix8;
-            default -> throw new IllegalStateException("Unexpected value: " + matrixSize);
-        };
     }
 
     @Override
@@ -113,12 +95,10 @@ public class OrderedDithering extends MatrixFilter {
         int blue = ColorUtils.blue(pixelColor);
 
         // Применение дизеринга к каждому каналу цвета
-        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, redQuantizationRank);
+        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer , redQuantizationRank);
         int newGreen = ColorUtils.findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, greenQuantizationRank);
         int newBlue = ColorUtils.findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, blueQuantizationRank);
         pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);
         return pixelColor;
     }
-
-    public enum MatrixOption {two, four, eight}
 }
