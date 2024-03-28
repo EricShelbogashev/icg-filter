@@ -22,7 +22,7 @@ public class MotionBlurViewUnit extends FilterViewUnit
             )
     );
 
-    public MotionBlurViewUnit(String filterName, String tipText, String iconPath, Consumer<List<Filter>> applyFilters)
+    public MotionBlurViewUnit(Consumer<List<Filter>> applyFilters)
     {
         super("Motion blur", "Apply motion blur", "icons/motionBlurIcon.png", applyFilters);
     }

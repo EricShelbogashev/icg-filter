@@ -39,7 +39,9 @@ public class ImageFilterApp extends JFrame {
                 new NegativeFilterViewUnit(this::applyFilters),
                 new EmbossingFilterViewUnit(this::applyFilters),
                 new MonochromeFilterViewUnit(this::applyFilters),
-                new DitheringFilterViewUnit(this::applyFilters)
+                new DitheringFilterViewUnit(this::applyFilters),
+                new SharpnessViewUnit(this::applyFilters),
+                new MotionBlurViewUnit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,

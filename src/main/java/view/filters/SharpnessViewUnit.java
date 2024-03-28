@@ -15,7 +15,7 @@ public class SharpnessViewUnit extends FilterViewUnit
 {
     private final SharpnessSettings options = new SharpnessSettings();
 
-    public SharpnessViewUnit(String filterName, String tipText, String iconPath, Consumer<List<Filter>> applyFilters)
+    public SharpnessViewUnit(Consumer<List<Filter>> applyFilters)
     {
         super("Sharpen", "Apply sharpness filter", "icons/sharpenIcon.png", applyFilters);
     }
