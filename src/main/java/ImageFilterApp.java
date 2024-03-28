@@ -36,7 +36,8 @@ public class ImageFilterApp extends JFrame {
                 new RotateImageViewUnit(this::applyFilters),
                 new BloomFilterViewUnit(this::applyFilters),
                 new NegativeFilterViewUnit(this::applyFilters),
-                new EmbossingFilterViewUnit(this::applyFilters)
+                new EmbossingFilterViewUnit(this::applyFilters),
+                new MonochromeFilterViewUnit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
