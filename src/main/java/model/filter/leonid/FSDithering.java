@@ -54,7 +54,7 @@ public class FSDithering extends CustomFilter {
 
                 int newRed = ColorUtils.findClosestColor(oldRed += (int)errors[x][y][0], quantizationRed);
                 int newGreen = ColorUtils.findClosestColor(oldGreen += (int)errors[x][y][1], quantizationGreen);
-                int newBlue = ColorUtils.findClosestColor(oldBlue += (int)errors[x][y][1], quantizationBlue);
+                int newBlue = ColorUtils.findClosestColor(oldBlue += (int)errors[x][y][2], quantizationBlue);
 
                 double[] quantError = {oldRed - newRed, oldGreen - newGreen, oldBlue - newBlue};
 
