@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -31,9 +33,9 @@ public class ImageFilterApp extends JFrame {
         JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
         JScrollPane scrollPane = createScrollPanel(imageLabel);
         filterUnits = List.of(
+                new FitImageToScreenFilterViewUnit(scrollPane::getSize, this::applyFilters), // Let it be first, because lower there is hard-coded resizing listener that takes first element of this list and acts as if it's FitImageToScreen
                 new WindFilterViewUnit(this::applyFilters),
                 new GammaFilterViewUnit(this::applyFilters),
-                new FitImageToScreenFilterViewUnit(scrollPane::getSize, this::applyFilters),
                 new RotateImageViewUnit(this::applyFilters),
                 new BloomFilterViewUnit(this::applyFilters),
                 new NegativeFilterViewUnit(this::applyFilters),
@@ -51,6 +53,27 @@ public class ImageFilterApp extends JFrame {
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
         applicationContext = new ApplicationContext(imageHolder, applicationProperties);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                FitImageToScreenFilterViewUnit fitFilter = (FitImageToScreenFilterViewUnit) filterUnits.getFirst(); //very bad, but I can't think how do this better with current architecture.
+                FitImageTurnOn turnedOn;
+                try
+                {
+                    turnedOn = fitFilter.getSettings().get(1).value();
+                }
+                catch(NullPointerException a)
+                {
+                    return;
+                }
+                if(turnedOn == FitImageTurnOn.ON)
+                {
+                    fitFilter.applyFilter(applicationContext.imageHolder().getCurrentImage());
+                }
+            }
+        });
+
     }
 
     public static void main(String[] args) {

@@ -19,7 +19,14 @@ public class FitImageToScreenFilterViewUnit extends FilterViewUnit {
                     "Choose fit to image algorithm",
                     "",
                     FitAlgorithm.class
-            ));
+            ),
+            OptionsFactory.settingEnum(
+                    FitImageTurnOn.OFF,
+                    "Turn on/off resizing",
+                    "",
+                    FitImageTurnOn.class
+            )
+    );
     private final Supplier<Dimension> getSize;
 
     public FitImageToScreenFilterViewUnit(Supplier<Dimension> getSize, Consumer<List<Filter>> applyFilters) {
@@ -44,6 +51,6 @@ public class FitImageToScreenFilterViewUnit extends FilterViewUnit {
 
     @Override
     public @Nullable List<Setting<?>> getSettings() {
-        return List.of(fitOptions.algorithmType());
+        return List.of(fitOptions.algorithmType(), fitOptions.on());
     }
 }
