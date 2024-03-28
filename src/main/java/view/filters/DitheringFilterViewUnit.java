@@ -19,8 +19,6 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Consumer;
 
-//5 min Bochkarev
-
 public class DitheringFilterViewUnit extends FilterViewUnit {
 
     private final DitheringSettings options = new DitheringSettings(
@@ -68,67 +66,54 @@ public class DitheringFilterViewUnit extends FilterViewUnit {
         DitheringMethods ditheringMethods = options.ditheringMethods().value();
         DitheringPerson ditheringPerson = options.ditheringPerson().value();
 
-        //switch does not work here because enum is not constant (?)
-        if(ditheringPerson == DitheringPerson.LEONID)
-        {
-            if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                FSDithering filter = new FSDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
+        switch (ditheringPerson) {
+            case LEONID -> {
+                if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+                    FSDithering filter = new FSDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                } else {
+                    OrderedDithering filter = new OrderedDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                }
             }
-            else {
-                OrderedDithering filter = new OrderedDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
+            case DASHA -> {
+                int[] kv = {redQuantizationRank, greenQuantizationRank, blueQuantizationRank};
+                if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+                    MyFloydDithering filter = new MyFloydDithering(kv);
+                    applyFilters.accept(List.of(filter));
+                } else {
+                    MyOrderedDithering filter = new MyOrderedDithering(kv);
+                    applyFilters.accept(List.of(filter));
+                }
             }
-        }
-        else if(ditheringPerson == DitheringPerson.DASHA)
-        {
-            int[] kv = {redQuantizationRank, greenQuantizationRank, blueQuantizationRank};
-            if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                MyFloydDithering filter = new MyFloydDithering(kv);
-                applyFilters.accept(List.of(filter));
+            case MIHAIL -> {
+                if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+                    MikhailFloydDither filter = new MikhailFloydDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                } else {
+                    MikhailOrderedDither filter = new MikhailOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                }
             }
-            else {
-                MyOrderedDithering filter = new MyOrderedDithering(kv);
-                applyFilters.accept(List.of(filter));
+            case ERIC -> {
+                if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+                    FloydSteinbergDSFilter filter = new FloydSteinbergDSFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                } else {
+                    EricOrderedDither filter = new EricOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                }
             }
-        }
-
-        else if(ditheringPerson == DitheringPerson.MIHAIL)
-        {
-            if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                MikhailFloydDither filter = new MikhailFloydDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
-            }
-            else {
-                MikhailOrderedDither filter = new MikhailOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
-            }
-        }
-
-        else if(ditheringPerson == DitheringPerson.ERIC)
-        {
-            if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                FloydSteinbergDSFilter filter = new FloydSteinbergDSFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
-            }
-            else {
-                EricOrderedDither filter = new EricOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
-            }
-        }
-
-        else if(ditheringPerson == DitheringPerson.EGOR)
-        {
-            if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                EgorFloydDither filter = new EgorFloydDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
-            }
-            else {
-                EgorOrderedDither filter = new EgorOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
-                applyFilters.accept(List.of(filter));
+            case EGOR -> {
+                if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+                    EgorFloydDither filter = new EgorFloydDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                } else {
+                    EgorOrderedDither filter = new EgorOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    applyFilters.accept(List.of(filter));
+                }
             }
         }
-
     }
 
     @Override
