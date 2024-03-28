@@ -35,7 +35,9 @@ public class ImageFilterApp extends JFrame {
                 new FitImageToScreenFilterViewUnit(this::getSize, this::applyFilters),
                 new RotateImageViewUnit(this::applyFilters),
                 new BloomFilterViewUnit(this::applyFilters),
-                new NegativeFilterViewUnit(this::applyFilters));
+                new NegativeFilterViewUnit(this::applyFilters),
+                new EmbossingFilterViewUnit(this::applyFilters)
+        );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
                 createOverlayPanel()
