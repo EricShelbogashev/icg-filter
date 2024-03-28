@@ -11,6 +11,8 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Consumer;
 
+//Bochkarev Egor ~15 min
+
 public class DitheringFilterViewUnit extends FilterViewUnit {
 
     private final DitheringSettings options = new DitheringSettings(
