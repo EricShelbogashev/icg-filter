@@ -6,7 +6,7 @@ import model.filter.leonid.ColorUtils;
 
 
 public class MotionBlurFilter extends MatrixFilter {
-    int strength = 1;
+    public int strength = 1;
 
     public MotionBlurFilter(int strength) {
         this.strength = strength;
@@ -14,11 +14,11 @@ public class MotionBlurFilter extends MatrixFilter {
 
     @Override
     protected int apply(Image image, int x, int y) {
-        int[] one = new int[]{3 * strength, 0, 0, 0, 0};
-        int[] two = new int[]{0, 2 * strength, 0, 0, 0};
-        int[] three = new int[]{0, 0, strength, 0, 0};
-        int[] four = new int[]{0, 0, 0, 2 * strength, 0};
-        int[] five = new int[]{0, 0, 0, 0, 3 * strength};
+        int[] one = new int[]{3, 0, 0, 0, 0};
+        int[] two = new int[]{0, 2, 0, 0, 0};
+        int[] three = new int[]{0, 0, 1, 0, 0};
+        int[] four = new int[]{0, 0, 0, 2, 0};
+        int[] five = new int[]{0, 0, 0, 0, 3};
         int[][] matrix = new int[][]{one, two, three, four, five};
 
 
@@ -34,9 +34,9 @@ public class MotionBlurFilter extends MatrixFilter {
                 blueResult += ColorUtils.blue(rgb) * matrix[i + 2][j + 2];
             }
         }
-        redResult /= 11 * strength;
-        greenResult /= 11 * strength;
-        blueResult /= 11 * strength;
+        redResult /= 11;
+        greenResult /= 11;
+        blueResult /= 11;
         redResult = Math.min(Math.max(redResult, 0), 255);
         greenResult = Math.min(Math.max(greenResult, 0), 255);
         blueResult = Math.min(Math.max(blueResult, 0), 255);

@@ -5,17 +5,12 @@ import core.filter.MatrixFilter;
 import model.filter.leonid.ColorUtils;
 
 public class SharpnessFilter extends MatrixFilter {
-    int strength = 1;
-
-    public SharpnessFilter(int strength) {
-        this.strength = strength;
-    }
 
     @Override
     protected int apply(Image image, int x, int y) {
-        int[] one = new int[]{0, -1 * strength, 0};
-        int[] two = new int[]{-1 * strength, 5 * strength, -1 * strength};
-        int[] three = new int[]{0, -1 * strength, 0};
+        int[] one = new int[]{0, -1, 0};
+        int[] two = new int[]{-1, 5, -1};
+        int[] three = new int[]{0, -1, 0};
         int[][] matrix = new int[][]{one, two, three};
 
 
@@ -31,9 +26,9 @@ public class SharpnessFilter extends MatrixFilter {
                 blueResult += ColorUtils.blue(rgb) * matrix[i + 1][j + 1];
             }
         }
-        redResult = Math.min(Math.max(redResult / strength, 0), 255);
-        greenResult = Math.min(Math.max(greenResult / strength, 0), 255);
-        blueResult = Math.min(Math.max(blueResult / strength, 0), 255);
+        redResult = Math.min(Math.max(redResult, 0), 255);
+        greenResult = Math.min(Math.max(greenResult, 0), 255);
+        blueResult = Math.min(Math.max(blueResult, 0), 255);
         return ColorUtils.rgb(redResult, greenResult, blueResult);
     }
 }
