@@ -29,10 +29,11 @@ public class ImageFilterApp extends JFrame {
     public ImageFilterApp(ApplicationProperties applicationProperties) {
         super("Image Filter Application");
         JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
+        JScrollPane scrollPane = createScrollPanel(imageLabel);
         filterUnits = List.of(
                 new WindFilterViewUnit(this::applyFilters),
                 new GammaFilterViewUnit(this::applyFilters),
-                new FitImageToScreenFilterViewUnit(this::getSize, this::applyFilters),
+                new FitImageToScreenFilterViewUnit(scrollPane::getSize, this::applyFilters),
                 new RotateImageViewUnit(this::applyFilters),
                 new BloomFilterViewUnit(this::applyFilters),
                 new NegativeFilterViewUnit(this::applyFilters),
@@ -42,7 +43,8 @@ public class ImageFilterApp extends JFrame {
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
-                createOverlayPanel()
+                createOverlayPanel(),
+                scrollPane
         );
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
@@ -77,14 +79,19 @@ public class ImageFilterApp extends JFrame {
         setLocationRelativeTo(null);
         createMenuBar();
         createToolbarButtons();
-        JScrollPane jScrollPane = new JScrollPane(applicationComponents.imageLabel());
+
+        setMinimumSize(new Dimension(800, 600));
+        pack();
+    }
+
+    private JScrollPane createScrollPanel(JLabel imageLabel) {
+        JScrollPane jScrollPane = new JScrollPane(imageLabel);
         jScrollPane.setViewportBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(4, 4, 4, 4),
                 BorderFactory.createDashedBorder(Color.BLACK, 5, 2)));
         addMouseDragFeature(jScrollPane);
         add(jScrollPane, BorderLayout.CENTER);
-        setMinimumSize(new Dimension(800, 600));
-        pack();
+        return jScrollPane;
     }
 
     private void createToolbarButtons() {

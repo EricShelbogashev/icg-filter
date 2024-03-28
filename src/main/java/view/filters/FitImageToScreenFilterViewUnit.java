@@ -30,12 +30,12 @@ public class FitImageToScreenFilterViewUnit extends FilterViewUnit {
     @Override
     public void applyFilter(BufferedImage image) {
         Dimension screenSize = getSize.get();
-        double widthRatio = screenSize.getWidth() / image.getWidth();
-        double heightRatio = screenSize.getHeight() / image.getHeight();
+        double widthRatio = (screenSize.getWidth() - 13) / image.getWidth();
+        double heightRatio = (screenSize.getHeight() - 13) / image.getHeight();
         double ratio = Math.min(widthRatio, heightRatio);
 
-        int newWidth = (int) (image.getWidth() * ratio);
-        int newHeight = (int) (image.getHeight() * ratio);
+        int newWidth = (int) Math.floor(image.getWidth() * ratio);
+        int newHeight = (int) Math.floor(image.getHeight() * ratio);
 
         final var algorithmType = fitOptions.algorithmType();
         FitAlgorithm algorithm = algorithmType.value();
