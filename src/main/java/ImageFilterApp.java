@@ -319,14 +319,14 @@ public class ImageFilterApp extends JFrame {
         applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(applicationContext.imageHolder().getOriginalImage());
+        FilterExecutor.Builder builder = FilterExecutor.of(copyOfImage(applicationContext.imageHolder().getOriginalImage()));
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    applicationContext.imageHolder().commitChanges(newImage);
+                    applicationContext.imageHolder().commitChanges(copyOfImage(newImage));
                     updateCanvas(applicationContext.imageHolder().getEditedImage());
                     showOverlay(false);
                 })
@@ -335,5 +335,17 @@ public class ImageFilterApp extends JFrame {
                     showOverlay(false);
                     return null;
                 });
+    }
+
+    private static BufferedImage copyOfImage(BufferedImage other) {
+        final var width = other.getWidth();
+        final var height = other.getHeight();
+        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                bufferedImage.setRGB(x, y, other.getRGB(x, y));
+            }
+        }
+        return bufferedImage;
     }
 }
