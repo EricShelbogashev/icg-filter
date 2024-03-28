@@ -6,7 +6,7 @@ public record DitheringSettings(
         Setting<Integer> redRank,
         Setting<Integer> greenRank,
         Setting<Integer> blueRank,
-        Setting<DitheringMethods> ditheringMethods
-
+        Setting<DitheringMethods> ditheringMethods,
+        Setting<DitheringPerson> ditheringPerson
         ) {
 }
