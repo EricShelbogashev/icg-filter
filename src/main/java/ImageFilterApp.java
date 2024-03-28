@@ -13,10 +13,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -53,22 +50,17 @@ public class ImageFilterApp extends JFrame {
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
         applicationContext = new ApplicationContext(imageHolder, applicationProperties);
-        addComponentListener(new ComponentAdapter() {
+        addComponentListener(new ComponentResizeEndListener() {
             @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
+            public void resizeTimedOut() {
                 FitImageToScreenFilterViewUnit fitFilter = (FitImageToScreenFilterViewUnit) filterUnits.getFirst(); //very bad, but I can't think how do this better with current architecture.
                 FitImageTurnOn turnedOn;
-                try
-                {
+                try {
                     turnedOn = fitFilter.getSettings().get(1).value();
-                }
-                catch(NullPointerException a)
-                {
+                } catch (NullPointerException a) {
                     return;
                 }
-                if(turnedOn == FitImageTurnOn.ON)
-                {
+                if (turnedOn == FitImageTurnOn.ON) {
                     fitFilter.applyFilter(applicationContext.imageHolder().getCurrentImage());
                 }
             }
@@ -377,5 +369,34 @@ public class ImageFilterApp extends JFrame {
             }
         }
         return bufferedImage;
+    }
+
+    private static abstract class ComponentResizeEndListener
+            extends ComponentAdapter
+            implements ActionListener {
+
+        private final Timer timer;
+
+        public ComponentResizeEndListener() {
+            this(30);
+        }
+
+        public ComponentResizeEndListener(int delayMS) {
+            timer = new Timer(delayMS, this);
+            timer.setRepeats(false);
+            timer.setCoalesce(false);
+        }
+
+        @Override
+        public void componentResized(ComponentEvent e) {
+            timer.restart();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            resizeTimedOut();
+        }
+
+        public abstract void resizeTimedOut();
     }
 }
