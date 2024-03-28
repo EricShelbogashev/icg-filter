@@ -7,12 +7,7 @@ import core.filter.FilterExecutor;
 import core.options.Setting;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.BloomFilterViewUnit;
-import view.filters.FilterViewUnit;
-import view.filters.FitImageToScreenFilterViewUnit;
-import view.filters.GammaFilterViewUnit;
-import view.filters.RotateImageViewUnit;
-import view.filters.WindFilterViewUnit;
+import view.filters.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -39,7 +34,8 @@ public class ImageFilterApp extends JFrame {
                 new GammaFilterViewUnit(this::applyFilters),
                 new FitImageToScreenFilterViewUnit(this::getSize, this::applyFilters),
                 new RotateImageViewUnit(this::applyFilters),
-                new BloomFilterViewUnit(this::applyFilters));
+                new BloomFilterViewUnit(this::applyFilters),
+                new NegativeFilterViewUnit(this::applyFilters));
         applicationComponents = new ApplicationComponents(
                 imageLabel,
                 createOverlayPanel()
