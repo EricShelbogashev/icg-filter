@@ -4,18 +4,15 @@ import core.filter.Image;
 import core.filter.MatrixFilter;
 import model.filter.leonid.ColorUtils;
 
-public class GammaFilter extends MatrixFilter
-{
+public class GammaFilter extends MatrixFilter {
     int gamm = 300;
 
-    public GammaFilter(int gamma)
-    {
+    public GammaFilter(int gamma) {
         this.gamm = gamma;
     }
 
     @Override
-    protected int apply(Image image, int x, int y)
-    {
+    protected int apply(Image image, int x, int y) {
         float gamma = (float) gamm / 100;
         int rgb = image.color(x, y);
         int redResult = (int) (255 * Math.pow(ColorUtils.red(rgb) / (float) 255, gamma));

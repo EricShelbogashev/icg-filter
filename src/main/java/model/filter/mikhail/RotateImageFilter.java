@@ -8,10 +8,16 @@ import java.awt.image.BufferedImage;
 
 public class RotateImageFilter extends CustomFilter {
 
-    private double angle;
+    private final double angle;
 
     public RotateImageFilter(double angle) {
         this.angle = angle;
+    }
+
+    private static GraphicsConfiguration getDefaultConfiguration() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        return gd.getDefaultConfiguration();
     }
 
     @Override
@@ -29,12 +35,6 @@ public class RotateImageFilter extends CustomFilter {
         g.drawRenderedImage(image.bufferedImage(), null);
         g.dispose();
         return result;
-    }
-
-    private static GraphicsConfiguration getDefaultConfiguration() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        return gd.getDefaultConfiguration();
     }
 }
 

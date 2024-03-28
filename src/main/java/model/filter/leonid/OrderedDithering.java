@@ -66,13 +66,11 @@ public class OrderedDithering extends MatrixFilter {
             ditherMatrix = ditherMatrix16;
             normalizer = 128;
             //factor = 1/128f;
-        }
-        else if (minQuantizationRank >= 128) {
+        } else if (minQuantizationRank >= 128) {
             matrixSize = 2;
             ditherMatrix = ditherMatrix2;
             normalizer = 2;
-        }
-        else if (minQuantizationRank >= 64) {
+        } else if (minQuantizationRank >= 64) {
             matrixSize = 4;
             ditherMatrix = ditherMatrix4;
             normalizer = 8;
@@ -95,7 +93,7 @@ public class OrderedDithering extends MatrixFilter {
         int blue = ColorUtils.blue(pixelColor);
 
         // Применение дизеринга к каждому каналу цвета
-        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer , redQuantizationRank);
+        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, redQuantizationRank);
         int newGreen = ColorUtils.findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, greenQuantizationRank);
         int newBlue = ColorUtils.findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, blueQuantizationRank);
         pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);

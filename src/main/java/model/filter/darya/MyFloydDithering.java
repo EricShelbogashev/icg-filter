@@ -24,7 +24,7 @@ public class MyFloydDithering extends MatrixFilter {
         int[] values = {image.color(x - 1, y), image.color(x + 1, y - 1), image.color(x, y - 1), image.color(x - 1, y - 1)};
         float[] koef = {7.0f / 16, 3.0f / 16, 5.0f / 16, 1 / 16.0f};
         for (int i = 0; i < 4; i++) {
-            err_red += old_red - ColorUtils.red(values[i])  * koef[i];
+            err_red += old_red - ColorUtils.red(values[i]) * koef[i];
             err_green += old_green - ColorUtils.green(values[i]) * koef[i];
             err_blue += old_blue - ColorUtils.blue(values[i]) * koef[i];
         }
@@ -33,6 +33,6 @@ public class MyFloydDithering extends MatrixFilter {
                 ColorUtils.findClosestColor(old_green + (int) err_green, kv[1]),
                 ColorUtils.findClosestColor(old_blue + (int) err_blue, kv[2]),
                 alpha
-                );
+        );
     }
 }

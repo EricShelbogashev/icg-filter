@@ -20,6 +20,10 @@ public class ImageHolder {
         return originalImage;
     }
 
+    public void setOriginalImage(BufferedImage originalImage) {
+        this.originalImage = originalImage;
+    }
+
     public BufferedImage getEditedImage() {
         return editedImage;
     }
@@ -30,9 +34,5 @@ public class ImageHolder {
 
     public void setCurrentImage(BufferedImage currentImage) {
         this.currentImage = currentImage;
-    }
-
-    public void setOriginalImage(BufferedImage originalImage) {
-        this.originalImage = originalImage;
     }
 }

@@ -68,15 +68,15 @@ public class ColorUtils {
 
 
     public static int findClosestColor(int color, int quantizationDeg) {
-            if (color < 0)
-                return 0;
-            if (color > 255)
-                return 255;
+        if (color < 0)
+            return 0;
+        if (color > 255)
+            return 255;
 
-            int quantSize = 255 / (quantizationDeg - 1);
-            // Сколько квантов в числе
-            int count = Math.round((float) color /quantSize);
+        int quantSize = 255 / (quantizationDeg - 1);
+        // Сколько квантов в числе
+        int count = Math.round((float) color / quantSize);
 
-            return count * quantSize;
-        }
+        return count * quantSize;
+    }
 }

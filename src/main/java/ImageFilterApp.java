@@ -7,7 +7,12 @@ import core.filter.FilterExecutor;
 import core.options.Setting;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.*;
+import view.filters.BloomFilterViewUnit;
+import view.filters.FilterViewUnit;
+import view.filters.FitImageToScreenFilterViewUnit;
+import view.filters.GammaFilterViewUnit;
+import view.filters.RotateImageViewUnit;
+import view.filters.WindFilterViewUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

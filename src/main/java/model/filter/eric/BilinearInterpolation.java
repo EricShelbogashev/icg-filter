@@ -44,7 +44,7 @@ public class BilinearInterpolation extends ResamplingFilter {
         int blue = (int) (ColorUtils.blue(a) * (1 - xDiff) * (1 - yDiff) + ColorUtils.blue(b) * xDiff * (1 - yDiff) +
                 ColorUtils.blue(c) * yDiff * (1 - xDiff) + ColorUtils.blue(d) * (xDiff * yDiff));
 
-        return  ColorUtils.rgb(clip(red), clip(green), clip(blue));
+        return ColorUtils.rgb(clip(red), clip(green), clip(blue));
     }
 
     private static int clip(int value) {
