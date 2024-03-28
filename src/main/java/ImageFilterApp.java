@@ -47,6 +47,8 @@ public class ImageFilterApp extends JFrame {
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
         applicationContext = new ApplicationContext(imageHolder, applicationProperties);
+        setMinimumSize(new Dimension(640, 480));
+
     }
 
     public static void main(String[] args) {
