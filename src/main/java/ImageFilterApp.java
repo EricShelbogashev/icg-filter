@@ -37,7 +37,8 @@ public class ImageFilterApp extends JFrame {
                 new BloomFilterViewUnit(this::applyFilters),
                 new NegativeFilterViewUnit(this::applyFilters),
                 new EmbossingFilterViewUnit(this::applyFilters),
-                new MonochromeFilterViewUnit(this::applyFilters)
+                new MonochromeFilterViewUnit(this::applyFilters),
+                new FSDitheringFilterViewUnit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
@@ -266,7 +267,7 @@ public class ImageFilterApp extends JFrame {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
             }
             try {
-                ImageIO.write(applicationContext.imageHolder().getCurrentImage(), "png", selectedFile);
+                ImageIO.write(applicationContext.imageHolder().getEditedImage(), "png", selectedFile);
                 System.out.println("Image successfully saved " + selectedFile.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Unable to save image " + e.getMessage());

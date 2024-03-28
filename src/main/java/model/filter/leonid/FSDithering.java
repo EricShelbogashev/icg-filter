@@ -5,10 +5,11 @@ import core.filter.Image;
 
 import java.awt.image.BufferedImage;
 
-
 public class FSDithering extends CustomFilter {
 
     int quantizationRed, quantizationGreen, quantizationBlue;
+
+    private double[][][] errors;
 
     public FSDithering(int quantizationRed, int quantizationGreen, int quantizationBlue) {
         this.quantizationRed = quantizationRed;
@@ -32,40 +33,47 @@ public class FSDithering extends CustomFilter {
 
     }
 
-    void setError(Image image, int x, int y, int xOffset, int yOffset, int[] quantError) {
-        int red = image.red(x + xOffset, y + yOffset);
-        red += (int) (quantError[0] * chooseFactor(xOffset, yOffset));
+    void setError(int x, int y, int xOffset, int yOffset, double[] quantError) {
+        // red error
+        errors[x + xOffset][y + yOffset][0] += quantError[0] * chooseFactor(xOffset, yOffset);
+        // green error
+        errors[x +xOffset][y + yOffset][1] += quantError[1] * chooseFactor(xOffset, yOffset);
+        // blue error
+        errors[x + xOffset][y + yOffset][2] += quantError[2] * chooseFactor(xOffset, yOffset);
 
-        int green = image.green(x + xOffset, y + yOffset);
-        green += (int) (quantError[1] * chooseFactor(xOffset, yOffset));
-
-        int blue = image.blue(x + xOffset, y + yOffset);
-        blue += (int) (quantError[2] * chooseFactor(xOffset, yOffset));
-
-        image.setColor(x + xOffset, y + yOffset, ColorUtils.rgb(red, green, blue));
     }
 
     @Override
     protected BufferedImage apply(Image image) {
+        errors = new double[image.width()][image.height()][3];
         for (int y = 0; y < image.bufferedImage().getHeight(); y++) {
             for (int x = 0; x < image.bufferedImage().getWidth(); x++) {
                 int oldRed = image.red(x, y);
                 int oldGreen = image.green(x, y);
                 int oldBlue = image.blue(x, y);
 
-                int newRed = ColorUtils.findClosestColor(oldRed, quantizationRed);
-                int newGreen = ColorUtils.findClosestColor(oldGreen, quantizationGreen);
-                int newBlue = ColorUtils.findClosestColor(oldBlue, quantizationBlue);
+                int newRed = ColorUtils.findClosestColor(oldRed += (int)errors[x][y][0], quantizationRed);
+                int newGreen = ColorUtils.findClosestColor(oldGreen += (int)errors[x][y][1], quantizationGreen);
+                int newBlue = ColorUtils.findClosestColor(oldBlue += (int)errors[x][y][1], quantizationBlue);
 
-                int[] quantError = {oldRed - newRed, oldGreen - newGreen, oldBlue - newBlue};
+                double[] quantError = {oldRed - newRed, oldGreen - newGreen, oldBlue - newBlue};
 
                 image.setColor(x, y, ColorUtils.rgb(newRed, newGreen, newBlue));
 
                 // Spread error
-                setError(image, x, y, 0, 1, quantError);
-                setError(image, x, y, 1, 0, quantError);
-                setError(image, x, y, -1, 1, quantError);
-                setError(image, x, y, 1, 1, quantError);
+                if (y+1 < image.height()) {
+                    if (x+1 < image.width()) {
+                        setError(x, y, 1, 1, quantError);
+                    }
+                    if (x > 0) {
+                        setError(x, y, -1, 1, quantError);
+                    }
+                    setError(x, y, 0, 1, quantError);
+                }
+
+                if (x+1 < image.width()) {
+                    setError(x, y, 1, 0, quantError);
+                }
 
             }
 
@@ -73,3 +81,4 @@ public class FSDithering extends CustomFilter {
         return image.bufferedImage();
     }
 }
+
