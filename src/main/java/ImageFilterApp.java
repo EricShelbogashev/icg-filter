@@ -249,6 +249,10 @@ public class ImageFilterApp extends JFrame {
     }
 
     public void saveFileAs() {
+        if (applicationContext.imageHolder().getOriginalImage() == null) {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+            return;
+        }
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
