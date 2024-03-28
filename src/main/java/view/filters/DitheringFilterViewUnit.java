@@ -4,13 +4,14 @@ import core.filter.Filter;
 import core.options.OptionsFactory;
 import core.options.Setting;
 import model.filter.leonid.FSDithering;
+import model.filter.leonid.OrderedDithering;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FSDitheringFilterViewUnit extends FilterViewUnit {
+public class DitheringFilterViewUnit extends FilterViewUnit {
 
     private final DitheringSettings options = new DitheringSettings(
             OptionsFactory.settingInteger(
@@ -30,10 +31,16 @@ public class FSDitheringFilterViewUnit extends FilterViewUnit {
                     "blue quantization",
                     "blue quantization rank",
                     2, 128
+            ),
+            OptionsFactory.settingEnum(
+                    DitheringMethods.ORDERED,
+                    "dithering method",
+                    "choose dithering method",
+                    DitheringMethods.class
             )
     );
 
-    public FSDitheringFilterViewUnit(Consumer<List<Filter>> applyFilters) {
+    public DitheringFilterViewUnit(Consumer<List<Filter>> applyFilters) {
         super("Floyd-Steinberg Dithering", "Apply Floyd-Steinberg dithering", "icons/ditherIcon.png", applyFilters);
     }
 
@@ -42,14 +49,22 @@ public class FSDitheringFilterViewUnit extends FilterViewUnit {
         int redQuantizationRank = options.redRank().value();
         int greenQuantizationRank = options.greenRank().value();
         int blueQuantizationRank = options.blueRank().value();
+        DitheringMethods ditheringMethods = options.ditheringMethods().value();
 
-        FSDithering filter = new FSDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
 
-        applyFilters.accept(List.of(filter));
+        if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
+            FSDithering filter = new FSDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+            applyFilters.accept(List.of(filter));
+        }
+        else {
+            OrderedDithering filter = new OrderedDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+            applyFilters.accept(List.of(filter));
+        }
+
     }
 
     @Override
     public @Nullable List<Setting<?>> getSettings() {
-        return List.of(options.redRank(), options.greenRank(), options.blueRank());
+        return List.of(options.redRank(), options.greenRank(), options.blueRank(), options.ditheringMethods());
     }
 }
