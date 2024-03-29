@@ -55,7 +55,7 @@ public class DitheringFilterViewUnit extends FilterViewUnit {
     );
 
     public DitheringFilterViewUnit(Consumer<List<Filter>> applyFilters) {
-        super("Floyd-Steinberg Dithering", "Apply Floyd-Steinberg dithering", "icons/ditherIcon.png", applyFilters);
+        super("Dithering", "Apply dithering", "icons/ditherIcon.png", applyFilters);
     }
 
     @Override
