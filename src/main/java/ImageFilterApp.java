@@ -5,15 +5,33 @@ import context.ImageHolder;
 import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.options.Setting;
+import model.filter.egor.ComponentResizeEndListener;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.*;
+import view.filters.BloomFilterViewUnit;
+import view.filters.DitheringFilterViewUnit;
+import view.filters.EmbossingFilterViewUnit;
+import view.filters.FilterViewUnit;
+import view.filters.FitImageToScreenFilterViewUnit;
+import view.filters.FitImageTurnOn;
+import view.filters.GammaFilterViewUnit;
+import view.filters.GaussianFilterViewInit;
+import view.filters.MonochromeFilterViewUnit;
+import view.filters.MotionBlurViewUnit;
+import view.filters.NegativeFilterViewUnit;
+import view.filters.RobertsFilterViewInit;
+import view.filters.RotateImageViewUnit;
+import view.filters.SharpnessViewUnit;
+import view.filters.SobelFilterViewInit;
+import view.filters.WaterShedFilterViewInit;
+import view.filters.WindFilterViewUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -54,16 +72,12 @@ public class ImageFilterApp extends JFrame {
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
         applicationContext = new ApplicationContext(imageHolder, applicationProperties);
-        addComponentListener(new ComponentResizeEndListener() {
+        addComponentListener(new ComponentResizeEndListener(30) {
             @Override
             public void resizeTimedOut() {
-                FitImageToScreenFilterViewUnit fitFilter = (FitImageToScreenFilterViewUnit) filterUnits.getFirst(); //very bad, but I can't think how do this better with current architecture.
+                FitImageToScreenFilterViewUnit fitFilter = (FitImageToScreenFilterViewUnit) filterUnits.getFirst();
                 FitImageTurnOn turnedOn;
-                try {
-                    turnedOn = fitFilter.getSettings().get(1).value();
-                } catch (NullPointerException a) {
-                    return;
-                }
+                turnedOn = Objects.requireNonNull(fitFilter.getSettings()).get(1).value();
                 if (turnedOn == FitImageTurnOn.ON) {
                     fitFilter.applyFilter(applicationContext.imageHolder().getCurrentImage());
                 }
@@ -373,34 +387,5 @@ public class ImageFilterApp extends JFrame {
             }
         }
         return bufferedImage;
-    }
-
-    private static abstract class ComponentResizeEndListener
-            extends ComponentAdapter
-            implements ActionListener {
-
-        private final Timer timer;
-
-        public ComponentResizeEndListener() {
-            this(30);
-        }
-
-        public ComponentResizeEndListener(int delayMS) {
-            timer = new Timer(delayMS, this);
-            timer.setRepeats(false);
-            timer.setCoalesce(false);
-        }
-
-        @Override
-        public void componentResized(ComponentEvent e) {
-            timer.restart();
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            resizeTimedOut();
-        }
-
-        public abstract void resizeTimedOut();
     }
 }
