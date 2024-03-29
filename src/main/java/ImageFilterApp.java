@@ -8,23 +8,7 @@ import core.options.Setting;
 import model.filter.egor.ComponentResizeEndListener;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.BloomFilterViewUnit;
-import view.filters.DitheringFilterViewUnit;
-import view.filters.EmbossingFilterViewUnit;
-import view.filters.FilterViewUnit;
-import view.filters.FitImageToScreenFilterViewUnit;
-import view.filters.FitImageTurnOn;
-import view.filters.GammaFilterViewUnit;
-import view.filters.GaussianFilterViewInit;
-import view.filters.MonochromeFilterViewUnit;
-import view.filters.MotionBlurViewUnit;
-import view.filters.NegativeFilterViewUnit;
-import view.filters.RobertsFilterViewInit;
-import view.filters.RotateImageViewUnit;
-import view.filters.SharpnessViewUnit;
-import view.filters.SobelFilterViewInit;
-import view.filters.WaterShedFilterViewInit;
-import view.filters.WindFilterViewUnit;
+import view.filters.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -260,7 +244,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void updateCanvas(BufferedImage image) {
-        applicationContext.imageHolder().commitChanges(image);
+        applicationContext.imageHolder().setCurrentImage(image);
         applicationComponents.imageLabel().setIcon(new ImageIcon(image));
         resetUIAfterProcessing();
     }
@@ -288,7 +272,6 @@ public class ImageFilterApp extends JFrame {
             BufferedImage loadedImage = ImageIO.read(imageFile);
             applicationContext.imageHolder().setCurrentImage(loadedImage);
             applicationContext.imageHolder().setOriginalImage(loadedImage);
-            applicationContext.imageHolder().commitChanges(loadedImage);
             applicationComponents.imageLabel().setIcon(new ImageIcon(loadedImage));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
@@ -309,7 +292,7 @@ public class ImageFilterApp extends JFrame {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
             }
             try {
-                ImageIO.write(applicationContext.imageHolder().getEditedImage(), "png", selectedFile);
+                ImageIO.write(applicationContext.imageHolder().getCurrentImage(), "png", selectedFile);
                 System.out.println("Image successfully saved " + selectedFile.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Unable to save image " + e.getMessage());
@@ -366,8 +349,8 @@ public class ImageFilterApp extends JFrame {
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    applicationContext.imageHolder().commitChanges(copyOfImage(newImage));
-                    updateCanvas(applicationContext.imageHolder().getEditedImage());
+                    applicationContext.imageHolder().setCurrentImage(copyOfImage(newImage));
+                    updateCanvas(applicationContext.imageHolder().getCurrentImage());
                     showOverlay(false);
                 })
                 .exceptionally(ex -> {

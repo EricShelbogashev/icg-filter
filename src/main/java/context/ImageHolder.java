@@ -2,15 +2,10 @@ package context;
 
 import java.awt.image.BufferedImage;
 
+
 public class ImageHolder {
     private BufferedImage originalImage;
-    private BufferedImage editedImage = null;
-
     private BufferedImage currentImage;
-
-    public void commitChanges(BufferedImage editedImage) {
-        this.editedImage = editedImage;
-    }
 
     public void rollBack() {
         currentImage = originalImage;
@@ -22,10 +17,6 @@ public class ImageHolder {
 
     public void setOriginalImage(BufferedImage originalImage) {
         this.originalImage = originalImage;
-    }
-
-    public BufferedImage getEditedImage() {
-        return editedImage;
     }
 
     public BufferedImage getCurrentImage() {
