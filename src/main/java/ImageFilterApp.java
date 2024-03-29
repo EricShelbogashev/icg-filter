@@ -43,7 +43,8 @@ public class ImageFilterApp extends JFrame {
                 new MotionBlurViewUnit(this::applyFilters),
                 new GaussianFilterViewInit(this::applyFilters),
                 new RobertsFilterViewInit(this::applyFilters),
-                new SobelFilterViewInit(this::applyFilters)
+                new SobelFilterViewInit(this::applyFilters),
+                new WaterShedFilterViewInit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
