@@ -40,7 +40,10 @@ public class ImageFilterApp extends JFrame {
                 new MonochromeFilterViewUnit(this::applyFilters),
                 new DitheringFilterViewUnit(this::applyFilters),
                 new SharpnessViewUnit(this::applyFilters),
-                new MotionBlurViewUnit(this::applyFilters)
+                new MotionBlurViewUnit(this::applyFilters),
+                new GaussianFilterViewInit(this::applyFilters),
+                new RobertsFilterViewInit(this::applyFilters),
+                new SobelFilterViewInit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
