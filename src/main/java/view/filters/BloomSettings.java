@@ -3,8 +3,8 @@ package view.filters;
 import core.options.Setting;
 
 public record BloomSettings(
-        Setting<Float> glowFactor,
-        Setting<Float> threshold,
+        Setting<Double> glowFactor,
+        Setting<Double> threshold,
         Setting<Integer> radius
 
 ) {

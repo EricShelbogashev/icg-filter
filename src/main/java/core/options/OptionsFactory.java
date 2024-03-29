@@ -20,22 +20,22 @@ public class OptionsFactory {
         };
     }
 
-    public static <T extends Enum<T>> Setting<T> settingEnum(T defaultValue, String label, String description, Class<T> type) {
-        return new EnumSetting<>(defaultValue, label, description, type);
-    }
-
-    public static Setting<Float> settingFloat(float defaultValue, String label, String hint, float min, float max) {
+    public static Setting<Double> settingDouble(Double defaultValue, String label, String hint, Double min, Double max) {
         return new Setting<>(defaultValue, label, hint, List.of(
                 value -> value < min ? "should be grater or equal to " + min : null,
                 value -> value > max ? "should be less or equal to " + max : null
-        ), Float.class) {
+        ), Double.class) {
             @Override
             public JComponent createComponent() {
-                JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.floatValue(), min, max, 0.1));
-                spinner.addVetoableChangeListener(e -> value(spinner.getValue()));
+                JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.doubleValue(), min.doubleValue(), max.doubleValue(), 0.1));
+                spinner.addChangeListener(e -> value(spinner.getValue()));
                 return spinner;
             }
         };
+    }
+
+    public static <T extends Enum<T>> Setting<T> settingEnum(T defaultValue, String label, String description, Class<T> type) {
+        return new EnumSetting<>(defaultValue, label, description, type);
     }
 
     public static Setting<Range> settingRange(Range defaultValue, String label, String hint, Range bounds) {

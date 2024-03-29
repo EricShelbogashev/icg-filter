@@ -16,17 +16,17 @@ import java.util.function.Consumer;
 public class BloomFilterViewUnit extends FilterViewUnit {
 
     private final BloomSettings options = new BloomSettings(
-            OptionsFactory.settingFloat(
-                    0.3f,
+            OptionsFactory.settingDouble(
+                    0.3,
                     "strength",
                     "",
-                    0, 1
+                    0.0, 1.0
             ),
-            OptionsFactory.settingFloat(
-                    0.7f,
+            OptionsFactory.settingDouble(
+                    0.7,
                     "threshold",
                     "",
-                    0, 1
+                    0.0, 1.0
             ),
             OptionsFactory.settingInteger(
                     5,
@@ -41,8 +41,8 @@ public class BloomFilterViewUnit extends FilterViewUnit {
 
     @Override
     public void applyFilter(BufferedImage image) {
-        float glowFactor = options.glowFactor().value();
-        float threshold = options.threshold().value();
+        double glowFactor = options.glowFactor().value();
+        double threshold = options.threshold().value();
         int radius = options.radius().value();
 
         BloomFilter bloomFilter = new BloomFilter(glowFactor, threshold);
