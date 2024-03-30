@@ -40,11 +40,10 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class ImageFilterApp extends JFrame {
-    private final ApplicationContext applicationContext;
-    private final ApplicationComponents applicationComponents;
+    private final ApplicationContext context;
+    private final ApplicationComponents components;
     private final List<FilterViewUnit> filterUnits;
     private final FitImageToScreenFilterViewUnit fitFilterUnit;
-    private JToggleButton showOriginalImageButton;
 
     public ImageFilterApp(ApplicationProperties applicationProperties) {
         super("Image Filter Application");
@@ -68,21 +67,22 @@ public class ImageFilterApp extends JFrame {
                 new WaterShedFilterViewInit(this::updateLoader),
                 new VHSFilterViewUnit(this::updateLoader)
         );
-        applicationComponents = new ApplicationComponents(
+        components = new ApplicationComponents(
                 imageLabel,
                 createOverlayPanel(),
-                scrollPane
+                scrollPane,
+                createShowOriginalImageButton()
         );
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
-        applicationContext = new ApplicationContext(imageHolder, applicationProperties);
+        context = new ApplicationContext(imageHolder, applicationProperties);
         addComponentListener(new ComponentResizeEndListener(30) {
             @Override
             public void resizeTimedOut() {
                 FitImageTurnOn turnedOn = fitFilterUnit.getFitOptions().on().value();
-                if (turnedOn == FitImageTurnOn.ON && applicationContext.imageHolder().getCurrentImage() != null) {
+                if (turnedOn == FitImageTurnOn.ON && context.imageHolder().getCurrentImage() != null) {
                     fitCurrentImageToScreen().join();
-                    updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
+                    updateCanvas(context.imageHolder().getResizedCurrentImage());
                 }
             }
         });
@@ -103,9 +103,19 @@ public class ImageFilterApp extends JFrame {
         return progressPanel;
     }
 
+    private JToggleButton createShowOriginalImageButton() {
+        JToggleButton showOriginalImageButton = new JToggleButton("Show original");
+        showOriginalImageButton.setToolTipText("Select to show original image.");
+        showOriginalImageButton.addActionListener(e -> {
+            onSwitchImagePressed(showOriginalImageButton);
+        });
+        showOriginalImageButton.setEnabled(false);
+        return showOriginalImageButton;
+    }
+
     private void showOverlay(boolean show) {
         SwingUtilities.invokeLater(() ->
-                applicationComponents
+                components
                         .progressPanel()
                         .setVisible(show));
     }
@@ -145,17 +155,12 @@ public class ImageFilterApp extends JFrame {
             toolbarButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(filterViewUnit.getIconPath()))));
             toolbarButton.setToolTipText(filterViewUnit.getTipText());
             toolbarButton.addActionListener(e -> {
-                applyFilter(applicationContext.imageHolder().getOriginalImage(), filterViewUnit);
+                applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
             });
             toolBar.add(toolbarButton);
         });
 
-        showOriginalImageButton = new JToggleButton("Original");
-        showOriginalImageButton.addActionListener(e -> {
-            showOriginalImageButton.setText("Edited");
-            onSwitchImagePressed(showOriginalImageButton);
-        });
-        toolBar.add(showOriginalImageButton);
+        toolBar.add(components.showOriginalImageButton());
         add(toolBar, BorderLayout.NORTH);
     }
 
@@ -166,7 +171,7 @@ public class ImageFilterApp extends JFrame {
         JMenuItem fitMenuItem = new JMenuItem(fitFilterUnit.getFilterName());
         fitMenuItem.addActionListener(e -> {
             initFitFilter();
-            if (applicationContext.imageHolder().getOriginalImage() != null) {
+            if (context.imageHolder().getOriginalImage() != null) {
                 initFitFilter();
             }
         });
@@ -174,7 +179,7 @@ public class ImageFilterApp extends JFrame {
         filterUnits.forEach(filterViewUnit -> {
             JMenuItem menuItem = new JMenuItem(filterViewUnit.getFilterName());
             menuItem.addActionListener(e -> {
-                applyFilter(applicationContext.imageHolder().getOriginalImage(), filterViewUnit);
+                applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
             });
             filterMenu.add(menuItem);
         });
@@ -182,11 +187,11 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void applyFilter(BufferedImage image, FilterViewUnit filterViewUnit) {
-        if (applicationContext.imageHolder().getOriginalImage() == null) {
+        if (context.imageHolder().getOriginalImage() == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
         }
-        applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        components.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
         List<Setting<?>> options = filterViewUnit.getSettings();
@@ -203,10 +208,10 @@ public class ImageFilterApp extends JFrame {
     private void acceptFilterToImageHolder(BufferedImage image, FilterViewUnit filterViewUnit) {
         filterViewUnit.applyFilter(image)
                 .thenAccept(newImage -> {
-                    applicationContext.imageHolder().setCurrentImage(Image.of(newImage));
+                    context.imageHolder().setCurrentImage(Image.of(newImage));
                     fitCurrentImageToScreen().join();
-                    updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
-                    showOriginalImageButton.setSelected(false);
+                    updateCanvas(context.imageHolder().getResizedCurrentImage());
+                    components.showOriginalImageButton().setSelected(false);
                     showOverlay(false);
                 })
                 .exceptionally(ex -> {
@@ -218,15 +223,15 @@ public class ImageFilterApp extends JFrame {
 
     private CompletableFuture<Void> fitCurrentImageToScreen() {
         return fitFilterUnit
-                .applyFilter(applicationContext.imageHolder().getCurrentImage())
+                .applyFilter(context.imageHolder().getCurrentImage())
                 .thenAccept(newImage -> {
-                    applicationContext.imageHolder().setResizedCurrentImage(newImage);
+                    context.imageHolder().setResizedCurrentImage(newImage);
                 })
                 .thenAccept(e -> {
                     fitFilterUnit
-                            .applyFilter(applicationContext.imageHolder().getOriginalImage())
+                            .applyFilter(context.imageHolder().getOriginalImage())
                             .thenAccept(resizedOriginal -> {
-                                applicationContext.imageHolder().setResizedOriginalImage(resizedOriginal);
+                                context.imageHolder().setResizedOriginalImage(resizedOriginal);
                             })
                             .join();
                 });
@@ -238,9 +243,9 @@ public class ImageFilterApp extends JFrame {
             throw new IllegalStateException("There are no filter settings to fit the image to the screen.");
         }
         SettingsDialogGenerator.generateAndShowDialog(options, () -> {
-            if (applicationContext.imageHolder().getOriginalImage() != null) {
+            if (context.imageHolder().getOriginalImage() != null) {
                 fitCurrentImageToScreen().join();
-                updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
+                updateCanvas(context.imageHolder().getResizedCurrentImage());
             }
         });
     }
@@ -304,49 +309,41 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
-//        if (applicationContext.imageHolder().getCurrentImage() != null
-//                && applicationContext.imageHolder().getOriginalImage() != null &&
-//                applicationContext.imageHolder().getEditedImage() != null) {
-//            if (!applicationContext.imageHolder().isEditedImage()) {
-//                applicationContext.imageHolder().setCurrentImage(applicationContext.imageHolder().getEditedImage());
-//                updateCanvas(applicationContext.imageHolder().getCurrentImage());
-//                button.setSelected(false);
-//            } else {
-//                applicationContext.imageHolder().rollBack();
-//                updateCanvas(applicationContext.imageHolder().getCurrentImage());
-//                button.setSelected(true);
-//            }
-//        } else if (applicationContext.imageHolder().getOriginalImage() != null) {
-//            JOptionPane.showMessageDialog(this, "This is original image.");
-//            button.setSelected(false);
-//        } else {
-//            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-//            button.setSelected(false);
-//        }
+        if (context.imageHolder().getResizedOriginalImage() == null || context.imageHolder().getResizedCurrentImage() == null) {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+            button.setSelected(false);
+            button.setEnabled(false);
+            return;
+        }
+        if (button.isSelected()) {
+            updateCanvas(context.imageHolder().getResizedOriginalImage());
+        } else {
+            updateCanvas(context.imageHolder().getResizedCurrentImage());
+        }
     }
 
     private void updateLoader(float percent) {
-        if (!applicationComponents.progressPanel().progressBar().isVisible()) {
-            applicationComponents.progressPanel().progressBar().setVisible(true);
+        if (!components.progressPanel().progressBar().isVisible()) {
+            components.progressPanel().progressBar().setVisible(true);
         }
 
         int progressValue = Math.round(percent * 100);
-        applicationComponents.progressPanel().progressBar().setValue(progressValue);
+        components.progressPanel().progressBar().setValue(progressValue);
 
-        if (!applicationComponents.progressPanel().progressBar().isStringPainted()) {
-            applicationComponents.progressPanel().progressBar().setStringPainted(true);
+        if (!components.progressPanel().progressBar().isStringPainted()) {
+            components.progressPanel().progressBar().setStringPainted(true);
         }
     }
 
     private void updateCanvas(BufferedImage image) {
-        applicationComponents.imageLabel().setIcon(new ImageIcon(image));
+        components.imageLabel().setIcon(new ImageIcon(image));
         resetUIAfterProcessing();
     }
 
     private void resetUIAfterProcessing() {
-        applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        components.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         this.revalidate();
-        applicationComponents.progressPanel().progressBar().setValue(100);
+        components.progressPanel().progressBar().setValue(100);
     }
 
 
@@ -364,18 +361,18 @@ public class ImageFilterApp extends JFrame {
     private void loadImage(File imageFile) {
         try {
             BufferedImage loadedImage = ImageIO.read(imageFile);
-            applicationContext.imageHolder().setCurrentImage(loadedImage);
-            applicationContext.imageHolder().setOriginalImage(loadedImage);
-//            applicationContext.imageHolder().setEditedImage(null);
+            context.imageHolder().setCurrentImage(loadedImage);
+            context.imageHolder().setOriginalImage(loadedImage);
             fitCurrentImageToScreen().join();
-            updateCanvas(applicationContext.imageHolder().getResizedOriginalImage());
+            updateCanvas(context.imageHolder().getResizedOriginalImage());
+            components.showOriginalImageButton().setEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
         }
     }
 
     public void saveFileAs() {
-        if (applicationContext.imageHolder().getOriginalImage() == null) {
+        if (context.imageHolder().getOriginalImage() == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
         }
@@ -388,7 +385,7 @@ public class ImageFilterApp extends JFrame {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
             }
             try {
-                ImageIO.write(applicationContext.imageHolder().getCurrentImage(), "png", selectedFile);
+                ImageIO.write(context.imageHolder().getCurrentImage(), "png", selectedFile);
                 System.out.println("Image successfully saved " + selectedFile.getAbsolutePath());
             } catch (IOException e) {
                 System.err.println("Unable to save image " + e.getMessage());
@@ -418,7 +415,7 @@ public class ImageFilterApp extends JFrame {
                         view.x += deltaX;
                         view.y += deltaY;
 
-                        applicationComponents.imageLabel().scrollRectToVisible(view);
+                        components.imageLabel().scrollRectToVisible(view);
                         origin = e.getPoint();
                     }
                 }

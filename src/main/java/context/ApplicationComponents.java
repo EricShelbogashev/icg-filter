@@ -7,6 +7,7 @@ import javax.swing.*;
 public record ApplicationComponents(
         JLabel imageLabel,
         ProgressPanel progressPanel,
-        JScrollPane scrollPane
+        JScrollPane scrollPane,
+        JToggleButton showOriginalImageButton
 ) {
 }
