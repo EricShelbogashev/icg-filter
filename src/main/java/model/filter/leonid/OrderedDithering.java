@@ -35,7 +35,7 @@ public class OrderedDithering extends MatrixFilter {
         }
     }
 
-    static int[][] ditherMatrix8 = {
+    public static int[][] ditherMatrix8 = {
             {0, 32, 8, 40, 2, 34, 10, 42},
             {48, 16, 56, 24, 50, 18, 58, 26},
             {12, 44, 4, 36, 14, 46, 6, 38},
@@ -46,7 +46,7 @@ public class OrderedDithering extends MatrixFilter {
             {63, 31, 55, 23, 61, 29, 53, 21}
     };
 
-    static int[][] ditherMatrix16 = {
+    public static int[][] ditherMatrix16 = {
             {0, 128, 32, 160, 8, 136, 40, 168, 2, 130, 34, 162, 10, 138, 42, 170},
             {192, 64, 224, 96, 200, 72, 232, 104, 194, 66, 226, 98, 202, 74, 234, 106},
             {48, 176, 16, 144, 56, 184, 24, 152, 50, 178, 18, 146, 58, 186, 26, 154},
@@ -64,13 +64,13 @@ public class OrderedDithering extends MatrixFilter {
             {63, 191, 31, 159, 55, 183, 23, 151, 61, 189, 29, 157, 53, 181, 21, 149},
             {255, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85}
     };
-    static int[][] ditherMatrix4 = {
+    public static int[][] ditherMatrix4 = {
             {0, 8, 2, 10},
             {12, 4, 14, 6},
             {3, 11, 1, 9},
             {15, 7, 13, 5}
     };
-    static int[][] ditherMatrix2 = {
+    public static int[][] ditherMatrix2 = {
             {0, 2},
             {3, 1}
     };

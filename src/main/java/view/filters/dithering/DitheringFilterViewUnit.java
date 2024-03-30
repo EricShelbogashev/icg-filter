@@ -6,7 +6,7 @@ import model.filter.boch.EgorFloydDither;
 import model.filter.boch.EgorOrderedDither;
 import model.filter.darya.MyFloydDithering;
 import model.filter.darya.MyOrderedDithering;
-import model.filter.eric.EricFloydSteinbergDSFilter;
+import model.filter.eric.EricFloydSteinbergFilter;
 import model.filter.eric.EricOrderedDither;
 import model.filter.leonid.FSDithering;
 import model.filter.leonid.OrderedDithering;
@@ -108,7 +108,7 @@ public class DitheringFilterViewUnit extends FilterViewUnit {
             case ERIC -> {
                 switch (ditheringMethods) {
                     case FLOYD_STEINBERG -> {
-                        EricFloydSteinbergDSFilter filter = new EricFloydSteinbergDSFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                        EricFloydSteinbergFilter filter = new EricFloydSteinbergFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
                         return applyFilters(image, List.of(filter));
                     }
                     case ORDERED -> {

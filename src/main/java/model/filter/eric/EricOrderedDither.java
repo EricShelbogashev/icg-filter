@@ -2,24 +2,31 @@ package model.filter.eric;
 
 import core.filter.Image;
 import core.filter.MatrixFilter;
+import model.filter.leonid.ColorUtils;
 
-//TODO: (e.bochkarev) реализовать.
+public class EricOrderedDither extends MatrixFilter {
+    private final DitherMatrix redDitherMatrix;
+    private final DitherMatrix greenDitherMatrix;
+    private final DitherMatrix blueDitherMatrix;
 
-public class EricOrderedDither extends MatrixFilter
-{
-    int r;
-    int g;
-    int b;
-
-    public EricOrderedDither(int r, int g, int b)
-    {
-        this.r = r;
-        this.g = g;
-        this.b = b;
+    public EricOrderedDither(int redQuantizationRank, int greenQuantizationRank, int blueQuantizationRank) {
+        this.redDitherMatrix = new DitherMatrix(redQuantizationRank);
+        this.greenDitherMatrix = new DitherMatrix(greenQuantizationRank);
+        this.blueDitherMatrix = new DitherMatrix(blueQuantizationRank);
     }
 
-    @Override
     protected int apply(Image image, int x, int y) {
-        return 0;
+        int pixelColor = image.color(x, y);
+
+        int newRed = ditherColor(ColorUtils.red(pixelColor), redDitherMatrix, x, y);
+        int newGreen = ditherColor(ColorUtils.green(pixelColor), greenDitherMatrix, x, y);
+        int newBlue = ditherColor(ColorUtils.blue(pixelColor), blueDitherMatrix, x, y);
+
+        return ColorUtils.rgb(newRed, newGreen, newBlue);
+    }
+
+    private int ditherColor(int colorValue, DitherMatrix ditherMatrix, int x, int y) {
+        int ditherValue = ditherMatrix.matrix[x % ditherMatrix.size][y % ditherMatrix.size] - ditherMatrix.normalizer;
+        return ColorUtils.findClosestColor(colorValue + ditherValue, ditherMatrix.size);
     }
 }
