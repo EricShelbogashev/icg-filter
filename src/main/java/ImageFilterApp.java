@@ -2,32 +2,29 @@ import context.ApplicationComponents;
 import context.ApplicationContext;
 import context.ApplicationProperties;
 import context.ImageHolder;
-import core.filter.Filter;
-import core.filter.FilterExecutor;
 import core.filter.Image;
 import core.options.Setting;
 import model.filter.egor.ComponentResizeEndListener;
-import model.filter.eric.ResamplingFilter;
-import view.filters.VHSFilterViewUnit;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.BloomFilterViewUnit;
-import view.filters.DitheringFilterViewUnit;
-import view.filters.EmbossingFilterViewUnit;
 import view.filters.FilterViewUnit;
-import view.filters.FitImageToScreenFilterViewUnit;
-import view.filters.FitImageTurnOn;
-import view.filters.GammaFilterViewUnit;
-import view.filters.GaussianFilterViewInit;
-import view.filters.MonochromeFilterViewUnit;
-import view.filters.MotionBlurViewUnit;
-import view.filters.NegativeFilterViewUnit;
-import view.filters.RobertsFilterViewInit;
-import view.filters.RotateImageViewUnit;
-import view.filters.SharpnessViewUnit;
-import view.filters.SobelFilterViewInit;
-import view.filters.WaterShedFilterViewInit;
-import view.filters.WindFilterViewUnit;
+import view.filters.bloom.BloomFilterViewUnit;
+import view.filters.dithering.DitheringFilterViewUnit;
+import view.filters.embossing.EmbossingFilterViewUnit;
+import view.filters.fit.FitImageToScreenFilterViewUnit;
+import view.filters.fit.FitImageTurnOn;
+import view.filters.gamma.GammaFilterViewUnit;
+import view.filters.gaussian.GaussianFilterViewInit;
+import view.filters.monochrome.MonochromeFilterViewUnit;
+import view.filters.motionblur.MotionBlurViewUnit;
+import view.filters.negative.NegativeFilterViewUnit;
+import view.filters.roberts.RobertsFilterViewInit;
+import view.filters.rotate.RotateImageViewUnit;
+import view.filters.sharpness.SharpnessViewUnit;
+import view.filters.sobel.SobelFilterViewInit;
+import view.filters.vhs.VHSFilterViewUnit;
+import view.filters.watershed.WaterShedFilterViewInit;
+import view.filters.wind.WindFilterViewUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -40,35 +37,36 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class ImageFilterApp extends JFrame {
     private final ApplicationContext applicationContext;
     private final ApplicationComponents applicationComponents;
     private final List<FilterViewUnit> filterUnits;
-
+    private final FitImageToScreenFilterViewUnit fitFilterUnit;
     private JToggleButton showOriginalImageButton;
 
     public ImageFilterApp(ApplicationProperties applicationProperties) {
         super("Image Filter Application");
         JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
         JScrollPane scrollPane = createScrollPanel(imageLabel);
+        fitFilterUnit = new FitImageToScreenFilterViewUnit(scrollPane::getSize, this::updateLoader);
         filterUnits = List.of(
-                new FitImageToScreenFilterViewUnit(scrollPane::getSize, this::applyFilters), // Let it be first, because lower there is hard-coded resizing listener that takes first element of this list and acts as if it's FitImageToScreen
-                new WindFilterViewUnit(this::applyFilters),
-                new GammaFilterViewUnit(this::applyFilters),
-                new RotateImageViewUnit(this::applyFilters),
-                new BloomFilterViewUnit(this::applyFilters),
-                new NegativeFilterViewUnit(this::applyFilters),
-                new EmbossingFilterViewUnit(this::applyFilters),
-                new MonochromeFilterViewUnit(this::applyFilters),
-                new DitheringFilterViewUnit(this::applyFilters),
-                new SharpnessViewUnit(this::applyFilters),
-                new MotionBlurViewUnit(this::applyFilters),
-                new GaussianFilterViewInit(this::applyFilters),
-                new RobertsFilterViewInit(this::applyFilters),
-                new SobelFilterViewInit(this::applyFilters),
-                new WaterShedFilterViewInit(this::applyFilters),
-                new VHSFilterViewUnit(this::applyFilters)
+                new WindFilterViewUnit(this::updateLoader),
+                new GammaFilterViewUnit(this::updateLoader),
+                new RotateImageViewUnit(this::updateLoader),
+                new BloomFilterViewUnit(this::updateLoader),
+                new NegativeFilterViewUnit(this::updateLoader),
+                new EmbossingFilterViewUnit(this::updateLoader),
+                new MonochromeFilterViewUnit(this::updateLoader),
+                new DitheringFilterViewUnit(this::updateLoader),
+                new SharpnessViewUnit(this::updateLoader),
+                new MotionBlurViewUnit(this::updateLoader),
+                new GaussianFilterViewInit(this::updateLoader),
+                new RobertsFilterViewInit(this::updateLoader),
+                new SobelFilterViewInit(this::updateLoader),
+                new WaterShedFilterViewInit(this::updateLoader),
+                new VHSFilterViewUnit(this::updateLoader)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
@@ -81,11 +79,10 @@ public class ImageFilterApp extends JFrame {
         addComponentListener(new ComponentResizeEndListener(30) {
             @Override
             public void resizeTimedOut() {
-                FitImageToScreenFilterViewUnit fitFilter = (FitImageToScreenFilterViewUnit) filterUnits.getFirst();
-                FitImageTurnOn turnedOn;
-                turnedOn = Objects.requireNonNull(fitFilter.getSettings()).get(1).value();
-                if (turnedOn == FitImageTurnOn.ON) {
-                    fitFilter.applyFilter(applicationContext.imageHolder().getEditedImage());
+                FitImageTurnOn turnedOn = fitFilterUnit.getFitOptions().on().value();
+                if (turnedOn == FitImageTurnOn.ON && applicationContext.imageHolder().getCurrentImage() != null) {
+                    fitCurrentImageToScreen().join();
+                    updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
                 }
             }
         });
@@ -136,46 +133,116 @@ public class ImageFilterApp extends JFrame {
     private void createToolbarButtons() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
+
+        JButton fitButton = new JButton();
+        fitButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(fitFilterUnit.getIconPath()))));
+        fitButton.addActionListener(e -> {
+            initFitFilter();
+        });
+        toolBar.add(fitButton);
         filterUnits.forEach(filterViewUnit -> {
             JButton toolbarButton = new JButton();
             toolbarButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(filterViewUnit.getIconPath()))));
             toolbarButton.setToolTipText(filterViewUnit.getTipText());
-            toolbarButton.addActionListener(e -> applyFilter(filterViewUnit));
+            toolbarButton.addActionListener(e -> {
+                applyFilter(applicationContext.imageHolder().getOriginalImage(), filterViewUnit);
+            });
             toolBar.add(toolbarButton);
         });
-        showOriginalImageButton = new JToggleButton("show original image");
-        showOriginalImageButton.addActionListener(e -> onSwitchImagePressed(showOriginalImageButton));
+
+        showOriginalImageButton = new JToggleButton("Original");
+        showOriginalImageButton.addActionListener(e -> {
+            showOriginalImageButton.setText("Edited");
+            onSwitchImagePressed(showOriginalImageButton);
+        });
         toolBar.add(showOriginalImageButton);
         add(toolBar, BorderLayout.NORTH);
     }
 
     private JMenu createFilterMenuItems() {
         JMenu filterMenu = new JMenu();
-        filterMenu.setText("Filter");
+        filterMenu.setText("Filters");
+
+        JMenuItem fitMenuItem = new JMenuItem(fitFilterUnit.getFilterName());
+        fitMenuItem.addActionListener(e -> {
+            initFitFilter();
+            if (applicationContext.imageHolder().getOriginalImage() != null) {
+                initFitFilter();
+            }
+        });
+        filterMenu.add(fitMenuItem);
         filterUnits.forEach(filterViewUnit -> {
             JMenuItem menuItem = new JMenuItem(filterViewUnit.getFilterName());
             menuItem.addActionListener(e -> {
-                applyFilter(filterViewUnit);
+                applyFilter(applicationContext.imageHolder().getOriginalImage(), filterViewUnit);
             });
             filterMenu.add(menuItem);
         });
         return filterMenu;
     }
 
-    private void applyFilter(FilterViewUnit filterViewUnit) {
+    private void applyFilter(BufferedImage image, FilterViewUnit filterViewUnit) {
         if (applicationContext.imageHolder().getOriginalImage() == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             return;
         }
+        applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        showOverlay(true);
+
         List<Setting<?>> options = filterViewUnit.getSettings();
         if (options == null) {
-            filterViewUnit.applyFilter(applicationContext.imageHolder().getOriginalImage());
+            acceptFilterToImageHolder(image, filterViewUnit);
         } else {
             SettingsDialogGenerator.generateAndShowDialog(options, () -> {
-                filterViewUnit.applyFilter(applicationContext.imageHolder().getOriginalImage());
+                acceptFilterToImageHolder(image, filterViewUnit);
             });
         }
 
+    }
+
+    private void acceptFilterToImageHolder(BufferedImage image, FilterViewUnit filterViewUnit) {
+        filterViewUnit.applyFilter(image)
+                .thenAccept(newImage -> {
+                    applicationContext.imageHolder().setCurrentImage(Image.of(newImage));
+                    fitCurrentImageToScreen().join();
+                    updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
+                    showOriginalImageButton.setSelected(false);
+                    showOverlay(false);
+                })
+                .exceptionally(ex -> {
+                    JOptionPane.showMessageDialog(this, "Error applying filter: " + ex.getMessage());
+                    showOverlay(false);
+                    return null;
+                });
+    }
+
+    private CompletableFuture<Void> fitCurrentImageToScreen() {
+        return fitFilterUnit
+                .applyFilter(applicationContext.imageHolder().getCurrentImage())
+                .thenAccept(newImage -> {
+                    applicationContext.imageHolder().setResizedCurrentImage(newImage);
+                })
+                .thenAccept(e -> {
+                    fitFilterUnit
+                            .applyFilter(applicationContext.imageHolder().getOriginalImage())
+                            .thenAccept(resizedOriginal -> {
+                                applicationContext.imageHolder().setResizedOriginalImage(resizedOriginal);
+                            })
+                            .join();
+                });
+    }
+
+    private void initFitFilter() {
+        List<Setting<?>> options = fitFilterUnit.getSettings();
+        if (options == null) {
+            throw new IllegalStateException("There are no filter settings to fit the image to the screen.");
+        }
+        SettingsDialogGenerator.generateAndShowDialog(options, () -> {
+            if (applicationContext.imageHolder().getOriginalImage() != null) {
+                fitCurrentImageToScreen().join();
+                updateCanvas(applicationContext.imageHolder().getResizedCurrentImage());
+            }
+        });
     }
 
     private JMenu createHelpMenu() {
@@ -237,25 +304,25 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
-        if (applicationContext.imageHolder().getCurrentImage() != null
-                && applicationContext.imageHolder().getOriginalImage() != null &&
-                applicationContext.imageHolder().getEditedImage() != null) {
-            if (!applicationContext.imageHolder().isEditedImage()) {
-                applicationContext.imageHolder().setCurrentImage(applicationContext.imageHolder().getEditedImage());
-                updateCanvas(applicationContext.imageHolder().getCurrentImage());
-                button.setSelected(false);
-            } else {
-                applicationContext.imageHolder().rollBack();
-                updateCanvas(applicationContext.imageHolder().getCurrentImage());
-                button.setSelected(true);
-            }
-        } else if (applicationContext.imageHolder().getOriginalImage() != null) {
-            JOptionPane.showMessageDialog(this, "This is original image.");
-            button.setSelected(false);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-            button.setSelected(false);
-        }
+//        if (applicationContext.imageHolder().getCurrentImage() != null
+//                && applicationContext.imageHolder().getOriginalImage() != null &&
+//                applicationContext.imageHolder().getEditedImage() != null) {
+//            if (!applicationContext.imageHolder().isEditedImage()) {
+//                applicationContext.imageHolder().setCurrentImage(applicationContext.imageHolder().getEditedImage());
+//                updateCanvas(applicationContext.imageHolder().getCurrentImage());
+//                button.setSelected(false);
+//            } else {
+//                applicationContext.imageHolder().rollBack();
+//                updateCanvas(applicationContext.imageHolder().getCurrentImage());
+//                button.setSelected(true);
+//            }
+//        } else if (applicationContext.imageHolder().getOriginalImage() != null) {
+//            JOptionPane.showMessageDialog(this, "This is original image.");
+//            button.setSelected(false);
+//        } else {
+//            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+//            button.setSelected(false);
+//        }
     }
 
     private void updateLoader(float percent) {
@@ -272,7 +339,6 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void updateCanvas(BufferedImage image) {
-        applicationContext.imageHolder().setCurrentImage(image);
         applicationComponents.imageLabel().setIcon(new ImageIcon(image));
         resetUIAfterProcessing();
     }
@@ -300,8 +366,9 @@ public class ImageFilterApp extends JFrame {
             BufferedImage loadedImage = ImageIO.read(imageFile);
             applicationContext.imageHolder().setCurrentImage(loadedImage);
             applicationContext.imageHolder().setOriginalImage(loadedImage);
-            applicationContext.imageHolder().setEditedImage(null);
-            applicationComponents.imageLabel().setIcon(new ImageIcon(loadedImage));
+//            applicationContext.imageHolder().setEditedImage(null);
+            fitCurrentImageToScreen().join();
+            updateCanvas(applicationContext.imageHolder().getResizedOriginalImage());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
         }
@@ -360,43 +427,5 @@ public class ImageFilterApp extends JFrame {
 
         pane.getViewport().addMouseListener(ma);
         pane.getViewport().addMouseMotionListener(ma);
-    }
-
-    private void applyFilters(List<Filter> filters) {
-        if (applicationContext.imageHolder().getCurrentImage() == null) {
-            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-            return;
-        }
-
-        applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        showOverlay(true);
-
-        boolean containsFitFilter = filters.stream()
-                .anyMatch(filter -> filter instanceof ResamplingFilter);
-        FilterExecutor.Builder builder;
-        if (containsFitFilter) {
-            builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getCurrentImage()));
-        } else {
-            builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getOriginalImage()));
-        }
-
-
-        for (Filter filter : filters) {
-            builder = builder.with(filter);
-        }
-        builder.progress(this::updateLoader)
-                .process()
-                .thenAccept(newImage -> {
-                    applicationContext.imageHolder().setCurrentImage(Image.of(newImage));
-                    applicationContext.imageHolder().setEditedImage(Image.of(newImage));
-                    updateCanvas(applicationContext.imageHolder().getCurrentImage());
-                    showOriginalImageButton.setSelected(false);
-                    showOverlay(false);
-                })
-                .exceptionally(ex -> {
-                    JOptionPane.showMessageDialog(this, "Error applying filter: " + ex.getMessage());
-                    showOverlay(false);
-                    return null;
-                });
     }
 }

@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 public class ImageHolder {
     private BufferedImage originalImage;
     private BufferedImage currentImage;
-    private BufferedImage editedImage;
+    private BufferedImage resizedOriginalImage;
+    private BufferedImage resizedCurrentImage;
+
 
     public void rollBack() {
         currentImage = originalImage;
@@ -28,13 +30,19 @@ public class ImageHolder {
         this.currentImage = currentImage;
     }
 
-    public BufferedImage getEditedImage() {return editedImage;}
-
-    public void setEditedImage(BufferedImage image) {
-        this.editedImage = image;
+    public BufferedImage getResizedOriginalImage() {
+        return resizedOriginalImage;
     }
 
-    public boolean isEditedImage() {
-        return (currentImage == editedImage);
+    public void setResizedOriginalImage(BufferedImage resizedOriginalImage) {
+        this.resizedOriginalImage = resizedOriginalImage;
+    }
+
+    public BufferedImage getResizedCurrentImage() {
+        return resizedCurrentImage;
+    }
+
+    public void setResizedCurrentImage(BufferedImage resizedCurrentImage) {
+        this.resizedCurrentImage = resizedCurrentImage;
     }
 }
