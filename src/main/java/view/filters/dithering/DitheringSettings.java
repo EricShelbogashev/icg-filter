@@ -8,5 +8,5 @@ public record DitheringSettings(
         Setting<Integer> blueRank,
         Setting<DitheringMethods> ditheringMethods,
         Setting<DitheringPerson> ditheringPerson
-        ) {
+) {
 }

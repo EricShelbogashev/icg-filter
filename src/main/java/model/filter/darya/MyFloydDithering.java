@@ -7,8 +7,8 @@ import model.filter.leonid.ColorUtils;
 import java.awt.image.BufferedImage;
 
 public class MyFloydDithering extends CustomFilter {
-    private double[][][] errors;
     private final int quantRed, quantGreen, quantBlue;
+    private double[][][] errors;
 
     public MyFloydDithering(int[] kv) {
         this.quantRed = kv[0];
@@ -39,9 +39,9 @@ public class MyFloydDithering extends CustomFilter {
         errors = new double[image.width()][image.height()][3];
         for (int y = 0; y < image.height(); y++) {
             for (int x = 0; x < image.width(); x++) {
-                int oldRed = image.red(x, y) + (int)errors[x][y][0];
-                int oldGreen = image.green(x, y) + (int)errors[x][y][1];
-                int oldBlue = image.blue(x, y) + (int)errors[x][y][2];
+                int oldRed = image.red(x, y) + (int) errors[x][y][0];
+                int oldGreen = image.green(x, y) + (int) errors[x][y][1];
+                int oldBlue = image.blue(x, y) + (int) errors[x][y][2];
                 int newRed = ColorUtils.findClosestColor(oldRed, quantRed);
                 int newGreen = ColorUtils.findClosestColor(oldGreen, quantGreen);
                 int newBlue = ColorUtils.findClosestColor(oldBlue, quantBlue);

@@ -23,18 +23,6 @@ public enum QuantizationRank {
         this.normalizer = normalizer;
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public int[][] getMatrix() {
-        return matrix;
-    }
-
-    public int getNormalizer() {
-        return normalizer;
-    }
-
     public static QuantizationRank fromRank(int rank) {
         if (rank >= RANK_128.rank) {
             return RANK_128;
@@ -45,5 +33,17 @@ public enum QuantizationRank {
         } else {
             return RANK_2;
         }
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public int[][] getMatrix() {
+        return matrix;
+    }
+
+    public int getNormalizer() {
+        return normalizer;
     }
 }

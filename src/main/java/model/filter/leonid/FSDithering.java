@@ -37,7 +37,7 @@ public class FSDithering extends CustomFilter {
         // red error
         errors[x + xOffset][y + yOffset][0] += quantError[0] * chooseFactor(xOffset, yOffset);
         // green error
-        errors[x +xOffset][y + yOffset][1] += quantError[1] * chooseFactor(xOffset, yOffset);
+        errors[x + xOffset][y + yOffset][1] += quantError[1] * chooseFactor(xOffset, yOffset);
         // blue error
         errors[x + xOffset][y + yOffset][2] += quantError[2] * chooseFactor(xOffset, yOffset);
 
@@ -52,17 +52,17 @@ public class FSDithering extends CustomFilter {
                 int oldGreen = image.green(x, y);
                 int oldBlue = image.blue(x, y);
 
-                int newRed = ColorUtils.findClosestColor(oldRed += (int)errors[x][y][0], quantizationRed);
-                int newGreen = ColorUtils.findClosestColor(oldGreen += (int)errors[x][y][1], quantizationGreen);
-                int newBlue = ColorUtils.findClosestColor(oldBlue += (int)errors[x][y][2], quantizationBlue);
+                int newRed = ColorUtils.findClosestColor(oldRed += (int) errors[x][y][0], quantizationRed);
+                int newGreen = ColorUtils.findClosestColor(oldGreen += (int) errors[x][y][1], quantizationGreen);
+                int newBlue = ColorUtils.findClosestColor(oldBlue += (int) errors[x][y][2], quantizationBlue);
 
                 double[] quantError = {oldRed - newRed, oldGreen - newGreen, oldBlue - newBlue};
 
                 image.setColor(x, y, ColorUtils.rgb(newRed, newGreen, newBlue));
 
                 // Spread error
-                if (y+1 < image.height()) {
-                    if (x+1 < image.width()) {
+                if (y + 1 < image.height()) {
+                    if (x + 1 < image.width()) {
                         setError(x, y, 1, 1, quantError);
                     }
                     if (x > 0) {
@@ -71,7 +71,7 @@ public class FSDithering extends CustomFilter {
                     setError(x, y, 0, 1, quantError);
                 }
 
-                if (x+1 < image.width()) {
+                if (x + 1 < image.width()) {
                     setError(x, y, 1, 0, quantError);
                 }
 

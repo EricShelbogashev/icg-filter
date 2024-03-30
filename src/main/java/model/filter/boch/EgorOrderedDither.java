@@ -5,23 +5,20 @@ import core.filter.MatrixFilter;
 
 //TODO: (e.bochkarev) реализовать.
 
-public class EgorOrderedDither extends MatrixFilter
-{
+public class EgorOrderedDither extends MatrixFilter {
 
     int r;
     int g;
     int b;
 
-    public EgorOrderedDither(int r, int g, int b)
-    {
+    public EgorOrderedDither(int r, int g, int b) {
         this.r = r;
         this.g = g;
         this.b = b;
     }
 
     @Override
-    protected int apply(Image image, int x, int y)
-    {
+    protected int apply(Image image, int x, int y) {
         return 0;
     }
 }

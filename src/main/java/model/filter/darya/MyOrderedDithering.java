@@ -1,11 +1,8 @@
 package model.filter.darya;
 
-import core.filter.CustomFilter;
 import core.filter.Image;
 import core.filter.MatrixFilter;
 import model.filter.leonid.ColorUtils;
-
-import java.awt.image.BufferedImage;
 
 public class MyOrderedDithering extends MatrixFilter {
     static int[][] Matrix8 = {
@@ -48,12 +45,14 @@ public class MyOrderedDithering extends MatrixFilter {
             {3, 1}
     };
     int redQuant, greenQuant, blueQuant;
+
     public MyOrderedDithering(int[] kv) {
         this.redQuant = kv[0];
         this.greenQuant = kv[1];
         this.blueQuant = kv[2];
     }
-    private int chooseStep(int x, int y, int quant){
+
+    private int chooseStep(int x, int y, int quant) {
         if (quant <= 3)
             return Matrix16[x % 16][y % 16] - 128;
         else if (quant >= 128)
@@ -63,6 +62,7 @@ public class MyOrderedDithering extends MatrixFilter {
         else
             return Matrix8[x % 8][y % 8] - 32;
     }
+
     @Override
     protected int apply(Image image, int x, int y) {
         int red = ColorUtils.red(image.color(x, y)) + chooseStep(x, y, redQuant);

@@ -30,6 +30,7 @@ public class FitImageToScreenFilterViewUnit extends FilterViewUnit {
     );
 
     private final Supplier<Dimension> getSize;
+
     public FitImageToScreenFilterViewUnit(Supplier<Dimension> getSize, Consumer<Float> progressFilterListener) {
         super("Fit image to screen", "Selects the image size so that it fits completely into the work area.", "icons/fit.png", progressFilterListener);
         this.getSize = getSize;

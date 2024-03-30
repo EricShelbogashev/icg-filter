@@ -1,6 +1,5 @@
 package view.filters.sharpness;
 
-public record SharpnessSettings()
-{
+public record SharpnessSettings() {
 
 }

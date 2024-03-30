@@ -1,7 +1,6 @@
 package view.filters.dithering;
 
-public enum DitheringPerson
-{
+public enum DitheringPerson {
     EGOR,
     LEONID,
     MIKHAIL,

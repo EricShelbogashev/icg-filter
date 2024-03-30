@@ -17,6 +17,6 @@ public class EgorFloydDither extends MatrixFilter {
 
     @Override
     protected int apply(Image image, int x, int y) {
-       return 0;
+        return 0;
     }
 }

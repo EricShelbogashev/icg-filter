@@ -5,36 +5,6 @@ import core.filter.MatrixFilter;
 
 public class OrderedDithering extends MatrixFilter {
 
-    private static class DitherMatrix {
-        int [][] matrix;
-        int size;
-        int normalizer;
-
-        public DitherMatrix(int quantizationRank) {
-            if (quantizationRank == 2) {
-                size = 16;
-                matrix = ditherMatrix16;
-                normalizer = 128;
-            } else if (quantizationRank >= 128) {
-                size = 2;
-                matrix = ditherMatrix2;
-                normalizer = 2;
-            } else if (quantizationRank >= 64) {
-                size = 4;
-                matrix = ditherMatrix4;
-                normalizer = 8;
-            } else if (quantizationRank >= 4) {
-                size = 8;
-                matrix = ditherMatrix8;
-                normalizer = 32;
-            } else {
-                size = 8;
-                matrix = ditherMatrix8;
-                normalizer = 32;
-            }
-        }
-    }
-
     public static int[][] ditherMatrix8 = {
             {0, 32, 8, 40, 2, 34, 10, 42},
             {48, 16, 56, 24, 50, 18, 58, 26},
@@ -45,7 +15,6 @@ public class OrderedDithering extends MatrixFilter {
             {15, 47, 7, 39, 13, 45, 5, 37},
             {63, 31, 55, 23, 61, 29, 53, 21}
     };
-
     public static int[][] ditherMatrix16 = {
             {0, 128, 32, 160, 8, 136, 40, 168, 2, 130, 34, 162, 10, 138, 42, 170},
             {192, 64, 224, 96, 200, 72, 232, 104, 194, 66, 226, 98, 202, 74, 234, 106},
@@ -74,15 +43,10 @@ public class OrderedDithering extends MatrixFilter {
             {0, 2},
             {3, 1}
     };
-
     int redQuantizationRank, greenQuantizationRank, blueQuantizationRank;
-
-
     DitherMatrix redDitherMatrix;
     DitherMatrix greenDitherMatrix;
     DitherMatrix blueDitherMatrix;
-
-
     public OrderedDithering(int redQuantizationRank, int greenQuantizationRank,
                             int blueQuantizationRank) {
         this.redQuantizationRank = redQuantizationRank;
@@ -110,5 +74,35 @@ public class OrderedDithering extends MatrixFilter {
                 blue + blueDitherMatrix.matrix[x % blueDitherMatrix.size][y % blueDitherMatrix.size] - blueDitherMatrix.normalizer, blueQuantizationRank);
         pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);
         return pixelColor;
+    }
+
+    private static class DitherMatrix {
+        int[][] matrix;
+        int size;
+        int normalizer;
+
+        public DitherMatrix(int quantizationRank) {
+            if (quantizationRank == 2) {
+                size = 16;
+                matrix = ditherMatrix16;
+                normalizer = 128;
+            } else if (quantizationRank >= 128) {
+                size = 2;
+                matrix = ditherMatrix2;
+                normalizer = 2;
+            } else if (quantizationRank >= 64) {
+                size = 4;
+                matrix = ditherMatrix4;
+                normalizer = 8;
+            } else if (quantizationRank >= 4) {
+                size = 8;
+                matrix = ditherMatrix8;
+                normalizer = 32;
+            } else {
+                size = 8;
+                matrix = ditherMatrix8;
+                normalizer = 32;
+            }
+        }
     }
 }
