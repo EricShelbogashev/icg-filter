@@ -15,6 +15,7 @@ public class EricOrderedDither extends MatrixFilter {
         this.blueDitherMatrix = new DitherMatrix(blueQuantizationRank);
     }
 
+    @Override
     protected int apply(Image image, int x, int y) {
         int pixelColor = image.color(x, y);
 
