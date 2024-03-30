@@ -28,6 +28,8 @@ public class ImageFilterApp extends JFrame {
     private final ApplicationComponents applicationComponents;
     private final List<FilterViewUnit> filterUnits;
 
+    private JToggleButton showOriginalImageButton;
+
     public ImageFilterApp(ApplicationProperties applicationProperties) {
         super("Image Filter Application");
         JLabel imageLabel = new JLabel("", SwingConstants.CENTER);
@@ -124,6 +126,9 @@ public class ImageFilterApp extends JFrame {
             });
             toolBar.add(toolbarButton);
         });
+        showOriginalImageButton = new JToggleButton("show original image");
+        showOriginalImageButton.addActionListener(e -> onSwitchImagePressed(showOriginalImageButton));
+        toolBar.add(showOriginalImageButton);
         add(toolBar, BorderLayout.NORTH);
     }
 
@@ -214,22 +219,27 @@ public class ImageFilterApp extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    /*private void onSwitchImagePressed(JToggleButton button) {
-        if (applicationContext.imageHolder().getCurrentImage() != null) {
-            if (image) {
-                isOriginalImage = false;
-                updateCanvas(editedImage);
+    private void onSwitchImagePressed(JToggleButton button) {
+        if (applicationContext.imageHolder().getCurrentImage() != null
+        && applicationContext.imageHolder().getOriginalImage() != null &&
+        applicationContext.imageHolder().getEditedImage() != null) {
+            if (!applicationContext.imageHolder().isEditedImage()) {
+                applicationContext.imageHolder().setCurrentImage(applicationContext.imageHolder().getEditedImage());
+                updateCanvas(applicationContext.imageHolder().getCurrentImage());
                 button.setSelected(false);
             } else {
-                isOriginalImage = true;
-                updateCanvas(originalImage);
+                applicationContext.imageHolder().rollBack();
+                updateCanvas(applicationContext.imageHolder().getCurrentImage());
                 button.setSelected(true);
-
             }
+        } else if (applicationContext.imageHolder().getOriginalImage() != null) {
+            JOptionPane.showMessageDialog(this, "This is original image.");
+            button.setSelected(false);
         } else {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
+            button.setSelected(false);
         }
-    }*/
+    }
 
     private void updateLoader(float percent) {
         if (!applicationComponents.progressPanel().progressBar().isVisible()) {
@@ -273,6 +283,7 @@ public class ImageFilterApp extends JFrame {
             BufferedImage loadedImage = ImageIO.read(imageFile);
             applicationContext.imageHolder().setCurrentImage(loadedImage);
             applicationContext.imageHolder().setOriginalImage(loadedImage);
+            applicationContext.imageHolder().setEditedImage(null);
             applicationComponents.imageLabel().setIcon(new ImageIcon(loadedImage));
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
@@ -351,7 +362,9 @@ public class ImageFilterApp extends JFrame {
                 .process()
                 .thenAccept(newImage -> {
                     applicationContext.imageHolder().setCurrentImage(Image.of(newImage));
+                    applicationContext.imageHolder().setEditedImage(Image.of(newImage));
                     updateCanvas(applicationContext.imageHolder().getCurrentImage());
+                    showOriginalImageButton.setSelected(false);
                     showOverlay(false);
                 })
                 .exceptionally(ex -> {
