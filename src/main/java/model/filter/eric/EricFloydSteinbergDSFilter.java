@@ -6,7 +6,7 @@ import model.filter.leonid.ColorUtils;
 
 import java.awt.image.BufferedImage;
 
-public class FloydSteinbergDSFilter extends CustomFilter {
+public class EricFloydSteinbergDSFilter extends CustomFilter {
     private static final int[][] ditherMatrix = {
             {1, 0, 7},
             {-1, 1, 3},
@@ -15,7 +15,7 @@ public class FloydSteinbergDSFilter extends CustomFilter {
     };
     private final int quantizationRed, quantizationGreen, quantizationBlue;
 
-    public FloydSteinbergDSFilter(int quantizationRed, int quantizationGreen, int quantizationBlue) {
+    public EricFloydSteinbergDSFilter(int quantizationRed, int quantizationGreen, int quantizationBlue) {
         this.quantizationRed = quantizationRed;
         this.quantizationBlue = quantizationBlue;
         this.quantizationGreen = quantizationGreen;

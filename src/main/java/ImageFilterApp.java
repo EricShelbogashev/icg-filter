@@ -4,18 +4,35 @@ import context.ApplicationProperties;
 import context.ImageHolder;
 import core.filter.Filter;
 import core.filter.FilterExecutor;
+import core.filter.Image;
 import core.options.Setting;
 import model.filter.egor.ComponentResizeEndListener;
 import model.filter.eric.ResamplingFilter;
+import view.filters.VHSFilterViewUnit;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
-import view.filters.*;
+import view.filters.BloomFilterViewUnit;
+import view.filters.DitheringFilterViewUnit;
+import view.filters.EmbossingFilterViewUnit;
+import view.filters.FilterViewUnit;
+import view.filters.FitImageToScreenFilterViewUnit;
+import view.filters.FitImageTurnOn;
+import view.filters.GammaFilterViewUnit;
+import view.filters.GaussianFilterViewInit;
+import view.filters.MonochromeFilterViewUnit;
+import view.filters.MotionBlurViewUnit;
+import view.filters.NegativeFilterViewUnit;
+import view.filters.RobertsFilterViewInit;
+import view.filters.RotateImageViewUnit;
+import view.filters.SharpnessViewUnit;
+import view.filters.SobelFilterViewInit;
+import view.filters.WaterShedFilterViewInit;
+import view.filters.WindFilterViewUnit;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import core.filter.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -50,7 +67,8 @@ public class ImageFilterApp extends JFrame {
                 new GaussianFilterViewInit(this::applyFilters),
                 new RobertsFilterViewInit(this::applyFilters),
                 new SobelFilterViewInit(this::applyFilters),
-                new WaterShedFilterViewInit(this::applyFilters)
+                new WaterShedFilterViewInit(this::applyFilters),
+                new VHSFilterViewUnit(this::applyFilters)
         );
         applicationComponents = new ApplicationComponents(
                 imageLabel,
@@ -67,7 +85,7 @@ public class ImageFilterApp extends JFrame {
                 FitImageTurnOn turnedOn;
                 turnedOn = Objects.requireNonNull(fitFilter.getSettings()).get(1).value();
                 if (turnedOn == FitImageTurnOn.ON) {
-                    fitFilter.applyFilter(applicationContext.imageHolder().getCurrentImage());
+                    fitFilter.applyFilter(applicationContext.imageHolder().getEditedImage());
                 }
             }
         });
@@ -122,9 +140,7 @@ public class ImageFilterApp extends JFrame {
             JButton toolbarButton = new JButton();
             toolbarButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(filterViewUnit.getIconPath()))));
             toolbarButton.setToolTipText(filterViewUnit.getTipText());
-            toolbarButton.addActionListener(e -> {
-                applyFilter(filterViewUnit);
-            });
+            toolbarButton.addActionListener(e -> applyFilter(filterViewUnit));
             toolBar.add(toolbarButton);
         });
         showOriginalImageButton = new JToggleButton("show original image");
@@ -222,8 +238,8 @@ public class ImageFilterApp extends JFrame {
 
     private void onSwitchImagePressed(JToggleButton button) {
         if (applicationContext.imageHolder().getCurrentImage() != null
-        && applicationContext.imageHolder().getOriginalImage() != null &&
-        applicationContext.imageHolder().getEditedImage() != null) {
+                && applicationContext.imageHolder().getOriginalImage() != null &&
+                applicationContext.imageHolder().getEditedImage() != null) {
             if (!applicationContext.imageHolder().isEditedImage()) {
                 applicationContext.imageHolder().setCurrentImage(applicationContext.imageHolder().getEditedImage());
                 updateCanvas(applicationContext.imageHolder().getCurrentImage());
@@ -360,8 +376,7 @@ public class ImageFilterApp extends JFrame {
         FilterExecutor.Builder builder;
         if (containsFitFilter) {
             builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getCurrentImage()));
-        }
-        else {
+        } else {
             builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getOriginalImage()));
         }
 

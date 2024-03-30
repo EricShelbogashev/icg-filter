@@ -8,7 +8,7 @@ import model.filter.boch.EgorOrderedDither;
 import model.filter.darya.MyFloydDithering;
 import model.filter.darya.MyOrderedDithering;
 import model.filter.eric.EricOrderedDither;
-import model.filter.eric.FloydSteinbergDSFilter;
+import model.filter.eric.EricFloydSteinbergDSFilter;
 import model.filter.leonid.FSDithering;
 import model.filter.leonid.OrderedDithering;
 import model.filter.mikhail.MikhailFloydDither;
@@ -97,7 +97,7 @@ public class DitheringFilterViewUnit extends FilterViewUnit {
             }
             case ERIC -> {
                 if (ditheringMethods == DitheringMethods.FLOYD_STEINBERG) {
-                    FloydSteinbergDSFilter filter = new FloydSteinbergDSFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                    EricFloydSteinbergDSFilter filter = new EricFloydSteinbergDSFilter(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
                     applyFilters.accept(List.of(filter));
                 } else {
                     EricOrderedDither filter = new EricOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
