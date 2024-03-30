@@ -5,6 +5,36 @@ import core.filter.MatrixFilter;
 
 public class OrderedDithering extends MatrixFilter {
 
+    private static class DitherMatrix {
+        int [][] matrix;
+        int size;
+        int normalizer;
+
+        public DitherMatrix(int quantizationRank) {
+            if (quantizationRank == 2) {
+                size = 16;
+                matrix = ditherMatrix16;
+                normalizer = 128;
+            } else if (quantizationRank >= 128) {
+                size = 2;
+                matrix = ditherMatrix2;
+                normalizer = 2;
+            } else if (quantizationRank >= 64) {
+                size = 4;
+                matrix = ditherMatrix4;
+                normalizer = 8;
+            } else if (quantizationRank >= 4) {
+                size = 8;
+                matrix = ditherMatrix8;
+                normalizer = 32;
+            } else {
+                size = 8;
+                matrix = ditherMatrix8;
+                normalizer = 32;
+            }
+        }
+    }
+
     static int[][] ditherMatrix8 = {
             {0, 32, 8, 40, 2, 34, 10, 42},
             {48, 16, 56, 24, 50, 18, 58, 26},
@@ -44,13 +74,14 @@ public class OrderedDithering extends MatrixFilter {
             {0, 2},
             {3, 1}
     };
+
     int redQuantizationRank, greenQuantizationRank, blueQuantizationRank;
-    int matrixSize;
 
-    int normalizer;
 
-    //float factor;
-    int[][] ditherMatrix;
+    DitherMatrix redDitherMatrix;
+    DitherMatrix greenDitherMatrix;
+    DitherMatrix blueDitherMatrix;
+
 
     public OrderedDithering(int redQuantizationRank, int greenQuantizationRank,
                             int blueQuantizationRank) {
@@ -58,31 +89,9 @@ public class OrderedDithering extends MatrixFilter {
         this.greenQuantizationRank = greenQuantizationRank;
         this.blueQuantizationRank = blueQuantizationRank;
 
-        int minQuantizationRank = Math.min(redQuantizationRank, greenQuantizationRank);
-        minQuantizationRank = Math.min(minQuantizationRank, blueQuantizationRank);
-
-        if (minQuantizationRank == 2) {
-            matrixSize = 16;
-            ditherMatrix = ditherMatrix16;
-            normalizer = 128;
-            //factor = 1/128f;
-        } else if (minQuantizationRank >= 128) {
-            matrixSize = 2;
-            ditherMatrix = ditherMatrix2;
-            normalizer = 2;
-        } else if (minQuantizationRank >= 64) {
-            matrixSize = 4;
-            ditherMatrix = ditherMatrix4;
-            normalizer = 8;
-        } else if (minQuantizationRank >= 4) {
-            matrixSize = 8;
-            ditherMatrix = ditherMatrix8;
-            normalizer = 32;
-        } else {
-            matrixSize = 8;
-            ditherMatrix = ditherMatrix8;
-            normalizer = 32;
-        }
+        redDitherMatrix = new DitherMatrix(redQuantizationRank);
+        greenDitherMatrix = new DitherMatrix(greenQuantizationRank);
+        blueDitherMatrix = new DitherMatrix(blueQuantizationRank);
     }
 
     @Override
@@ -93,9 +102,12 @@ public class OrderedDithering extends MatrixFilter {
         int blue = ColorUtils.blue(pixelColor);
 
         // Применение дизеринга к каждому каналу цвета
-        int newRed = ColorUtils.findClosestColor(red + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, redQuantizationRank);
-        int newGreen = ColorUtils.findClosestColor(green + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, greenQuantizationRank);
-        int newBlue = ColorUtils.findClosestColor(blue + ditherMatrix[x % matrixSize][y % matrixSize] - normalizer, blueQuantizationRank);
+        int newRed = ColorUtils.findClosestColor(
+                red + redDitherMatrix.matrix[x % redDitherMatrix.size][y % redDitherMatrix.size] - redDitherMatrix.normalizer, redQuantizationRank);
+        int newGreen = ColorUtils.findClosestColor(
+                green + greenDitherMatrix.matrix[x % greenDitherMatrix.size][y % greenDitherMatrix.size] - greenDitherMatrix.normalizer, greenQuantizationRank);
+        int newBlue = ColorUtils.findClosestColor(
+                blue + blueDitherMatrix.matrix[x % blueDitherMatrix.size][y % blueDitherMatrix.size] - blueDitherMatrix.normalizer, blueQuantizationRank);
         pixelColor = ColorUtils.rgb(newRed, newGreen, newBlue);
         return pixelColor;
     }
