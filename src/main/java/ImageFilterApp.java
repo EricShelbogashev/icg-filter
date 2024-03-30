@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import core.filter.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -213,22 +214,22 @@ public class ImageFilterApp extends JFrame {
         setJMenuBar(menuBar);
     }
 
-//    private void onSwitchImagePressed(JToggleButton button) {
-//        if (applicationContext.imageHolder().getCurrentImage() != null) {
-//            if (isOriginalImage) {
-//                isOriginalImage = false;
-//                updateCanvas(editedImage);
-//                button.setSelected(false);
-//            } else {
-//                isOriginalImage = true;
-//                updateCanvas(originalImage);
-//                button.setSelected(true);
-//
-//            }
-//        } else {
-//            JOptionPane.showMessageDialog(this, "Please choose an image first.");
-//        }
-//    }
+    /*private void onSwitchImagePressed(JToggleButton button) {
+        if (applicationContext.imageHolder().getCurrentImage() != null) {
+            if (image) {
+                isOriginalImage = false;
+                updateCanvas(editedImage);
+                button.setSelected(false);
+            } else {
+                isOriginalImage = true;
+                updateCanvas(originalImage);
+                button.setSelected(true);
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Please choose an image first.");
+        }
+    }*/
 
     private void updateLoader(float percent) {
         if (!applicationComponents.progressPanel().progressBar().isVisible()) {
@@ -342,14 +343,14 @@ public class ImageFilterApp extends JFrame {
         applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(copyOfImage(applicationContext.imageHolder().getOriginalImage()));
+        FilterExecutor.Builder builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getOriginalImage()));
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
         builder.progress(this::updateLoader)
                 .process()
                 .thenAccept(newImage -> {
-                    applicationContext.imageHolder().setCurrentImage(copyOfImage(newImage));
+                    applicationContext.imageHolder().setCurrentImage(Image.of(newImage));
                     updateCanvas(applicationContext.imageHolder().getCurrentImage());
                     showOverlay(false);
                 })
@@ -358,17 +359,5 @@ public class ImageFilterApp extends JFrame {
                     showOverlay(false);
                     return null;
                 });
-    }
-
-    private static BufferedImage copyOfImage(BufferedImage other) {
-        final var width = other.getWidth();
-        final var height = other.getHeight();
-        final var bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                bufferedImage.setRGB(x, y, other.getRGB(x, y));
-            }
-        }
-        return bufferedImage;
     }
 }
