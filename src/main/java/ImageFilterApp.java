@@ -6,6 +6,7 @@ import core.filter.Filter;
 import core.filter.FilterExecutor;
 import core.options.Setting;
 import model.filter.egor.ComponentResizeEndListener;
+import model.filter.eric.ResamplingFilter;
 import model.options.SettingsDialogGenerator;
 import view.ProgressPanel;
 import view.filters.*;
@@ -354,7 +355,17 @@ public class ImageFilterApp extends JFrame {
         applicationComponents.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         showOverlay(true);
 
-        FilterExecutor.Builder builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getOriginalImage()));
+        boolean containsFitFilter = filters.stream()
+                .anyMatch(filter -> filter instanceof ResamplingFilter);
+        FilterExecutor.Builder builder;
+        if (containsFitFilter) {
+            builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getCurrentImage()));
+        }
+        else {
+            builder = FilterExecutor.of(Image.of(applicationContext.imageHolder().getOriginalImage()));
+        }
+
+
         for (Filter filter : filters) {
             builder = builder.with(filter);
         }
