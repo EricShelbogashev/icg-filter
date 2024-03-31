@@ -75,7 +75,7 @@ public class DitheringFilterViewUnit extends FilterViewUnit {
                         return applyFilters(image, List.of(filter));
                     }
                     case ORDERED -> {
-                        OrderedDithering filter = new OrderedDithering(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
+                        EgorOrderedDither filter = new EgorOrderedDither(redQuantizationRank, greenQuantizationRank, blueQuantizationRank);
                         return applyFilters(image, List.of(filter));
                     }
                 }

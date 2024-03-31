@@ -4,7 +4,7 @@ import context.ApplicationProperties;
 import context.ImageHolder;
 import core.filter.Image;
 import core.options.Setting;
-import model.filter.egor.ComponentResizeEndListener;
+import model.filter.boch.ComponentResizeEndListener;
 import model.options.SettingsDialogGenerator;
 import view.Menu;
 import view.ProgressPanel;

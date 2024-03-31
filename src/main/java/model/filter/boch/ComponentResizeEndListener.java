@@ -1,4 +1,4 @@
-package model.filter.egor;
+package model.filter.boch;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
