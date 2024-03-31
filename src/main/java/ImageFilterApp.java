@@ -6,7 +6,9 @@ import core.filter.Image;
 import core.options.Setting;
 import model.filter.egor.ComponentResizeEndListener;
 import model.options.SettingsDialogGenerator;
+import view.Menu;
 import view.ProgressPanel;
+import view.ToolBar;
 import view.filters.FilterViewUnit;
 import view.filters.bloom.BloomFilterViewUnit;
 import view.filters.dithering.DitheringFilterViewUnit;
@@ -36,6 +38,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -73,8 +76,8 @@ public class ImageFilterApp extends JFrame {
                 imageLabel,
                 createOverlayPanel(),
                 scrollPane,
-                createShowOriginalImageButton()
-        );
+                createToolbarButtons(),
+                createMenuBar());
         initializeUI();
         ImageHolder imageHolder = new ImageHolder();
         context = new ApplicationContext(imageHolder, applicationProperties);
@@ -125,8 +128,6 @@ public class ImageFilterApp extends JFrame {
     private void initializeUI() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        createMenuBar();
-        createToolbarButtons();
 
         setMinimumSize(new Dimension(640, 480));
         pack();
@@ -142,16 +143,18 @@ public class ImageFilterApp extends JFrame {
         return jScrollPane;
     }
 
-    private void createToolbarButtons() {
+    private ToolBar createToolbarButtons() {
         JToolBar toolBar = new JToolBar("Image Tools");
         toolBar.setFloatable(false);
 
+        List<JButton> buttons = new ArrayList<>();
         JButton fitButton = new JButton();
         fitButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(fitFilterUnit.getIconPath()))));
         fitButton.addActionListener(e -> {
             initFitFilter();
         });
         toolBar.add(fitButton);
+        buttons.add(fitButton);
         filterUnits.forEach(filterViewUnit -> {
             try {
                 JButton toolbarButton = new JButton();
@@ -161,12 +164,15 @@ public class ImageFilterApp extends JFrame {
                     applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
                 });
                 toolBar.add(toolbarButton);
+                buttons.add(toolbarButton);
             } catch (NullPointerException ignored) {
             }
         });
 
-        toolBar.add(components.showOriginalImageButton());
+        JToggleButton showOriginalImageButton = createShowOriginalImageButton();
+        toolBar.add(showOriginalImageButton);
         add(toolBar, BorderLayout.NORTH);
+        return new ToolBar(toolBar, buttons, showOriginalImageButton);
     }
 
     private JMenu createFilterMenuItems() {
@@ -197,15 +203,24 @@ public class ImageFilterApp extends JFrame {
             return;
         }
         components.progressPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        showOverlay(true);
 
         List<Setting<?>> options = filterViewUnit.getSettings();
         if (options == null) {
             acceptFilterToImageHolder(image, filterViewUnit);
         } else {
+            components.toolBar().setEnabledAllButtons(false);
+            components.menuBar().setEnabled(false);
             SettingsDialogGenerator.generateAndShowDialog(options, () -> {
-                acceptFilterToImageHolder(image, filterViewUnit);
-            });
+                        showOverlay(true);
+                        acceptFilterToImageHolder(image, filterViewUnit);
+                        components.toolBar().setEnabledAllButtons(true);
+                        components.menuBar().setEnabled(true);
+                    },
+                    () -> {
+                        showOverlay(false);
+                        components.toolBar().setEnabledAllButtons(true);
+                        components.menuBar().setEnabled(true);
+                    });
         }
 
     }
@@ -216,7 +231,7 @@ public class ImageFilterApp extends JFrame {
                     context.imageHolder().setCurrentImage(Image.of(newImage));
                     fitCurrentImageToScreen().join();
                     updateCanvas(context.imageHolder().getResizedCurrentImage());
-                    components.showOriginalImageButton().setSelected(false);
+                    components.toolBar().getShowOriginalImageButton().setSelected(false);
                     showOverlay(false);
                 })
                 .exceptionally(ex -> {
@@ -252,6 +267,8 @@ public class ImageFilterApp extends JFrame {
                 fitCurrentImageToScreen().join();
                 updateCanvas(context.imageHolder().getResizedCurrentImage());
             }
+        }, () -> {
+            showOverlay(false);
         });
     }
 
@@ -302,15 +319,23 @@ public class ImageFilterApp extends JFrame {
         return fileMenu;
     }
 
-    private void createMenuBar() {
+    private Menu createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+        List<JMenu> menuList = new ArrayList<>();
+        JMenu help = createHelpMenu();
+        JMenu file = createFileMenu();
+        JMenu filters = createFilterMenuItems();
+        menuList.add(help);
+        menuList.add(file);
+        menuList.add(filters);
 
-        menuBar.add(createHelpMenu());
-        menuBar.add(createFileMenu());
-        menuBar.add(createFilterMenuItems());
+        menuBar.add(file);
+        menuBar.add(filters);
+        menuBar.add(help);
 //        menuBar.add(createModifyMenu());
 
         setJMenuBar(menuBar);
+        return new Menu(menuBar, menuList);
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
@@ -370,7 +395,7 @@ public class ImageFilterApp extends JFrame {
             context.imageHolder().setOriginalImage(loadedImage);
             fitCurrentImageToScreen().join();
             updateCanvas(context.imageHolder().getResizedOriginalImage());
-            components.showOriginalImageButton().setEnabled(true);
+            components.toolBar().getShowOriginalImageButton().setEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
         }

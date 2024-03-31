@@ -10,7 +10,7 @@ import java.util.List;
 
 public class SettingsDialogGenerator {
 
-    public static void generateAndShowDialog(List<Setting<?>> settings, Runnable onClose) {
+    public static void generateAndShowDialog(List<Setting<?>> settings, Runnable onAccept, Runnable onClose) {
         JFrame frame = new JFrame("Options");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
@@ -28,12 +28,15 @@ public class SettingsDialogGenerator {
         }
 
         JButton cancelButton = new JButton("cancel");
-        cancelButton.addActionListener(e -> frame.dispose());
+        cancelButton.addActionListener(e -> {
+            frame.dispose();
+            onClose.run();
+        });
 
         JButton okButton = new JButton("ok");
         okButton.addActionListener(e -> {
             frame.dispose();
-            onClose.run();
+            onAccept.run();
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -55,6 +58,7 @@ public class SettingsDialogGenerator {
             @Override
             public void windowClosed(WindowEvent e) {
                 super.windowClosed(e);
+                onClose.run();
             }
         });
     }
