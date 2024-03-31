@@ -388,9 +388,19 @@ public class ImageFilterApp extends JFrame {
             return;
         }
         if (button.isSelected()) {
-            updateCanvas(context.imageHolder().getResizedOriginalImage());
+            if (context.imageHolder().getResizedOriginalImage() == null) {
+                updateCanvas(context.imageHolder().getOriginalImage());
+            }
+            else {
+                updateCanvas(context.imageHolder().getResizedOriginalImage());
+            }
         } else {
-            updateCanvas(context.imageHolder().getResizedCurrentImage());
+            if (context.imageHolder().getResizedCurrentImage() == null) {
+                updateCanvas(context.imageHolder().getCurrentImage());
+            }
+            else {
+                updateCanvas(context.imageHolder().getResizedCurrentImage());
+            }
         }
     }
 
