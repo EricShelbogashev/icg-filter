@@ -15,6 +15,7 @@ public class OptionsFactory {
             public JComponent createComponent() {
                 JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.intValue(), min, max, 1));
                 spinner.addChangeListener(e -> value(spinner.getValue()));
+                spinner.setToolTipText(hint);
                 return spinner;
             }
         };
