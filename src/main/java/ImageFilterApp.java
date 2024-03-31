@@ -149,12 +149,50 @@ public class ImageFilterApp extends JFrame {
 
         List<JButton> buttons = new ArrayList<>();
         JButton fitButton = new JButton();
+        fitButton.setToolTipText("Fit to screen");
         fitButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(fitFilterUnit.getIconPath()))));
         fitButton.addActionListener(e -> {
             initFitFilter();
         });
         toolBar.add(fitButton);
         buttons.add(fitButton);
+
+        JButton helpButton = new JButton();
+        helpButton.setToolTipText("Help");
+        helpButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("icons/help.png"))));
+        String aboutMessage = """
+                ICGFilter is program for applying filters. You have to choose and load an image before
+                applying and for some of filters you have to choose some parameters. Also there is
+                opportunity for showing original image.
+                 Authors:\s
+                Shelbogashev Eric
+                Shaikhutdinov Leonid
+                Avtsinova Daria
+                Kulakov Michael
+                Bochkarev Egor\s
+                """;
+        helpButton.addActionListener(e -> JOptionPane.showMessageDialog(this, aboutMessage));
+        toolBar.add(helpButton);
+        buttons.add(helpButton);
+
+        JButton openButton = new JButton();
+        openButton.setToolTipText("Open file");
+        openButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("icons/open.png"))));
+        openButton.addActionListener(e -> {
+            chooseImage();
+        });
+        toolBar.add(openButton);
+        buttons.add(openButton);
+
+        JButton saveButton = new JButton();
+        saveButton.setToolTipText("Save file");
+        saveButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("icons/save.png"))));
+        saveButton.addActionListener(e -> {
+            saveFileAs();
+        });
+        toolBar.add(saveButton);
+        buttons.add(saveButton);
+
         filterUnits.forEach(filterViewUnit -> {
             try {
                 JButton toolbarButton = new JButton();
