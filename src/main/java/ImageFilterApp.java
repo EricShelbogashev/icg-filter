@@ -229,8 +229,12 @@ public class ImageFilterApp extends JFrame {
         filterViewUnit.applyFilter(image)
                 .thenAccept(newImage -> {
                     context.imageHolder().setCurrentImage(Image.of(newImage));
-                    fitCurrentImageToScreen().join();
-                    updateCanvas(context.imageHolder().getResizedCurrentImage());
+                    if (fitFilterUnit.getFitOptions().on().value() == FitImageTurnOn.ON) {
+                        fitCurrentImageToScreen().join();
+                        updateCanvas(context.imageHolder().getResizedCurrentImage());
+                    } else {
+                        updateCanvas(context.imageHolder().getCurrentImage());
+                    }
                     components.toolBar().getShowOriginalImageButton().setSelected(false);
                     showOverlay(false);
                 })
@@ -339,7 +343,7 @@ public class ImageFilterApp extends JFrame {
     }
 
     private void onSwitchImagePressed(JToggleButton button) {
-        if (context.imageHolder().getResizedOriginalImage() == null || context.imageHolder().getResizedCurrentImage() == null) {
+        if (context.imageHolder().getOriginalImage() == null || context.imageHolder().getCurrentImage() == null) {
             JOptionPane.showMessageDialog(this, "Please choose an image first.");
             button.setSelected(false);
             button.setEnabled(false);
@@ -393,8 +397,12 @@ public class ImageFilterApp extends JFrame {
             BufferedImage loadedImage = ImageIO.read(imageFile);
             context.imageHolder().setCurrentImage(loadedImage);
             context.imageHolder().setOriginalImage(loadedImage);
-            fitCurrentImageToScreen().join();
-            updateCanvas(context.imageHolder().getResizedOriginalImage());
+            if (fitFilterUnit.getFitOptions().on().value() == FitImageTurnOn.ON) {
+                fitCurrentImageToScreen().join();
+                updateCanvas(context.imageHolder().getResizedOriginalImage());
+            } else {
+                updateCanvas(context.imageHolder().getOriginalImage());
+            }
             components.toolBar().getShowOriginalImageButton().setEnabled(true);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error loading image: " + e.getMessage());
