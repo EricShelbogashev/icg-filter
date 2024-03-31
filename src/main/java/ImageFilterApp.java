@@ -23,6 +23,7 @@ import view.filters.rotate.RotateImageViewUnit;
 import view.filters.sharpness.SharpnessViewUnit;
 import view.filters.sobel.SobelFilterViewInit;
 import view.filters.vhs.VHSFilterViewUnit;
+import view.filters.watercolor.WatercolorFilterViewUnit;
 import view.filters.watershed.WaterShedFilterViewInit;
 import view.filters.wind.WindFilterViewUnit;
 
@@ -65,7 +66,8 @@ public class ImageFilterApp extends JFrame {
                 new RobertsFilterViewInit(this::updateLoader),
                 new SobelFilterViewInit(this::updateLoader),
                 new WaterShedFilterViewInit(this::updateLoader),
-                new VHSFilterViewUnit(this::updateLoader)
+                new VHSFilterViewUnit(this::updateLoader),
+                new WatercolorFilterViewUnit(this::updateLoader)
         );
         components = new ApplicationComponents(
                 imageLabel,
@@ -151,13 +153,16 @@ public class ImageFilterApp extends JFrame {
         });
         toolBar.add(fitButton);
         filterUnits.forEach(filterViewUnit -> {
-            JButton toolbarButton = new JButton();
-            toolbarButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(filterViewUnit.getIconPath()))));
-            toolbarButton.setToolTipText(filterViewUnit.getTipText());
-            toolbarButton.addActionListener(e -> {
-                applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
-            });
-            toolBar.add(toolbarButton);
+            try {
+                JButton toolbarButton = new JButton();
+                toolbarButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(filterViewUnit.getIconPath()))));
+                toolbarButton.setToolTipText(filterViewUnit.getTipText());
+                toolbarButton.addActionListener(e -> {
+                    applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
+                });
+                toolBar.add(toolbarButton);
+            } catch (NullPointerException ignored) {
+            }
         });
 
         toolBar.add(components.showOriginalImageButton());
