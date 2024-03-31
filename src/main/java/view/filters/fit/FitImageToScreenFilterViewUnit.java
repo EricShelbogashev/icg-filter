@@ -22,7 +22,7 @@ public class FitImageToScreenFilterViewUnit extends FilterViewUnit {
                     FitAlgorithm.class
             ),
             OptionsFactory.settingEnum(
-                    FitImageTurnOn.ON,
+                    FitImageTurnOn.OFF,
                     "Turn on/off resizing",
                     "",
                     FitImageTurnOn.class
