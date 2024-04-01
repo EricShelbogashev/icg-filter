@@ -328,11 +328,11 @@ public class ImageFilterApp extends JFrame {
                 applying and for some of filters you have to choose some parameters. Also there is
                 opportunity for showing original image.
                  Authors:\s
-                Shelbogashev Eric
-                Shaikhutdinov Leonid
-                Avtsinova Daria
-                Kulakov Michael
-                Bochkarev Egor\s
+                Shelbogashev Eric : Fit alg, Resampling, VHS filters, architecture
+                Shaikhutdinov Leonid : Monochrome, Negative, Bloom, Embossing filters
+                Avtsinova Daria:  Gaussian, Roberts, Sobel, Watershed filters
+                Kulakov Michael :  Rotate, Median, Wind filters, architecture
+                Bochkarev Egor : Gamma, Sharpness, MotionBlur filters\s
                 """;
         aboutProgram.addActionListener(e -> JOptionPane.showMessageDialog(this, aboutMessage));
         helpMenu.add(aboutProgram);
