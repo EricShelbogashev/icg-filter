@@ -22,7 +22,7 @@ public class SobelFilterViewInit extends FilterViewUnit {
     );
 
     public SobelFilterViewInit(Consumer<Float> progressFilterListener) {
-        super("Sobel Filter", "Get edges on the image.", "icons/sobel.png", progressFilterListener);
+        super("Sobel Filter", "Get edges on the image. (Sobel)", "icons/sobel.png", progressFilterListener);
     }
 
     @Override

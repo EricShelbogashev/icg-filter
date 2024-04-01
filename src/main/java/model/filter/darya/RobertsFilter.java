@@ -39,7 +39,7 @@ public class RobertsFilter extends MatrixFilter {
         int resColor = (int) Math.pow(resultColor1 * resultColor1 + resultColor2 * resultColor2, 0.5);
         resColor = Math.max(resColor, 0);
         resColor = Math.min(resColor, 255);
-        if (resColor > 28)
+        if (resColor > binarize)
             resColor = 255;
         else
             resColor = 0;

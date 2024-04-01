@@ -22,7 +22,7 @@ public class RobertsFilterViewInit extends FilterViewUnit {
     );
 
     public RobertsFilterViewInit(Consumer<Float> progressFilterListener) {
-        super("Roberts Filter", "Get edges on the image.", "icons/roberts.png", progressFilterListener);
+        super("Roberts Filter", "Get edges on the image. (Roberts)", "icons/roberts.png", progressFilterListener);
     }
 
     @Override
