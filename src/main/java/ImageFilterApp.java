@@ -156,6 +156,8 @@ public class ImageFilterApp extends JFrame {
         fitButton.setToolTipText("Fit to screen");
         fitButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource(fitFilterUnit.getIconPath()))));
         fitButton.addActionListener(e -> {
+            components.toolBar().setEnabledAllButtons(false);
+            components.menuBar().setEnabled(false);
             initFitFilter();
         });
         toolBar.add(fitButton);
@@ -312,9 +314,13 @@ public class ImageFilterApp extends JFrame {
             if (context.imageHolder().getOriginalImage() != null) {
                 fitCurrentImageToScreen().join();
                 updateCanvas(context.imageHolder().getResizedCurrentImage());
+                components.toolBar().setEnabledAllButtons(true);
+                components.menuBar().setEnabled(true);
             }
         }, () -> {
             showOverlay(false);
+            components.toolBar().setEnabledAllButtons(true);
+            components.menuBar().setEnabled(true);
         });
     }
 
