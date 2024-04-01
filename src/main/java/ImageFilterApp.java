@@ -225,6 +225,8 @@ public class ImageFilterApp extends JFrame {
 
         JMenuItem fitMenuItem = new JMenuItem(fitFilterUnit.getFilterName());
         fitMenuItem.addActionListener(e -> {
+            components.toolBar().setEnabledAllButtons(false);
+            components.menuBar().setEnabled(false);
             initFitFilter();
             if (context.imageHolder().getOriginalImage() != null) {
                 initFitFilter();
@@ -234,6 +236,8 @@ public class ImageFilterApp extends JFrame {
         filterUnits.forEach(filterViewUnit -> {
             JMenuItem menuItem = new JMenuItem(filterViewUnit.getFilterName());
             menuItem.addActionListener(e -> {
+                components.toolBar().setEnabledAllButtons(false);
+                components.menuBar().setEnabled(false);
                 applyFilter(context.imageHolder().getOriginalImage(), filterViewUnit);
             });
             filterMenu.add(menuItem);
