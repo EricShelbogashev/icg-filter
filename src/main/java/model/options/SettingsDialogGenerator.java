@@ -52,13 +52,13 @@ public class SettingsDialogGenerator {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                onClose.run();
                 super.windowClosing(e);
             }
 
             @Override
             public void windowClosed(WindowEvent e) {
                 super.windowClosed(e);
-                onClose.run();
             }
         });
     }

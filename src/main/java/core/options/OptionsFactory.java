@@ -14,9 +14,23 @@ public class OptionsFactory {
             @Override
             public JComponent createComponent() {
                 JSpinner spinner = new JSpinner(new SpinnerNumberModel(value.intValue(), min, max, 1));
+                JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);
+                slider.setMajorTickSpacing(1);
+                slider.setPaintTicks(true);
+                slider.addChangeListener(it -> {
+                    spinner.setValue(slider.getValue());
+                });
+
+                spinner.addChangeListener(it -> {
+                    slider.setValue((int) spinner.getValue());
+                });
                 spinner.addChangeListener(e -> value(spinner.getValue()));
                 spinner.setToolTipText(hint);
-                return spinner;
+                slider.setToolTipText(hint);
+                JComponent component = new JPanel();
+                component.add(slider);
+                component.add(spinner);
+                return component;
             }
         };
     }
