@@ -28,7 +28,7 @@ public class WindFilterViewUnit extends FilterViewUnit {
             OptionsFactory.settingInteger(
                     3,
                     "Threshold",
-                    "Higher values restrict the effect to fewer areas of the image.",
+                    "Lower values restrict the effect to fewer areas of the image.",
                     0, 50
             )
     );
