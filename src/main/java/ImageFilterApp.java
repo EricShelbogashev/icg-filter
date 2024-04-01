@@ -85,9 +85,13 @@ public class ImageFilterApp extends JFrame {
             @Override
             public void resizeTimedOut() {
                 FitImageTurnOn turnedOn = fitFilterUnit.getFitOptions().on().value();
-                if (turnedOn == FitImageTurnOn.ON && context.imageHolder().getCurrentImage() != null) {
+                if (!components.toolBar().getShowOriginalImageButton().isSelected() && turnedOn == FitImageTurnOn.ON && context.imageHolder().getCurrentImage() != null) {
                     fitCurrentImageToScreen().join();
                     updateCanvas(context.imageHolder().getResizedCurrentImage());
+                }
+                if (components.toolBar().getShowOriginalImageButton().isSelected() && turnedOn == FitImageTurnOn.ON && context.imageHolder().getCurrentImage() != null) {
+                    fitCurrentImageToScreen().join();
+                    updateCanvas(context.imageHolder().getResizedOriginalImage());
                 }
             }
         });
@@ -390,15 +394,13 @@ public class ImageFilterApp extends JFrame {
         if (button.isSelected()) {
             if (context.imageHolder().getResizedOriginalImage() == null) {
                 updateCanvas(context.imageHolder().getOriginalImage());
-            }
-            else {
+            } else {
                 updateCanvas(context.imageHolder().getResizedOriginalImage());
             }
         } else {
             if (context.imageHolder().getResizedCurrentImage() == null) {
                 updateCanvas(context.imageHolder().getCurrentImage());
-            }
-            else {
+            } else {
                 updateCanvas(context.imageHolder().getResizedCurrentImage());
             }
         }
