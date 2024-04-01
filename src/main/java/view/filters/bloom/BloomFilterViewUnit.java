@@ -32,7 +32,7 @@ public class BloomFilterViewUnit extends FilterViewUnit {
             OptionsFactory.settingInteger(
                     5,
                     "radius",
-                    "", 1, 50
+                    "", 1, 10
             )
     );
 
