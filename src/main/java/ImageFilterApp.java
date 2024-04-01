@@ -176,6 +176,13 @@ public class ImageFilterApp extends JFrame {
                 Avtsinova Daria
                 Kulakov Michael
                 Bochkarev Egor\s
+                Mikhail created the `ApplicationContext` data class, which stored the application state, and integrated it into the main program code. He designed and implemented an architecture for managing dialog boxes and saving settings through a common interface, which minimized manually changing settings and launching dialog boxes. Mikhail also provided mechanisms for saving and rolling back image changes.
+                                
+                Egor implemented the `FitToScreen` functionality, which ensured that the image fits the screen size and automatically adjusts it when the screen size changes. He set the minimum application window size to 640x480, added dither buttons for each person, and ensured that the parameter ranges for all filters except individual filters were checked for correctness and saved.
+                                
+                Leonid was responsible for checking the use of tools from `ColorUtils` and `Image` by each filter, excluding direct processing of `BufferedImage`. He also moved the `ImageUtils#copy` method to the `Image` class, using parametric polymorphism, and worked on implementing the task on the dotted line, waiting for the requirements to be clarified.
+                                
+                Dasha, after completing Egor’s work, carried out a final check of the project in accordance with the final checklist. She checked the presence of all buttons, tooltips, undo capabilities in dialog boxes, the correct operation of filters, scrolling and resizing of the window, as well as the implementation of specific project tasks.
                 """;
         helpButton.addActionListener(e -> JOptionPane.showMessageDialog(this, aboutMessage));
         toolBar.add(helpButton);
