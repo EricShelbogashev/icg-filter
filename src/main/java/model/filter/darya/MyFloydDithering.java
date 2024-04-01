@@ -12,8 +12,8 @@ public class MyFloydDithering extends CustomFilter {
 
     public MyFloydDithering(int[] kv) {
         this.quantRed = kv[0];
-        this.quantBlue = kv[1];
-        this.quantGreen = kv[2];
+        this.quantGreen = kv[1];
+        this.quantBlue = kv[2];
     }
 
     float chooseKoeff(int xStep, int yStep) {
