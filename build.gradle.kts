@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     compileOnly("org.jetbrains:annotations:24.1.0")
+    implementation("com.formdev:flatlaf:3.4.1")
 }
 
 tasks.test {

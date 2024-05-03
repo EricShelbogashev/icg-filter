@@ -1,3 +1,4 @@
+import com.formdev.flatlaf.FlatLightLaf;
 import context.ApplicationComponents;
 import context.ApplicationContext;
 import context.ApplicationProperties;
@@ -103,6 +104,7 @@ public class ImageFilterApp extends JFrame {
         SwingUtilities.invokeLater(() -> {
             ImageFilterApp frame = new ImageFilterApp(applicationProperties);
             frame.setVisible(true);
+            FlatLightLaf.setup();
         });
     }
 
